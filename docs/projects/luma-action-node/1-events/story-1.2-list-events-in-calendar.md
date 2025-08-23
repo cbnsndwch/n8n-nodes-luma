@@ -10,50 +10,49 @@
 **So that** I can process multiple events in bulk operations
 
 ## Acceptance Criteria
-- ✅ Support calendar ID input (required)
-- ✅ Support filtering by event state (active, draft, past)
-- ✅ Support filtering by series ID
+- ✅ Support calendar-based event listing (no calendar ID required)
+- ✅ Support filtering by date range (before/after)
+- ✅ Support sorting by start date
 - ✅ Support pagination with limit and cursor
 - ✅ Return structured event list
 
 ## Technical Implementation
 ```typescript
-// Resource: Event  
-// Operation: List
+// Resource: Calendar  
+// Operation: List Events
 // Parameters:
 {
-  calendarId: string (required),
   additionalFields: {
-    eventState?: 'active' | 'draft' | 'past',
-    seriesId?: string,
-    limit?: number,
-    after?: string, // pagination cursor
-    before?: string // pagination cursor
+    before?: string, // ISO 8601 datetime
+    after?: string, // ISO 8601 datetime
+    sortDirection?: 'asc' | 'desc' | 'asc nulls last' | 'desc nulls last',
+    sortColumn?: 'start_at',
+    paginationCursor?: string,
+    paginationLimit?: number
   }
 }
 ```
 
 ## API Endpoint
-- `GET /v1/calendar/list-events` - List events in calendar
+- `GET /public/v1/calendar/list-events` - List events in calendar
 
 ## Test Cases
 - List all events in calendar
-- Filter by active events only
-- Filter by specific series
+- Filter by date range (before/after)
+- Sort events by start date
 - Pagination works correctly
 - Empty calendar returns empty array
 
 ## Definition of Done
-- [ ] Calendar ID parameter validation implemented
-- [ ] Event state filtering working
-- [ ] Series ID filtering implemented
+- [ ] Date range filtering implemented
+- [ ] Sorting by start date working
 - [ ] Pagination with cursors working
 - [ ] Unit tests written and passing
 - [ ] Integration tests completed
 - [ ] Documentation updated
 
 ## Dependencies
-- Calendar must exist before listing events
+- Valid API credentials for calendar access
 
 ## Estimated Effort
 **Story Points:** 5  

@@ -23,35 +23,36 @@ This PRD defines the implementation requirements for a comprehensive Luma Action
 
 ## API Coverage Analysis
 
-Based on Luma's API structure (`/v{version}/{resource}/{action}`), the action node should support:
+Based on Luma's actual API structure (`/public/v1/{resource}/{action}`), the action node should support:
 
-### Core Resources
-1. **Events** - Primary resource for event management
-2. **Calendars** - Container and organization management
-3. **Guests** - Attendee and registration management  
-4. **Tickets** - Ticket types and pricing management
-5. **Coupons** - Discount and promotion management
-6. **People** - Contact and attendee data management
-7. **User** - Account and profile management
+### Core Resources (Based on Actual API)
+1. **Events** - Primary resource for event management and guest operations
+2. **Calendar** - List operations for events, people, and coupons
+3. **Coupons** - Event and calendar-level discount management
+4. **People & Tags** - Contact management and tagging system
+5. **User** - Account information access
+6. **Images** - Upload functionality for event assets
+7. **Entity** - Lookup operations by slug
 
-### Core Operations
-- **List** - Get multiple resources with filtering
-- **Get** - Retrieve single resource by ID
-- **Create** - Add new resources
-- **Update** - Modify existing resources  
-- **Delete** - Remove resources
+### Available Operations (Per Actual API)
+- **Get/List** - Retrieve single resources or filtered collections
+- **Create** - Add new events, coupons, tags, guests
+- **Update** - Modify existing events, coupons, tags, guest status
+- **Add/Import** - Add guests to events, import people to calendars
+- **Send** - Send invitations and notifications
+- **Delete** - Limited to person tags only
+- **Lookup** - Entity resolution by slug
 
-## Epic Structure
+## Epic Structure (Aligned with GitHub Issues)
 
-The implementation is organized into 7 main epics, each focusing on a specific resource area:
+The implementation is organized into 4 main epics, each aligned with actual API capabilities and existing GitHub issues:
 
-1. **Epic 1: Core Event Management** (`1-events/epic.md`)
-2. **Epic 2: Calendar Operations** (`2-calendars/epic.md`)  
-3. **Epic 3: Guest & RSVP Management** (`3-guests/epic.md`)
-4. **Epic 4: Ticket Management** (`4-tickets/epic.md`)
-5. **Epic 5: Coupon & Promotion Management** (`5-coupons/epic.md`)
-6. **Epic 6: People & Contact Management** (`6-people/epic.md`)
-7. **Epic 7: User & Account Operations** (`7-users/epic.md`)
+1. **Epic 1: Core Event Management** (`1-events/epic.md`) - Event CRUD and host management (GitHub Issue #10)
+2. **Epic 2: Calendar Operations** (`2-calendars/epic.md`) - Calendar event listing, people management, and coupons (GitHub Issue #16)  
+3. **Epic 3: Guest & RSVP Management** (`3-guests/epic.md`) - Event guest operations and status management (GitHub Issue #24)
+4. **Epic 4: Ticket Management** (`4-tickets/epic.md`) - Coupon-based pricing and discount operations (GitHub Issue #34)
+
+**Note:** The original documentation planned 7 epics, but after analyzing the actual Luma API specification, only 4 epics are needed to cover all available functionality. The API does not support many operations originally assumed (calendar CRUD, dedicated ticket management, separate user management).
 
 ## Implementation Principles
 
@@ -98,32 +99,34 @@ The implementation is organized into 7 main epics, each focusing on a specific r
 
 ### API Constraints
 - Rate limiting considerations
-- Per-route versioning (v1, v2 endpoints)
-- POST-based write operations
+- All endpoints use `/public/v1/` prefix
+- POST-based write operations (no PUT or DELETE for most operations)
 - JSON request/response format
+- Limited delete operations (only person tags)
 
 ## Risk Assessment
 
 ### High Priority Risks
-1. **API Changes**: Luma's evolving API with per-route versioning
+1. **API Limitations**: Not all expected CRUD operations are available
 2. **Rate Limiting**: Potential throttling with high-volume operations
 3. **Complex Data Models**: Rich event/guest data structures
+4. **Limited Calendar Management**: No direct calendar CRUD operations
 
 ### Mitigation Strategies
-1. **Version Management**: Support multiple API versions per endpoint
+1. **Scope Management**: Focus on available operations rather than assumed ones
 2. **Rate Limit Handling**: Implement exponential backoff and retry logic
 3. **Data Validation**: Comprehensive input/output validation
+4. **Alternative Workflows**: Use available operations to achieve desired outcomes
 
 ## Timeline & Delivery
 
-### Implementation Order (Recommended)
-1. **Epic 1: Core Event Management** - Foundation operations
-2. **Epic 3: Guest & RSVP Management** - High-value user scenarios  
-3. **Epic 2: Calendar Operations** - Organizational features
-4. **Epic 4: Ticket Management** - Monetization features
-5. **Epic 5: Coupon Management** - Marketing features
-6. **Epic 6: People Management** - Advanced CRM features
-7. **Epic 7: User Operations** - Administrative features
+### Implementation Order (Revised for Actual API)
+1. **Epic 1: Core Event Management** - Foundation operations (create, update, get)
+2. **Epic 2: Event Guest Operations** - High-value user scenarios (add, invite, status updates)
+3. **Epic 3: Calendar List Operations** - Discovery and listing features
+4. **Epic 4: Coupon Management** - Marketing and discount features
+5. **Epic 5: People & Tag Management** - Contact organization features
+6. **Epic 6: Utility Operations** - Supporting features (lookup, upload, user info)
 
 ### Delivery Strategy
 - Each epic can be implemented and tested independently

@@ -11,15 +11,16 @@ Implement core event management operations for the Luma Action Node, enabling us
 
 ## API Endpoints Covered
 
-Based on Luma's API conventions (`/v{version}/{resource}/{action}`):
+Based on Luma's actual API structure (`/public/v1/{resource}/{action}`):
 
 ### Event Operations
-- `GET /v1/event/get` - Get single event details
-- `GET /v1/calendar/list-events` - List events in calendar  
-- `POST /v1/event/create` - Create new event
-- `POST /v1/event/update` - Update existing event
-- `POST /v1/event/delete` - Delete event
-- `GET /v1/event/get-schema` - Get event schema/metadata
+- `GET /public/v1/event/get` - Get single event details
+- `GET /public/v1/calendar/list-events` - List events in calendar  
+- `POST /public/v1/event/create` - Create new event
+- `POST /public/v1/event/update` - Update existing event
+- `POST /public/v1/event/add-host` - Add host to event
+
+Note: Event deletion is not available in the current API.
 
 ## User Stories
 
@@ -29,31 +30,31 @@ This epic contains 5 user stories that implement core event management functiona
 Retrieve detailed information about a specific event for use in workflow logic.
 - **Priority:** High
 - **Story Points:** 3
-- **API:** `GET /v1/event/get`
+- **API:** `GET /public/v1/event/get`
 
 ### [Story 1.2: List Events in Calendar](./story-1.2-list-events-in-calendar.md)
 Retrieve a list of events from a calendar for bulk operations.
 - **Priority:** High  
 - **Story Points:** 5
-- **API:** `GET /v1/calendar/list-events`
+- **API:** `GET /public/v1/calendar/list-events`
 
 ### [Story 1.3: Create New Event](./story-1.3-create-new-event.md)
 Create new events programmatically to automate event creation from external sources.
 - **Priority:** High
 - **Story Points:** 8
-- **API:** `POST /v1/event/create`
+- **API:** `POST /public/v1/event/create`
 
 ### [Story 1.4: Update Existing Event](./story-1.4-update-existing-event.md)
 Modify existing event details to keep event information current and accurate.
 - **Priority:** Medium
 - **Story Points:** 5
-- **API:** `POST /v1/event/update`
+- **API:** `POST /public/v1/event/update`
 
-### [Story 1.5: Delete Event](./story-1.5-delete-event.md)
-Remove events that are no longer needed to maintain clean event listings.
-- **Priority:** Low
+### [Story 1.5: Add Event Host](./story-1.5-add-event-host.md)
+Add additional hosts to events for collaborative event management.
+- **Priority:** Medium
 - **Story Points:** 3
-- **API:** `POST /v1/event/delete`
+- **API:** `POST /public/v1/event/add-host`
 
 **Total Story Points:** 24
 

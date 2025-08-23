@@ -42,7 +42,7 @@
 ```
 
 ## API Endpoint
-- `POST /v1/event/create` - Create new event
+- `POST /public/v1/event/create` - Create new event
 
 ## Test Cases
 - Create minimal event (name, time, calendar)

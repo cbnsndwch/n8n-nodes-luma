@@ -5,21 +5,20 @@ Implement comprehensive guest and RSVP management operations for the Luma Action
 
 ## Epic Goals
 - Enable complete guest lifecycle management
-- Support RSVP approval workflows
+- Support RSVP approval workflows  
 - Handle guest data and communication
 - Provide bulk guest operations
 
 ## API Endpoints Covered
 
+Based on Luma's actual API structure (`/public/v1/event/{action}`):
+
 ### Guest Operations
-- `GET /v1/event/get-guests` - List event guests
-- `GET /v1/guest/get` - Get single guest details
-- `POST /v1/guest/register` - Register guest for event
-- `POST /v1/guest/update` - Update guest information
-- `POST /v1/guest/approve` - Approve guest registration
-- `POST /v1/guest/reject` - Reject guest registration
-- `POST /v1/guest/cancel` - Cancel guest registration
-- `POST /v1/guest/check-in` - Check in guest at event
+- `GET /public/v1/event/get-guest` - Get single guest details
+- `GET /public/v1/event/get-guests` - List event guests with filtering
+- `POST /public/v1/event/add-guests` - Add/register guests to event
+- `POST /public/v1/event/update-guest-status` - Update guest approval status
+- `POST /public/v1/event/send-invites` - Send invitations to guests
 
 ## User Stories
 
@@ -29,25 +28,25 @@ This epic contains 8 user stories that implement comprehensive guest and RSVP ma
 Retrieve all guests for a specific event to manage attendee lists and communications.
 - **Priority:** High
 - **Story Points:** 5
-- **API:** `GET /v1/event/get-guests`
+- **API:** `GET /public/v1/event/get-guests`
 
 ### [Story 3.2: Get Guest Details](./story-3.2-get-guest-details.md)
 Retrieve detailed information about a specific guest for individual registration data access.
 - **Priority:** Medium
 - **Story Points:** 3
-- **API:** `GET /v1/guest/get`
+- **API:** `GET /public/v1/event/get-guest`
 
 ### [Story 3.3: Register Guest for Event](./story-3.3-register-guest-for-event.md)
 Register guests for events programmatically to automate registration processes.
 - **Priority:** High
 - **Story Points:** 8
-- **API:** `POST /v1/guest/register`
+- **API:** `POST /public/v1/event/add-guests`
 
-### [Story 3.4: Update Guest Information](./story-3.4-update-guest-information.md)
-Modify existing guest registration details to keep attendee information current.
-- **Priority:** Medium
+### [Story 3.4: Update Guest Status](./story-3.4-update-guest-status.md)
+Modify guest approval status and other guest properties.
+- **Priority:** High
 - **Story Points:** 5
-- **API:** `POST /v1/guest/update`
+- **API:** `POST /public/v1/event/update-guest-status`
 
 ### [Story 3.5: Approve Guest Registration](./story-3.5-approve-guest-registration.md)
 Approve pending guest registrations to automate approval workflows.

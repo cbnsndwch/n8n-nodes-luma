@@ -1,52 +1,57 @@
-# [PROJ_002] Epic 4: Ticket Management
+# [PROJ_002] Epic 4: Ticket Management (Coupon-Based)
 
 ## Overview
-Implement comprehensive ticket type and pricing management operations for the Luma Action Node, enabling users to configure event pricing, manage ticket availability, and handle ticket-related operations through n8n workflows.
+Implement ticket pricing and discount management operations for the Luma Action Node through coupon functionality, enabling users to manage event pricing, discounts, and promotional offers through n8n workflows.
+
+**Note:** Luma's API does not provide direct ticket type management endpoints. Ticket pricing is managed through coupon discounts applied to base event pricing.
 
 ## Epic Goals
-- Enable complete ticket type lifecycle management
-- Support dynamic pricing and availability control
-- Handle ticket inventory and capacity limits
-- Provide ticket analytics and reporting
+- Enable coupon-based pricing and discount management
+- Support both event-level and calendar-level coupons
+- Handle promotional campaigns and discount workflows
+- Provide coupon analytics and usage tracking
 
 ## API Endpoints Covered
 
-### Ticket Operations
-- `GET /v1/event/ticket-types/list` - List ticket types for event
-- `GET /v1/event/ticket-types/get` - Get single ticket type details
-- `POST /v1/event/ticket-types/create` - Create new ticket type
-- `POST /v1/event/ticket-types/update` - Update ticket type configuration
-- `POST /v1/event/ticket-types/delete` - Delete ticket type
-- `GET /v1/event/ticket-types/analytics` - Get ticket sales analytics
-- `POST /v1/event/ticket-types/bulk-update` - Bulk update ticket types
+Based on Luma's actual API structure for coupon operations:
+
+### Event Coupon Operations
+- `GET /public/v1/event/coupons` - List event coupons
+- `POST /public/v1/event/create-coupon` - Create event coupon
+- `POST /public/v1/event/update-coupon` - Update event coupon
+
+### Calendar Coupon Operations  
+- `GET /public/v1/calendar/coupons` - List calendar coupons
+- `POST /public/v1/calendar/coupons/create` - Create calendar coupon
+- `PUT /public/v1/calendar/coupons/update` - Update calendar coupon
 
 ## User Stories
 
-This epic contains 7 user stories that implement comprehensive ticket management functionality:
+This epic contains 7 user stories that implement coupon-based ticket management functionality:
 
-### [Story 4.1: List Event Ticket Types](./story-4.1-list-event-ticket-types.md)
-Retrieve all ticket types for a specific event to understand pricing structure and availability.
+### [Story 4.1: List Event Coupons](./story-4.1-list-event-coupons.md)
+Retrieve all coupons for a specific event to understand discount availability and usage.
 - **Priority:** High
 - **Story Points:** 3
-- **API:** `GET /v1/event/ticket-types/list`
+- **API:** `GET /public/v1/event/coupons`
 
-### [Story 4.2: Get Ticket Type Details](./story-4.2-get-ticket-type-details.md)
-Retrieve detailed information about a specific ticket type for configuration access.
-- **Priority:** High
+### [Story 4.2: Get Coupon Details](./story-4.2-get-coupon-details.md)
+Retrieve detailed information about specific coupons for configuration and analytics.
+- **Priority:** Medium
 - **Story Points:** 3
-- **API:** `GET /v1/event/ticket-types/get`
+- **API:** Derived from list operations
 
-### [Story 4.3: Create New Ticket Type](./story-4.3-create-new-ticket-type.md)
-Create new ticket types programmatically to automate event pricing setup.
+### [Story 4.3: Create Event Coupon](./story-4.3-create-event-coupon.md)
+Create new event-specific coupons to manage promotional pricing.
 - **Priority:** High
 - **Story Points:** 8
-- **API:** `POST /v1/event/ticket-types/create`
+- **API:** `POST /public/v1/event/create-coupon`
 
-### [Story 4.4: Update Ticket Type Configuration](./story-4.4-update-ticket-type-configuration.md)
-Modify existing ticket type settings to adjust pricing and availability.
+### [Story 4.4: Update Event Coupon](./story-4.4-update-event-coupon.md)
+Modify existing event coupon settings to adjust discount terms.
 - **Priority:** Medium
 - **Story Points:** 5
-- **API:** `POST /v1/event/ticket-types/update`
+- **API:** `POST /public/v1/event/update-coupon`
 
 ### [Story 4.5: Delete Ticket Type](./story-4.5-delete-ticket-type.md)
 Remove ticket types that are no longer needed to clean up pricing structure.

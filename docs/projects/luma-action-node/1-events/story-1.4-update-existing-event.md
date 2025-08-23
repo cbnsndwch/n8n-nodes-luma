@@ -38,7 +38,7 @@
 ```
 
 ## API Endpoint
-- `POST /v1/event/update` - Update existing event
+- `POST /public/v1/event/update` - Update existing event
 
 ## Test Cases
 - Update single field preserves others

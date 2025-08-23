@@ -13,7 +13,7 @@
 - ✅ Support event ID input (required)
 - ✅ Return complete event object with all metadata
 - ✅ Handle non-existent event gracefully
-- ✅ Support both admin view and public view options
+- ✅ Support admin-level event information access
 
 ## Technical Implementation
 ```typescript
@@ -21,15 +21,12 @@
 // Operation: Get
 // Parameters:
 {
-  eventId: string (required),
-  additionalFields: {
-    view?: 'admin' | 'public'
-  }
+  eventId: string (required) // api_id parameter
 }
 ```
 
 ## API Endpoint
-- `GET /v1/event/get` - Get single event details
+- `GET /public/v1/event/get` - Get single event details
 
 ## Test Cases
 - Valid event ID returns event data
