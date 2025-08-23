@@ -18,7 +18,14 @@
         "format": "prettier nodes credentials --write",
         "lint": "eslint nodes credentials package.json",
         "lintfix": "eslint nodes credentials package.json --fix",
-        "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+        "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
+        "test:local:setup": "tsx .n8n/scripts/setup.ts",
+        "test:local:start": "tsx .n8n/scripts/start-n8n.ts",
+        "test:local:link": "tsx .n8n/scripts/link-nodes.ts",
+        "test:local:health": "tsx .n8n/scripts/health-check.ts",
+        "test:local": "pnpm run build && pnpm run test:local:link && pnpm run test:local:start",
+        "dev:local": "concurrently \"pnpm run dev\" \"pnpm run test:local:watch\"",
+        "test:local:watch": "tsx .n8n/scripts/link-nodes.ts --clean && tsx .n8n/scripts/start-n8n.ts"
     },
     "files": [
         "dist"
@@ -26,6 +33,7 @@
     "main": "dist/index.js",
     "devDependencies": {
         "@typescript-eslint/parser": "~8.40.0",
+        "concurrently": "^9.0.1",
         "eslint": "^8.57.0",
         "eslint-plugin-n8n-nodes-base": "^1.16.3",
         "gulp": "^5.0.1",
