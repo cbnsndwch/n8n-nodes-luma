@@ -13,7 +13,8 @@ export class Luma implements INodeType {
 		icon: 'file:luma.svg',
 		group: ['output'],
 		version: 1,
-		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
+		subtitle:
+			'={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description: 'Consume Luma API',
 		defaults: {
 			name: 'Luma',
@@ -74,7 +75,8 @@ export class Luma implements INodeType {
 				if (operation === 'getMany') {
 					// Placeholder for getting events
 					const responseData = {
-						message: 'Luma node is set up and ready for implementation',
+						message:
+							'Luma node is set up and ready for implementation',
 						resource,
 						operation,
 					};
