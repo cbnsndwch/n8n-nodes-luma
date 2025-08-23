@@ -24,8 +24,9 @@
         "test:local:link": "tsx .n8n/scripts/link-nodes.ts",
         "test:local:health": "tsx .n8n/scripts/health-check.ts",
         "test:local": "pnpm run build && pnpm run test:local:link && pnpm run test:local:start",
-        "dev:local": "concurrently \"pnpm run dev\" \"pnpm run test:local:watch\"",
-        "test:local:watch": "tsx .n8n/scripts/link-nodes.ts --clean && tsx .n8n/scripts/start-n8n.ts"
+        "dev:local": "concurrently \"pnpm run dev\" \"tsx .n8n/scripts/watch.ts\"",
+        "test:local:help": "tsx .n8n/scripts/help.ts",
+        "test:local:watch": "tsx .n8n/scripts/watch.ts"
     },
     "files": [
         "dist"
