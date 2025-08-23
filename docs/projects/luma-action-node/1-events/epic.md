@@ -15,12 +15,12 @@ Based on Luma's actual API structure (`/public/v1/{resource}/{action}`):
 
 ### Event Operations
 - `GET /public/v1/event/get` - Get single event details
-- `GET /public/v1/calendar/list-events` - List events in calendar  
 - `POST /public/v1/event/create` - Create new event
 - `POST /public/v1/event/update` - Update existing event
 - `POST /public/v1/event/add-host` - Add host to event
 
-Note: Event deletion is not available in the current API.
+**Note:** Event listing within calendars is covered in Epic 2 (Calendar Operations).  
+**Note:** Event deletion is not available in the current API.
 
 ## User Stories
 

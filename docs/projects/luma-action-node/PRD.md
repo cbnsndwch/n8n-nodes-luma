@@ -43,16 +43,17 @@ Based on Luma's actual API structure (`/public/v1/{resource}/{action}`), the act
 - **Delete** - Limited to person tags only
 - **Lookup** - Entity resolution by slug
 
-## Epic Structure (Aligned with GitHub Issues)
+## Epic Structure (Aligned with GitHub Issues + Utilities)
 
-The implementation is organized into 4 main epics, each aligned with actual API capabilities and existing GitHub issues:
+The implementation is organized into 5 main epics, covering all available API functionality:
 
 1. **Epic 1: Core Event Management** (`1-events/epic.md`) - Event CRUD and host management (GitHub Issue #10)
 2. **Epic 2: Calendar Operations** (`2-calendars/epic.md`) - Calendar event listing, people management, and coupons (GitHub Issue #16)  
 3. **Epic 3: Guest & RSVP Management** (`3-guests/epic.md`) - Event guest operations and status management (GitHub Issue #24)
-4. **Epic 4: Ticket Management** (`4-tickets/epic.md`) - Coupon-based pricing and discount operations (GitHub Issue #34)
+4. **Epic 4: Ticket Management** (`4-tickets/epic.md`) - Event coupon-based pricing and discount operations (GitHub Issue #34)
+5. **Epic 5: Utility Operations** (`5-utilities/epic.md`) - User info, entity lookup, and image upload support
 
-**Note:** The original documentation planned 7 epics, but after analyzing the actual Luma API specification, only 4 epics are needed to cover all available functionality. The API does not support many operations originally assumed (calendar CRUD, dedicated ticket management, separate user management).
+**API Coverage:** All 27 endpoints from the Luma OpenAPI specification are now covered across these 5 epics with no overlaps or gaps.
 
 ## Implementation Principles
 

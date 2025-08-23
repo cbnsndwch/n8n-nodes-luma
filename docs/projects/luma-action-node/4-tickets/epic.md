@@ -20,14 +20,11 @@ Based on Luma's actual API structure for coupon operations:
 - `POST /public/v1/event/create-coupon` - Create event coupon
 - `POST /public/v1/event/update-coupon` - Update event coupon
 
-### Calendar Coupon Operations  
-- `GET /public/v1/calendar/coupons` - List calendar coupons
-- `POST /public/v1/calendar/coupons/create` - Create calendar coupon
-- `PUT /public/v1/calendar/coupons/update` - Update calendar coupon
+**Note:** Calendar-level coupon operations are covered in Epic 2 (Calendar Operations).
 
 ## User Stories
 
-This epic contains 7 user stories that implement coupon-based ticket management functionality:
+This epic contains 6 user stories that implement event coupon management functionality:
 
 ### [Story 4.1: List Event Coupons](./story-4.1-list-event-coupons.md)
 Retrieve all coupons for a specific event to understand discount availability and usage.
