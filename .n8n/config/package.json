@@ -1,0 +1,16 @@
+{
+  "name": "@cbnsndwch/n8n-nodes-luma-local",
+  "version": "0.1.0",
+  "description": "Local development package for n8n Luma nodes",
+  "private": true,
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "credentials/LumaApi.credentials.js"
+    ],
+    "nodes": [
+      "nodes/Luma/Luma.node.js",
+      "nodes/LumaTrigger/LumaTrigger.node.js"
+    ]
+  }
+}
