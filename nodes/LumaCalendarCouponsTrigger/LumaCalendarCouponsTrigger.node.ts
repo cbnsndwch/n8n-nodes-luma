@@ -62,7 +62,10 @@ export class LumaCalendarCouponsTrigger implements INodeType {
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
 		const calendarId = this.getNodeParameter('calendarId') as string;
-		const additionalFields = this.getNodeParameter('additionalFields', {}) as IDataObject;
+		const additionalFields = this.getNodeParameter(
+			'additionalFields',
+			{},
+		) as IDataObject;
 
 		// Get static data for maintaining state
 		const staticData = this.getWorkflowStaticData('global');
@@ -107,7 +110,7 @@ export class LumaCalendarCouponsTrigger implements INodeType {
 
 				for (const coupon of coupons) {
 					const couponId = coupon.coupon_id || coupon.id;
-					
+
 					// Skip if we've already seen this coupon
 					if (!seenCouponIds.includes(couponId)) {
 						newCoupons.push({
@@ -138,7 +141,6 @@ export class LumaCalendarCouponsTrigger implements INodeType {
 
 					this.emit([newCoupons]);
 				}
-
 			} catch (error) {
 				// Handle rate limiting with exponential backoff
 				if (error.response?.status === 429) {
@@ -147,7 +149,10 @@ export class LumaCalendarCouponsTrigger implements INodeType {
 				}
 
 				// Log other errors but don't stop polling
-				this.logger?.error('Luma Calendar Coupons Trigger error:', error.message);
+				this.logger?.error(
+					'Luma Calendar Coupons Trigger error:',
+					error.message,
+				);
 			}
 		};
 

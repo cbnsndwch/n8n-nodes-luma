@@ -62,7 +62,10 @@ export class LumaPeopleTrigger implements INodeType {
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
 		const calendarId = this.getNodeParameter('calendarId') as string;
-		const additionalFields = this.getNodeParameter('additionalFields', {}) as IDataObject;
+		const additionalFields = this.getNodeParameter(
+			'additionalFields',
+			{},
+		) as IDataObject;
 
 		// Get static data for maintaining state
 		const staticData = this.getWorkflowStaticData('global');
@@ -107,7 +110,7 @@ export class LumaPeopleTrigger implements INodeType {
 
 				for (const person of people) {
 					const personId = person.person_id || person.id;
-					
+
 					// Skip if we've already seen this person
 					if (!seenPeopleIds.includes(personId)) {
 						newPeople.push({
@@ -131,14 +134,15 @@ export class LumaPeopleTrigger implements INodeType {
 				if (newPeople.length > 0) {
 					// Sort by creation time if available
 					newPeople.sort((a, b) => {
-						const timeA = a.json.created_at || a.json.joined_at || '';
-						const timeB = b.json.created_at || b.json.joined_at || '';
+						const timeA =
+							a.json.created_at || a.json.joined_at || '';
+						const timeB =
+							b.json.created_at || b.json.joined_at || '';
 						return timeA.localeCompare(timeB);
 					});
 
 					this.emit([newPeople]);
 				}
-
 			} catch (error) {
 				// Handle rate limiting with exponential backoff
 				if (error.response?.status === 429) {

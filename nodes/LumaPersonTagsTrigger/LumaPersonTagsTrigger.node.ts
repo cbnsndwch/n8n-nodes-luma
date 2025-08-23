@@ -62,7 +62,10 @@ export class LumaPersonTagsTrigger implements INodeType {
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
 		const calendarId = this.getNodeParameter('calendarId') as string;
-		const additionalFields = this.getNodeParameter('additionalFields', {}) as IDataObject;
+		const additionalFields = this.getNodeParameter(
+			'additionalFields',
+			{},
+		) as IDataObject;
 
 		// Get static data for maintaining state
 		const staticData = this.getWorkflowStaticData('global');
@@ -107,7 +110,7 @@ export class LumaPersonTagsTrigger implements INodeType {
 
 				for (const tag of tags) {
 					const tagId = tag.tag_id || tag.id;
-					
+
 					// Skip if we've already seen this tag
 					if (!seenTagIds.includes(tagId)) {
 						newTags.push({
@@ -138,7 +141,6 @@ export class LumaPersonTagsTrigger implements INodeType {
 
 					this.emit([newTags]);
 				}
-
 			} catch (error) {
 				// Handle rate limiting with exponential backoff
 				if (error.response?.status === 429) {
@@ -147,7 +149,10 @@ export class LumaPersonTagsTrigger implements INodeType {
 				}
 
 				// Log other errors but don't stop polling
-				this.logger?.error('Luma Person Tags Trigger error:', error.message);
+				this.logger?.error(
+					'Luma Person Tags Trigger error:',
+					error.message,
+				);
 			}
 		};
 

@@ -83,7 +83,10 @@ export class LumaEventGuestsTrigger implements INodeType {
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
 		const eventId = this.getNodeParameter('eventId') as string;
-		const additionalFields = this.getNodeParameter('additionalFields', {}) as IDataObject;
+		const additionalFields = this.getNodeParameter(
+			'additionalFields',
+			{},
+		) as IDataObject;
 
 		// Get static data for maintaining state
 		const staticData = this.getWorkflowStaticData('global');
@@ -132,7 +135,7 @@ export class LumaEventGuestsTrigger implements INodeType {
 
 				for (const guest of guests) {
 					const guestId = guest.guest_id || guest.id;
-					
+
 					// Skip if we've already seen this guest
 					if (!seenGuestIds.includes(guestId)) {
 						newGuests.push({
@@ -156,14 +159,15 @@ export class LumaEventGuestsTrigger implements INodeType {
 				if (newGuests.length > 0) {
 					// Sort by creation time if available
 					newGuests.sort((a, b) => {
-						const timeA = a.json.created_at || a.json.registered_at || '';
-						const timeB = b.json.created_at || b.json.registered_at || '';
+						const timeA =
+							a.json.created_at || a.json.registered_at || '';
+						const timeB =
+							b.json.created_at || b.json.registered_at || '';
 						return timeA.localeCompare(timeB);
 					});
 
 					this.emit([newGuests]);
 				}
-
 			} catch (error) {
 				// Handle rate limiting with exponential backoff
 				if (error.response?.status === 429) {
@@ -172,7 +176,10 @@ export class LumaEventGuestsTrigger implements INodeType {
 				}
 
 				// Log other errors but don't stop polling
-				this.logger?.error('Luma Event Guests Trigger error:', error.message);
+				this.logger?.error(
+					'Luma Event Guests Trigger error:',
+					error.message,
+				);
 			}
 		};
 

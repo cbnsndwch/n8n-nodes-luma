@@ -56,7 +56,7 @@ export class LumaEventsTrigger implements INodeType {
 						value: '15s',
 					},
 					{
-						name: 'Every 30 Seconds', 
+						name: 'Every 30 Seconds',
 						value: '30s',
 					},
 					{
@@ -135,7 +135,10 @@ export class LumaEventsTrigger implements INodeType {
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
 		const calendarId = this.getNodeParameter('calendarId') as string;
-		const additionalFields = this.getNodeParameter('additionalFields', {}) as IDataObject;
+		const additionalFields = this.getNodeParameter(
+			'additionalFields',
+			{},
+		) as IDataObject;
 
 		// Get static data for maintaining state
 		const staticData = this.getWorkflowStaticData('global');
@@ -186,7 +189,7 @@ export class LumaEventsTrigger implements INodeType {
 
 				for (const event of events) {
 					const eventId = event.event_id || event.id;
-					
+
 					// Skip if we've already seen this event
 					if (!seenEventIds.includes(eventId)) {
 						newEvents.push({
@@ -210,14 +213,15 @@ export class LumaEventsTrigger implements INodeType {
 				if (newEvents.length > 0) {
 					// Sort by creation time if available
 					newEvents.sort((a, b) => {
-						const timeA = a.json.created_at || a.json.start_at || '';
-						const timeB = b.json.created_at || b.json.start_at || '';
+						const timeA =
+							a.json.created_at || a.json.start_at || '';
+						const timeB =
+							b.json.created_at || b.json.start_at || '';
 						return timeA.localeCompare(timeB);
 					});
 
 					this.emit([newEvents]);
 				}
-
 			} catch (error) {
 				// Handle rate limiting with exponential backoff
 				if (error.response?.status === 429) {
