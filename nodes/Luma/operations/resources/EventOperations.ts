@@ -72,6 +72,12 @@ export class EventOperations extends BaseOperations {
         if (additionalFields.eventState) {
             qs.event_state = additionalFields.eventState as string;
         }
+        if (additionalFields.after) {
+            qs.after = additionalFields.after as string;
+        }
+        if (additionalFields.before) {
+            qs.before = additionalFields.before as string;
+        }
 
         const responseData = await this.executeRequest(context, {
             method: 'GET',

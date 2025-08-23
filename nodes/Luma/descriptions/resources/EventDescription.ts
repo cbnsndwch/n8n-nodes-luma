@@ -4,7 +4,9 @@ import {
     limitField,
     visibilityField,
     approvalRequiredField,
-    capacityField
+    capacityField,
+    afterCursorField,
+    beforeCursorField
 } from '../shared/CommonFields';
 import {
     locationTypeField,
@@ -166,6 +168,25 @@ export const seriesIdField: INodeProperties = {
     description: 'Filter events by series ID (for getMany operation)'
 };
 
+// Pagination cursor fields for getMany operation
+export const eventAfterCursorField: INodeProperties = {
+    ...afterCursorField,
+    displayOptions: {
+        show: {
+            '/operation': ['getMany']
+        }
+    }
+};
+
+export const eventBeforeCursorField: INodeProperties = {
+    ...beforeCursorField,
+    displayOptions: {
+        show: {
+            '/operation': ['getMany']
+        }
+    }
+};
+
 // Additional fields collection for events
 export const eventAdditionalFields: INodeProperties = {
     displayName: 'Additional Fields',
@@ -217,6 +238,8 @@ export const eventAdditionalFields: INodeProperties = {
         // Fields for getMany operation
         eventStateField,
         limitField,
-        seriesIdField
+        seriesIdField,
+        eventAfterCursorField,
+        eventBeforeCursorField
     ]
 };
