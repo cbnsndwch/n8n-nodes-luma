@@ -176,21 +176,47 @@ export const eventAdditionalFields: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['event'],
-            operation: ['create', 'update', 'getMany']
+            operation: ['create', 'update', 'getMany', 'get']
         }
     },
     options: [
+        // Fields for get operation
+        {
+            displayName: 'View',
+            name: 'view',
+            type: 'options',
+            displayOptions: {
+                show: {
+                    '/operation': ['get']
+                }
+            },
+            options: [
+                {
+                    name: 'Public',
+                    value: 'public'
+                },
+                {
+                    name: 'Admin',
+                    value: 'admin'
+                }
+            ],
+            default: 'public',
+            description:
+                'Choose between public view (excludes sensitive data) or admin view (includes private fields)'
+        },
+        // Fields for create/update operations
         approvalRequiredField,
         capacityField,
         endDateField,
-        eventStateField,
-        limitField,
         locationAddressField,
         locationNameField,
         locationTypeField,
         locationUrlField,
-        seriesIdField,
         timezoneField,
-        visibilityField
+        visibilityField,
+        // Fields for getMany operation
+        eventStateField,
+        limitField,
+        seriesIdField
     ]
 };

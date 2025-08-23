@@ -20,12 +20,24 @@ export class EventOperations extends BaseOperations {
             context.itemIndex
         ) as string;
 
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: IDataObject = {
+            event_id: eventId
+        };
+
+        // Add view parameter if specified
+        if (additionalFields.view) {
+            qs.view = additionalFields.view as string;
+        }
+
         const responseData = await this.executeRequest(context, {
             method: 'GET',
             url: 'https://api.lu.ma/public/v1/event/get',
-            qs: {
-                event_id: eventId
-            }
+            qs
         });
 
         return this.createReturnItem(responseData, context.itemIndex);
