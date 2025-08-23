@@ -41,7 +41,7 @@ class N8nStarter {
    */
   private loadEnvironmentVariables(): void {
     if (!existsSync(ENV_FILE)) {
-      throw new Error(`Environment file not found: ${ENV_FILE}. Run 'pnpm run test:local:setup' first.`);
+      throw new Error(`Environment file not found: ${ENV_FILE}. Run 'pnpm run n8n:setup' first.`);
     }
 
     this.log('Loading environment variables...');
@@ -73,7 +73,7 @@ class N8nStarter {
     this.log('Validating custom nodes...');
 
     if (!existsSync(CUSTOM_NODES_DIR)) {
-      throw new Error(`Custom nodes directory not found: ${CUSTOM_NODES_DIR}. Run 'pnpm run test:local:link' first.`);
+      throw new Error(`Custom nodes directory not found: ${CUSTOM_NODES_DIR}. Run 'pnpm run n8n:link' first.`);
     }
 
     // Check for required node files
@@ -86,7 +86,7 @@ class N8nStarter {
     for (const file of requiredFiles) {
       const filePath = join(CUSTOM_NODES_DIR, file);
       if (!existsSync(filePath)) {
-        throw new Error(`Required node file missing: ${file}. Run 'pnpm run test:local:link' first.`);
+        throw new Error(`Required node file missing: ${file}. Run 'pnpm run n8n:link' first.`);
       }
     }
 
@@ -182,10 +182,10 @@ class N8nStarter {
     } catch (error) {
       console.error('\n❌ Failed to start n8n:', (error as Error).message);
       console.error('\nTroubleshooting steps:');
-      console.error('  1. Run: pnpm run test:local:setup');
+      console.error('  1. Run: pnpm run n8n:setup');
       console.error('  2. Run: pnpm run build');
-      console.error('  3. Run: pnpm run test:local:link');
-      console.error('  4. Try again: pnpm run test:local:start');
+      console.error('  3. Run: pnpm run n8n:link');
+      console.error('  4. Try again: pnpm run n8n:start');
       process.exit(1);
     }
   }
@@ -215,9 +215,9 @@ Options:
 This script starts n8n with custom Luma nodes loaded from the local environment.
 
 Prerequisites:
-  1. Run 'pnpm run test:local:setup' to set up the environment
+  1. Run 'pnpm run n8n:setup' to set up the environment
   2. Run 'pnpm run build' to build the nodes
-  3. Run 'pnpm run test:local:link' to link the nodes
+  3. Run 'pnpm run n8n:link' to link the nodes
 
 Then you can start n8n with this script.
 `);

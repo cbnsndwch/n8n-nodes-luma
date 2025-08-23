@@ -207,7 +207,7 @@ class NodeLinker {
 
       console.log('\n✅ Node linking complete!');
       console.log('\nYour nodes are now available in the local n8n environment.');
-      console.log('Next step: pnpm run test:local:start');
+      console.log('Next step: pnpm run n8n:start');
 
     } catch (error) {
       console.error('\n❌ Node linking failed:', (error as Error).message);

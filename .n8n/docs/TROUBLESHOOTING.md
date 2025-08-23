@@ -35,7 +35,7 @@ npx tsx .n8n/scripts/setup.ts
 **Solution**:
 ```bash
 pnpm run build
-pnpm run test:local:link
+pnpm run n8n:link
 ```
 
 #### "Environment file not found"
@@ -43,7 +43,7 @@ pnpm run test:local:link
 
 **Solution**:
 ```bash
-pnpm run test:local:setup
+pnpm run n8n:setup
 ```
 
 ### 2. Node Building Issues
@@ -87,7 +87,7 @@ pnpm run build
 
 **Solution**:
 ```bash
-pnpm run test:local:setup
+pnpm run n8n:setup
 ```
 
 #### "Required file missing after linking"
@@ -107,7 +107,7 @@ ls -la .n8n/.local/n8n-custom-nodes/
 # Clean rebuild and re-link
 pnpm run clean
 pnpm run build
-pnpm run test:local:link --clean
+pnpm run n8n:link --clean
 ```
 
 #### "Permission denied when linking"
@@ -151,7 +151,7 @@ echo "N8N_PORT=5679" >> .n8n/.local/.env
 **Diagnosis Steps**:
 1. Check nodes are linked:
    ```bash
-   pnpm run test:local:health
+   pnpm run n8n:health
    ```
 
 2. Check environment variables:
@@ -164,11 +164,11 @@ echo "N8N_PORT=5679" >> .n8n/.local/.env
 **Solutions**:
 ```bash
 # Re-link with clean state
-pnpm run test:local:link --clean
+pnpm run n8n:link --clean
 
 # Restart n8n
 # (Stop with Ctrl+C, then restart)
-pnpm run test:local:start
+pnpm run n8n:start
 ```
 
 #### "n8n starts but shows errors"
@@ -184,7 +184,7 @@ pnpm run test:local:start
 pnpm run build
 
 # Run health check
-pnpm run test:local:health --verbose
+pnpm run n8n:health --verbose
 ```
 
 ### 5. Development Workflow Issues
@@ -197,8 +197,8 @@ pnpm run test:local:health --verbose
 # After code changes:
 1. Stop n8n (Ctrl+C)
 2. Rebuild: pnpm run build
-3. Re-link: pnpm run test:local:link
-4. Restart: pnpm run test:local:start
+3. Re-link: pnpm run n8n:link
+4. Restart: pnpm run n8n:start
 ```
 
 #### "Watch mode not working"
@@ -258,7 +258,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 cat .n8n/.local/.env
 
 # Check environment loading
-pnpm run test:local:health
+pnpm run n8n:health
 ```
 
 **Solution**:
@@ -312,10 +312,10 @@ rm -rf .n8n/.local/
 pnpm run clean
 
 # Full setup from scratch
-pnpm run test:local:setup
+pnpm run n8n:setup
 pnpm run build
-pnpm run test:local:link
-pnpm run test:local:start
+pnpm run n8n:link
+pnpm run n8n:start
 ```
 
 #### "Partial cleanup"
@@ -325,7 +325,7 @@ pnpm run test:local:start
 ```bash
 # Keep n8n data, reset nodes only
 rm -rf .n8n/.local/n8n-custom-nodes/
-pnpm run test:local:link
+pnpm run n8n:link
 ```
 
 ## Diagnostic Commands
@@ -333,10 +333,10 @@ pnpm run test:local:link
 ### Health Check
 ```bash
 # Basic health check
-pnpm run test:local:health
+pnpm run n8n:health
 
 # Verbose diagnostics
-pnpm run test:local:health --verbose
+pnpm run n8n:health --verbose
 ```
 
 ### Manual Verification
@@ -371,7 +371,7 @@ tsx .n8n/scripts/health-check.ts --verbose
 ### 1. Self-Diagnosis
 Always start with:
 ```bash
-pnpm run test:local:health --verbose
+pnpm run n8n:health --verbose
 ```
 
 ### 2. Check Prerequisites
@@ -383,7 +383,7 @@ pnpm run test:local:health --verbose
 Try with a completely clean environment:
 ```bash
 rm -rf .n8n/.local/
-pnpm run test:local:setup
+pnpm run n8n:setup
 ```
 
 ### 4. Report Issues
@@ -391,7 +391,7 @@ When reporting issues, include:
 - Operating system and version
 - Node.js version (`node --version`)
 - pnpm version (`pnpm --version`)
-- Output of `pnpm run test:local:health --verbose`
+- Output of `pnpm run n8n:health --verbose`
 - Specific error messages
 - Steps to reproduce
 
@@ -418,7 +418,7 @@ If n8n fails due to memory:
 ```bash
 # Increase Node.js memory limit
 export NODE_OPTIONS="--max-old-space-size=4096"
-pnpm run test:local:start
+pnpm run n8n:start
 ```
 
 ### File System Issues

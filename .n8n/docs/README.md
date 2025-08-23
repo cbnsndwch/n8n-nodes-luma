@@ -12,28 +12,28 @@ This directory contains the complete local testing environment for developing an
 ### One-Command Setup
 ```bash
 # Complete setup and start n8n with nodes
-pnpm run test:local
+pnpm run n8n
 ```
 
 ### Step-by-Step Setup
 ```bash
 # 1. Set up local environment
-pnpm run test:local:setup
+pnpm run n8n:setup
 
 # 2. Build the nodes
 pnpm run build
 
 # 3. Link nodes to local n8n
-pnpm run test:local:link
+pnpm run n8n:link
 
 # 4. Start n8n with custom nodes
-pnpm run test:local:start
+pnpm run n8n:start
 ```
 
 ### Development Workflow
 ```bash
 # Start development with watch mode + auto-linking
-pnpm run dev:local
+pnpm run n8n:dev
 ```
 
 ## Directory Structure
@@ -62,16 +62,16 @@ pnpm run dev:local
 ## Available Scripts
 
 ### Setup and Environment
-- **`pnpm run test:local:setup`** - Set up local testing environment
-- **`pnpm run test:local:health`** - Check environment health
-- **`pnpm run test:local:link`** - Link built nodes to n8n
+- **`pnpm run n8n:setup`** - Set up local testing environment
+- **`pnpm run n8n:health`** - Check environment health
+- **`pnpm run n8n:link`** - Link built nodes to n8n
 
 ### Running n8n
-- **`pnpm run test:local:start`** - Start n8n with custom nodes
-- **`pnpm run test:local`** - Complete workflow (build + link + start)
+- **`pnpm run n8n:start`** - Start n8n with custom nodes
+- **`pnpm run n8n`** - Complete workflow (build + link + start)
 
 ### Development
-- **`pnpm run dev:local`** - Development mode with watch and auto-linking
+- **`pnpm run n8n:dev`** - Development mode with watch and auto-linking
 
 ## How It Works
 
@@ -98,13 +98,13 @@ During development, the workflow supports rapid iteration:
 
 1. **Make changes** to TypeScript files in `nodes/` or `credentials/`
 2. **Auto-rebuild** (if using `pnpm run dev`)
-3. **Auto-link** (if using `pnpm run dev:local`)
+3. **Auto-link** (if using `pnpm run n8n:dev`)
 4. **Manual restart** n8n to see changes (future: hot reload)
 
 ## Testing Your Nodes
 
 ### 1. Access Local n8n
-After starting with `pnpm run test:local:start`, open:
+After starting with `pnpm run n8n:start`, open:
 - **URL**: http://localhost:5678
 - **Default**: No authentication required in local mode
 
@@ -173,14 +173,14 @@ For common issues and solutions, see [TROUBLESHOOTING.md](./TROUBLESHOOTING.md).
 ### Quick Diagnostics
 ```bash
 # Check environment health
-pnpm run test:local:health
+pnpm run n8n:health
 
 # Verbose health check
-pnpm run test:local:health --verbose
+pnpm run n8n:health --verbose
 
 # Clean setup from scratch
 rm -rf .n8n/.local
-pnpm run test:local:setup
+pnpm run n8n:setup
 ```
 
 ## Security Considerations
@@ -208,9 +208,9 @@ The local testing environment can be integrated with CI/CD pipelines:
 - name: Test nodes locally
   run: |
     pnpm install
-    pnpm run test:local:setup
+    pnpm run n8n:setup
     pnpm run build
-    pnpm run test:local:health
+    pnpm run n8n:health
 ```
 
 For automated testing, consider using headless mode or API testing approaches.

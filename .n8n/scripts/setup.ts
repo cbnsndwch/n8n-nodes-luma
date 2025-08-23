@@ -176,10 +176,10 @@ class LocalTestingSetup {
       console.log('\n✅ Local testing environment setup complete!');
       console.log('\nNext steps:');
       console.log('  1. Run: pnpm run build');
-      console.log('  2. Run: pnpm run test:local:link');
-      console.log('  3. Run: pnpm run test:local:start');
+      console.log('  2. Run: pnpm run n8n:link');
+      console.log('  3. Run: pnpm run n8n:start');
       console.log('\nOr use the all-in-one command:');
-      console.log('  pnpm run test:local');
+      console.log('  pnpm run n8n');
       
     } catch (error) {
       console.error('\n❌ Setup failed:', (error as Error).message);

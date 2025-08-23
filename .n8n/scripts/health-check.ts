@@ -339,18 +339,18 @@ class HealthChecker {
       console.log(`\n🔧 Recommended fixes:`);
       
       if (fixable > 0) {
-        console.log(`  Run setup: pnpm run test:local:setup`);
+        console.log(`  Run setup: pnpm run n8n:setup`);
         console.log(`  Build project: pnpm run build`);
-        console.log(`  Link nodes: pnpm run test:local:link`);
+        console.log(`  Link nodes: pnpm run n8n:link`);
       }
 
-      console.log(`\n  Or run the complete workflow: pnpm run test:local`);
+      console.log(`\n  Or run the complete workflow: pnpm run n8n`);
     } else if (warned > 0) {
       console.log(`\n✅ Environment is functional with minor warnings.`);
-      console.log(`Ready to start: pnpm run test:local:start`);
+      console.log(`Ready to start: pnpm run n8n:start`);
     } else {
       console.log(`\n✅ Environment is healthy and ready!`);
-      console.log(`Ready to start: pnpm run test:local:start`);
+      console.log(`Ready to start: pnpm run n8n:start`);
     }
   }
 

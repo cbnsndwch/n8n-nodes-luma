@@ -20,7 +20,7 @@ console.log('2. Automatically re-link nodes when files change');
 console.log('3. You can manually restart n8n to see changes\n');
 
 console.log('To start n8n in a separate terminal:');
-console.log('  pnpm run test:local:start\n');
+console.log('  pnpm run n8n:start\n');
 
 console.log('Press Ctrl+C to stop watching.\n');
 
