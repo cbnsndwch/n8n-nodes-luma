@@ -6,16 +6,19 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 import {
-    eventResource,
     eventOperations,
     eventIdField,
     calendarIdField,
     eventNameField,
     eventDescriptionField,
     eventStartDateField,
-    eventAdditionalFields
+    eventAdditionalFields,
+    calendarOperations,
+    calendarApiIdField,
+    calendarAdditionalFields,
+    lumaResource
 } from './descriptions';
-import { EventOperations } from './operations';
+import { EventOperations, CalendarOperations } from './operations';
 
 export class Luma implements INodeType {
     description: INodeTypeDescription = {
@@ -39,14 +42,17 @@ export class Luma implements INodeType {
             }
         ],
         properties: [
-            eventResource,
+            lumaResource,
             eventOperations,
+            calendarOperations,
             eventIdField,
             calendarIdField,
+            calendarApiIdField,
             eventNameField,
             eventDescriptionField,
             eventStartDateField,
-            eventAdditionalFields
+            eventAdditionalFields,
+            calendarAdditionalFields
         ]
     };
 
@@ -87,6 +93,32 @@ export class Luma implements INodeType {
                             throw new NodeOperationError(
                                 this.getNode(),
                                 `The operation "${operation}" is not supported!`
+                            );
+                    }
+
+                    // Handle single vs multiple results
+                    if (Array.isArray(result)) {
+                        returnData.push(...result);
+                    } else {
+                        returnData.push(result);
+                    }
+                } else if (resource === 'calendar') {
+                    const context = {
+                        executeFunctions: this,
+                        itemIndex: i
+                    };
+
+                    let result: INodeExecutionData | INodeExecutionData[];
+
+                    switch (operation) {
+                        case 'listEvents':
+                            result =
+                                await CalendarOperations.listEvents(context);
+                            break;
+                        default:
+                            throw new NodeOperationError(
+                                this.getNode(),
+                                `The operation "${operation}" is not supported for calendar resource!`
                             );
                     }
 
