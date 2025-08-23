@@ -18,14 +18,24 @@
         "format": "prettier nodes credentials --write",
         "lint": "eslint nodes credentials package.json",
         "lintfix": "eslint nodes credentials package.json --fix",
-        "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+        "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
+        "n8n:setup": "tsx .n8n/scripts/setup.ts",
+        "n8n:start": "tsx .n8n/scripts/start-n8n.ts",
+        "n8n:link": "tsx .n8n/scripts/link-nodes.ts",
+        "n8n:health": "tsx .n8n/scripts/health-check.ts",
+        "n8n": "pnpm run build && pnpm run n8n:link && pnpm run n8n:start",
+        "n8n:dev": "concurrently \"pnpm run dev\" \"tsx .n8n/scripts/watch.ts\"",
+        "n8n:help": "tsx .n8n/scripts/help.ts",
+        "n8n:watch": "tsx .n8n/scripts/watch.ts"
     },
     "files": [
         "dist"
     ],
     "main": "dist/index.js",
     "devDependencies": {
+        "@types/node": "^22.17.2",
         "@typescript-eslint/parser": "~8.40.0",
+        "concurrently": "^9.0.1",
         "eslint": "^8.57.0",
         "eslint-plugin-n8n-nodes-base": "^1.16.3",
         "gulp": "^5.0.1",
@@ -33,6 +43,7 @@
         "npm-check-updates": "^18.0.2",
         "prettier": "^3.6.2",
         "rimraf": "^6.0.1",
+        "sqlite3": "^5.1.7",
         "tsx": "^4.20.4",
         "typescript": "~5.8.2"
     },

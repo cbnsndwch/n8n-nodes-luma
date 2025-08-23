@@ -101,12 +101,12 @@ Add new scripts to existing `package.json`:
 ```json
 {
   "scripts": {
-    "test:local:setup": "tsx .n8n/scripts/setup.ts",
-    "test:local:start": "tsx .n8n/scripts/start-n8n.ts",
-    "test:local:link": "tsx .n8n/scripts/link-nodes.ts",
-    "test:local:health": "tsx .n8n/scripts/health-check.ts",
-    "test:local": "pnpm run build && pnpm run test:local:link && pnpm run test:local:start",
-    "dev:local": "concurrently \"pnpm run dev\" \"pnpm run test:local:watch\""
+    "n8n:setup": "tsx .n8n/scripts/setup.ts",
+    "n8n:start": "tsx .n8n/scripts/start-n8n.ts",
+    "n8n:link": "tsx .n8n/scripts/link-nodes.ts",
+    "n8n:health": "tsx .n8n/scripts/health-check.ts",
+    "n8n": "pnpm run build && pnpm run n8n:link && pnpm run n8n:start",
+    "n8n:dev": "concurrently \"pnpm run dev\" \"pnpm run n8n:watch\""
   }
 }
 ```
@@ -121,7 +121,7 @@ Add new scripts to existing `package.json`:
 
 #### 2.3 Watch Mode Integration
 **Development Workflow**:
-1. `pnpm run dev:local` starts TypeScript watch mode
+1. `pnpm run n8n:dev` starts TypeScript watch mode
 2. On file changes: rebuild → re-link → optionally restart n8n
 3. Developer sees changes in local n8n instance
 
@@ -130,7 +130,7 @@ Add new scripts to existing `package.json`:
 #### 3.1 Setup Automation
 **One-Command Setup**:
 ```bash
-pnpm run test:local:setup
+pnpm run n8n:setup
 ```
 - Creates `.n8n/.local/` directory structure
 - Installs n8n locally if needed
@@ -187,9 +187,9 @@ pnpm run test:local:setup
 ## Success Criteria
 
 ### Functional Requirements
-- ✅ **Quick Setup**: `pnpm run test:local:setup` creates working environment
-- ✅ **One-Command Testing**: `pnpm run test:local` starts n8n with nodes loaded
-- ✅ **Development Integration**: `pnpm run dev:local` enables live development
+- ✅ **Quick Setup**: `pnpm run n8n:setup` creates working environment
+- ✅ **One-Command Testing**: `pnpm run n8n` starts n8n with nodes loaded
+- ✅ **Development Integration**: `pnpm run n8n:dev` enables live development
 - ✅ **Node Visibility**: Both Luma and LumaTrigger nodes appear in n8n UI
 - ✅ **Credential Integration**: LumaApi credentials work in local environment
 - ✅ **Cross-Platform**: Works on Windows, macOS, and Linux
@@ -252,7 +252,7 @@ pnpm run test:local:setup
 ## Acceptance Criteria
 
 ### Must Have (MVP)
-- [ ] Local n8n instance starts with `pnpm run test:local`
+- [ ] Local n8n instance starts with `pnpm run n8n`
 - [ ] Built Luma nodes are available in local n8n UI
 - [ ] Credentials system functions correctly
 - [ ] Basic development workflow documented
