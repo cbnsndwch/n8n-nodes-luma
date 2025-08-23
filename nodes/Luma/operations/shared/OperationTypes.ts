@@ -48,3 +48,10 @@ export interface EventFilters extends IDataObject {
     after?: string; // pagination cursor
     before?: string; // pagination cursor
 }
+
+export interface ImageUploadData extends IDataObject {
+    image_type?: 'event_cover' | 'calendar_avatar' | 'user_avatar';
+    max_size_bytes?: number;
+    allowed_formats?: string[];
+    expiration_minutes?: number;
+}

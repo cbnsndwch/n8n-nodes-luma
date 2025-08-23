@@ -87,5 +87,6 @@ export const forceDeleteField: INodeProperties = {
     name: 'force',
     type: 'boolean',
     default: false,
-    description: 'Whether to permanently delete the event (hard delete) instead of soft delete'
+    description:
+        'Whether to permanently delete the event (hard delete) instead of soft delete'
 };

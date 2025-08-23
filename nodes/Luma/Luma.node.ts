@@ -13,9 +13,12 @@ import {
     eventNameField,
     eventDescriptionField,
     eventStartDateField,
-    eventAdditionalFields
+    eventAdditionalFields,
+    utilityOperations,
+    imageTypeField,
+    utilityAdditionalFields
 } from './descriptions';
-import { EventOperations } from './operations';
+import { EventOperations, UtilityOperations } from './operations';
 
 export class Luma implements INodeType {
     description: INodeTypeDescription = {
@@ -41,12 +44,15 @@ export class Luma implements INodeType {
         properties: [
             eventResource,
             eventOperations,
+            utilityOperations,
             eventIdField,
             calendarIdField,
             eventNameField,
             eventDescriptionField,
             eventStartDateField,
-            eventAdditionalFields
+            eventAdditionalFields,
+            imageTypeField,
+            utilityAdditionalFields
         ]
     };
 
@@ -59,14 +65,14 @@ export class Luma implements INodeType {
 
         for (let i = 0; i < items.length; i++) {
             try {
+                const context = {
+                    executeFunctions: this,
+                    itemIndex: i
+                };
+
+                let result: INodeExecutionData | INodeExecutionData[];
+
                 if (resource === 'event') {
-                    const context = {
-                        executeFunctions: this,
-                        itemIndex: i
-                    };
-
-                    let result: INodeExecutionData | INodeExecutionData[];
-
                     switch (operation) {
                         case 'get':
                             result = await EventOperations.get(context);
@@ -86,21 +92,35 @@ export class Luma implements INodeType {
                         default:
                             throw new NodeOperationError(
                                 this.getNode(),
-                                `The operation "${operation}" is not supported!`
+                                `The operation "${operation}" is not supported for Event resource!`
                             );
                     }
-
-                    // Handle single vs multiple results
-                    if (Array.isArray(result)) {
-                        returnData.push(...result);
-                    } else {
-                        returnData.push(result);
+                } else if (resource === 'utility') {
+                    switch (operation) {
+                        case 'createImageUploadUrl':
+                            result =
+                                await UtilityOperations.createImageUploadUrl(
+                                    context
+                                );
+                            break;
+                        default:
+                            throw new NodeOperationError(
+                                this.getNode(),
+                                `The operation "${operation}" is not supported for Utility resource!`
+                            );
                     }
                 } else {
                     throw new NodeOperationError(
                         this.getNode(),
                         `The resource "${resource}" is not supported!`
                     );
+                }
+
+                // Handle single vs multiple results
+                if (Array.isArray(result)) {
+                    returnData.push(...result);
+                } else {
+                    returnData.push(result);
                 }
             } catch (error) {
                 if (this.continueOnFail()) {

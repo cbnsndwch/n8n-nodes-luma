@@ -32,6 +32,10 @@ export const eventResource: INodeProperties = {
         {
             name: 'Event',
             value: 'event'
+        },
+        {
+            name: 'Utility',
+            value: 'utility'
         }
     ],
     default: 'event'
