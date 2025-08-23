@@ -187,7 +187,13 @@ export class EventOperations extends BaseOperations {
             body.description = eventDescription;
         }
 
-        // Add optional fields
+        // Add optional fields for update
+        if (additionalFields.name) {
+            body.name = additionalFields.name as string;
+        }
+        if (additionalFields.startAt) {
+            body.start_at = additionalFields.startAt as string;
+        }
         if (additionalFields.endAt) {
             body.end_at = additionalFields.endAt as string;
         }
@@ -203,6 +209,9 @@ export class EventOperations extends BaseOperations {
         }
         if (additionalFields.capacity) {
             body.capacity = additionalFields.capacity as number;
+        }
+        if (additionalFields.state) {
+            body.state = additionalFields.state as string;
         }
 
         // Add location if specified

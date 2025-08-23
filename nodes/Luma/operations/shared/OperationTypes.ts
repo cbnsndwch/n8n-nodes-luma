@@ -36,6 +36,7 @@ export interface EventData extends IDataObject {
     visibility?: string;
     approval_required?: boolean;
     capacity?: number;
+    state?: string;
     location?: LocationData;
 }
 
