@@ -1,0 +1,196 @@
+import type { INodeProperties } from 'n8n-workflow';
+import {
+    idField,
+    limitField,
+    visibilityField,
+    approvalRequiredField,
+    capacityField
+} from '../shared/CommonFields';
+import {
+    locationTypeField,
+    locationNameField,
+    locationAddressField,
+    locationUrlField
+} from '../shared/LocationFields';
+import {
+    startDateField,
+    endDateField,
+    timezoneField
+} from '../shared/DateTimeFields';
+
+// Event resource parameter descriptions
+
+export const eventResource: INodeProperties = {
+    displayName: 'Resource',
+    name: 'resource',
+    type: 'options',
+    noDataExpression: true,
+    options: [
+        {
+            name: 'Event',
+            value: 'event'
+        }
+    ],
+    default: 'event'
+};
+
+export const eventOperations: INodeProperties = {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: {
+        show: {
+            resource: ['event']
+        }
+    },
+    options: [
+        {
+            name: 'Create',
+            value: 'create',
+            action: 'Create an event'
+        },
+        {
+            name: 'Delete',
+            value: 'delete',
+            action: 'Delete an event'
+        },
+        {
+            name: 'Get',
+            value: 'get',
+            action: 'Get an event'
+        },
+        {
+            name: 'Get Many',
+            value: 'getMany',
+            action: 'Get many events'
+        },
+        {
+            name: 'Update',
+            value: 'update',
+            action: 'Update an event'
+        }
+    ],
+    default: 'get'
+};
+
+// Event-specific required fields
+export const eventIdField = idField(
+    'Event ID',
+    'eventId',
+    'The ID of the event',
+    {
+        resource: ['event'],
+        operation: ['get', 'update', 'delete']
+    }
+);
+
+export const calendarIdField = idField(
+    'Calendar ID',
+    'calendarId',
+    'The ID of the calendar',
+    {
+        resource: ['event'],
+        operation: ['getMany', 'create']
+    }
+);
+
+export const eventNameField: INodeProperties = {
+    displayName: 'Event Name',
+    name: 'eventName',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['create']
+        }
+    },
+    default: '',
+    description: 'The name of the event'
+};
+
+export const eventDescriptionField: INodeProperties = {
+    displayName: 'Event Description',
+    name: 'eventDescription',
+    type: 'string',
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['create', 'update']
+        }
+    },
+    default: '',
+    description: 'The description of the event'
+};
+
+// Event start date with display conditions
+export const eventStartDateField: INodeProperties = {
+    ...startDateField,
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['create']
+        }
+    }
+};
+
+// Event state filter for getMany operation
+export const eventStateField: INodeProperties = {
+    displayName: 'Event State',
+    name: 'eventState',
+    type: 'options',
+    options: [
+        {
+            name: 'Active',
+            value: 'active'
+        },
+        {
+            name: 'Draft',
+            value: 'draft'
+        },
+        {
+            name: 'Past',
+            value: 'past'
+        }
+    ],
+    default: 'active',
+    description: 'Filter events by state (for getMany operation)'
+};
+
+export const seriesIdField: INodeProperties = {
+    displayName: 'Series ID',
+    name: 'seriesId',
+    type: 'string',
+    default: '',
+    description: 'Filter events by series ID (for getMany operation)'
+};
+
+// Additional fields collection for events
+export const eventAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['create', 'update', 'getMany']
+        }
+    },
+    options: [
+        approvalRequiredField,
+        capacityField,
+        endDateField,
+        eventStateField,
+        limitField,
+        locationAddressField,
+        locationNameField,
+        locationTypeField,
+        locationUrlField,
+        seriesIdField,
+        timezoneField,
+        visibilityField
+    ]
+};

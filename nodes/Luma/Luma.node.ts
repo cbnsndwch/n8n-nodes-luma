@@ -4,7 +4,18 @@ import type {
     INodeType,
     INodeTypeDescription
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import {
+    eventResource,
+    eventOperations,
+    eventIdField,
+    calendarIdField,
+    eventNameField,
+    eventDescriptionField,
+    eventStartDateField,
+    eventAdditionalFields
+} from './descriptions';
+import { EventOperations } from './operations';
 
 export class Luma implements INodeType {
     description: INodeTypeDescription = {
@@ -28,38 +39,14 @@ export class Luma implements INodeType {
             }
         ],
         properties: [
-            {
-                displayName: 'Resource',
-                name: 'resource',
-                type: 'options',
-                noDataExpression: true,
-                options: [
-                    {
-                        name: 'Event',
-                        value: 'event'
-                    }
-                ],
-                default: 'event'
-            },
-            {
-                displayName: 'Operation',
-                name: 'operation',
-                type: 'options',
-                noDataExpression: true,
-                displayOptions: {
-                    show: {
-                        resource: ['event']
-                    }
-                },
-                options: [
-                    {
-                        name: 'Get Many',
-                        value: 'getMany',
-                        action: 'Get many events'
-                    }
-                ],
-                default: 'getMany'
-            }
+            eventResource,
+            eventOperations,
+            eventIdField,
+            calendarIdField,
+            eventNameField,
+            eventDescriptionField,
+            eventStartDateField,
+            eventAdditionalFields
         ]
     };
 
@@ -67,25 +54,63 @@ export class Luma implements INodeType {
         const items = this.getInputData();
         const returnData: INodeExecutionData[] = [];
 
-        const resource = this.getNodeParameter('resource', 0) as string;
-        const operation = this.getNodeParameter('operation', 0) as string;
+        const resource = this.getNodeParameter('resource', 0);
+        const operation = this.getNodeParameter('operation', 0);
 
         for (let i = 0; i < items.length; i++) {
-            if (resource === 'event') {
-                if (operation === 'getMany') {
-                    // Placeholder for getting events
-                    const responseData = {
-                        message:
-                            'Luma node is set up and ready for implementation',
-                        resource,
-                        operation
+            try {
+                if (resource === 'event') {
+                    const context = {
+                        executeFunctions: this,
+                        itemIndex: i
                     };
 
+                    let result: INodeExecutionData | INodeExecutionData[];
+
+                    switch (operation) {
+                        case 'get':
+                            result = await EventOperations.get(context);
+                            break;
+                        case 'getMany':
+                            result = await EventOperations.getMany(context);
+                            break;
+                        case 'create':
+                            result = await EventOperations.create(context);
+                            break;
+                        case 'update':
+                            result = await EventOperations.update(context);
+                            break;
+                        case 'delete':
+                            result = await EventOperations.delete(context);
+                            break;
+                        default:
+                            throw new NodeOperationError(
+                                this.getNode(),
+                                `The operation "${operation}" is not supported!`
+                            );
+                    }
+
+                    // Handle single vs multiple results
+                    if (Array.isArray(result)) {
+                        returnData.push(...result);
+                    } else {
+                        returnData.push(result);
+                    }
+                } else {
+                    throw new NodeOperationError(
+                        this.getNode(),
+                        `The resource "${resource}" is not supported!`
+                    );
+                }
+            } catch (error) {
+                if (this.continueOnFail()) {
                     returnData.push({
-                        json: responseData,
+                        json: { error: error.message },
                         pairedItem: { item: i }
                     });
+                    continue;
                 }
+                throw error;
             }
         }
 
