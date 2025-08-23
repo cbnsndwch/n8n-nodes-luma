@@ -81,3 +81,11 @@ export const beforeCursorField: INodeProperties = {
     default: '',
     description: 'Pagination cursor to get results before this point'
 };
+
+export const forceDeleteField: INodeProperties = {
+    displayName: 'Force Delete',
+    name: 'force',
+    type: 'boolean',
+    default: false,
+    description: 'Whether to permanently delete the event (hard delete) instead of soft delete'
+};

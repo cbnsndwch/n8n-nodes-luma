@@ -239,13 +239,25 @@ export class EventOperations extends BaseOperations {
             'eventId',
             context.itemIndex
         ) as string;
+        
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: IDataObject = {
+            event_id: eventId
+        };
+
+        // Add force parameter for hard delete if specified
+        if (additionalFields.force === true) {
+            body.force = true;
+        }
 
         const responseData = await this.executeRequest(context, {
             method: 'POST',
             url: 'https://api.lu.ma/public/v1/event/delete',
-            body: {
-                event_id: eventId
-            }
+            body
         });
 
         return this.createReturnItem(responseData, context.itemIndex);
