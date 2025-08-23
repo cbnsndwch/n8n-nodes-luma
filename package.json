@@ -1,57 +1,54 @@
 {
-  "name": "@cbnsndwch/n8n-nodes-luma",
-  "version": "0.1.0",
-  "description": "n8n community nodes for Luma's API",
-  "keywords": [
-    "n8n-community-node-package"
-  ],
-  "license": "MIT",
-  "homepage": "https://github.com/cbnsndwch/n8n-nodes-luma",
-  "author": {
-    "name": "cbnsndwch",
-    "url": "https://cbnsndwch.io"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cbnsndwch/n8n-nodes-luma.git"
-  },
-  "engines": {
-    "node": ">=22"
-  },
-  "packageManager": "pnpm@9.0.0",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "pnpm run clean && tsc && gulp build:icons",
-    "clean": "rimraf dist",
-    "dev": "tsc --watch",
-    "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials package.json",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
-  },
-  "files": [
-    "dist"
-  ],
-  "n8n": {
-    "n8nNodesApiVersion": 1,
-    "credentials": [
-      "dist/credentials/LumaApi.credentials.js"
+    "name": "@cbnsndwch/n8n-nodes-luma",
+    "version": "0.1.0",
+    "description": "n8n community nodes for Luma's API",
+    "license": "MIT",
+    "homepage": "https://github.com/cbnsndwch/n8n-nodes-luma",
+    "keywords": [
+        "n8n-community-node-package"
     ],
-    "nodes": [
-      "dist/nodes/Luma/Luma.node.js"
-    ]
-  },
-  "devDependencies": {
-    "@typescript-eslint/parser": "~8.32.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-n8n-nodes-base": "^1.16.3",
-    "gulp": "^5.0.0",
-    "n8n-workflow": "*",
-    "prettier": "^3.5.3",
-    "rimraf": "^5.0.0",
-    "typescript": "^5.8.2"
-  },
-  "peerDependencies": {
-    "n8n-workflow": "*"
-  }
+    "author": {
+        "name": "cbnsndwch",
+        "url": "https://cbnsndwch.io"
+    },
+    "scripts": {
+        "build": "pnpm run clean && tsc && gulp build:icons",
+        "clean": "rimraf dist",
+        "dev": "tsc --watch",
+        "format": "prettier nodes credentials --write",
+        "lint": "eslint nodes credentials package.json",
+        "lintfix": "eslint nodes credentials package.json --fix",
+        "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    },
+    "files": [
+        "dist"
+    ],
+    "main": "dist/index.js",
+    "devDependencies": {
+        "@typescript-eslint/parser": "~8.32.0",
+        "eslint": "^8.57.0",
+        "eslint-plugin-n8n-nodes-base": "^1.16.3",
+        "gulp": "^5.0.0",
+        "n8n-workflow": "*",
+        "prettier": "^3.5.3",
+        "rimraf": "^5.0.0",
+        "typescript": "^5.8.2"
+    },
+    "peerDependencies": {
+        "n8n-workflow": "*"
+    },
+    "engines": {
+        "node": ">=22"
+    },
+    "packageManager": "pnpm@10.15.0+sha512.486ebc259d3e999a4e8691ce03b5cac4a71cbeca39372a9b762cb500cfdf0873e2cb16abe3d951b1ee2cf012503f027b98b6584e4df22524e0c7450d9ec7aa7b",
+    "n8n": {
+        "n8nNodesApiVersion": 1,
+        "credentials": [
+            "dist/credentials/LumaApi.credentials.js"
+        ],
+        "nodes": [
+            "dist/nodes/Luma/Luma.node.js",
+            "dist/nodes/LumaTrigger/LumaTrigger.node.js"
+        ]
+    }
 }
