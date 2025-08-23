@@ -21,13 +21,18 @@ n8n community nodes for Luma's API. This is a TypeScript-based n8n community nod
 ### Project Structure
 The repository follows standard n8n community node structure:
 ```
-├── credentials/           # API credential definitions
-├── nodes/                # Node implementations
-├── dist/                 # Compiled output (auto-generated)
-├── package.json          # Project configuration
-├── tsconfig.json         # TypeScript configuration
-├── .eslintrc.js          # ESLint configuration
-└── jest.config.js        # Jest test configuration
+├── .github/                   # GitHub configuration
+├── __tests__/                 # Jest test files  
+├── credentials/               # API credential definitions
+├── nodes/                     # Node implementations
+├── dist/                      # Compiled output (auto-generated)
+├── package.json               # Project configuration
+├── tsconfig.json              # TypeScript configuration
+├── .eslintrc.js              # ESLint configuration
+├── .prettierrc.js            # Prettier configuration
+├── jest.config.js            # Jest test configuration
+├── gulpfile.js               # Gulp build tasks
+└── .gitignore                # Git ignore rules
 ```
 
 ### Development Workflow
@@ -131,12 +136,39 @@ Before committing changes, **ALWAYS** run:
 - **package.json**: Defines n8n.nodes and n8n.credentials arrays for registration
 - **tsconfig.json**: TypeScript compilation settings for n8n compatibility
 - **.eslintrc.js**: ESLint configuration with n8n-specific rules
+- **.prettierrc.js**: Prettier code formatting configuration
+- **jest.config.js**: Jest testing framework configuration
+- **gulpfile.js**: Gulp build tasks for icon processing
 - **dist/**: Contains compiled JavaScript files that n8n actually loads
+
+### Current Project Structure
+```
+├── .github/
+│   └── copilot-instructions.md  # This file
+├── __tests__/                   # Jest test files
+├── credentials/
+│   └── LumaApi.credentials.ts   # API credential definition
+├── nodes/
+│   └── Luma/
+│       ├── Luma.node.ts         # Main node implementation
+│       └── luma.svg             # Node icon
+├── package.json                 # Project configuration
+├── tsconfig.json               # TypeScript configuration
+├── .eslintrc.js                # ESLint rules
+├── .prettierrc.js              # Code formatting rules
+├── jest.config.js              # Test configuration
+├── gulpfile.js                 # Build tasks
+└── .gitignore                  # Git ignore rules
+```
 
 ### API Integration Notes
 - Luma API documentation: https://docs.lu.ma/
 - Requires API key authentication
 - Main resources: Events, Users, Calendars
 - Rate limiting may apply - implement proper error handling
+
+### Quick Validation Commands
+Test TypeScript syntax without dependencies: `tsc --noEmit` (takes 10-30 seconds)
+Check project structure: `find . -name "*.ts" -o -name "*.js" -o -name "*.json" | grep -v node_modules`
 
 Always verify any commands work in your specific environment before relying on them. If network connectivity issues prevent dependency installation, document the limitation clearly.
