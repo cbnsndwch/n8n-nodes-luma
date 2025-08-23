@@ -6,7 +6,8 @@ import {
     approvalRequiredField,
     capacityField,
     afterCursorField,
-    beforeCursorField
+    beforeCursorField,
+    forceDeleteField
 } from '../shared/CommonFields';
 import {
     locationTypeField,
@@ -58,12 +59,12 @@ export const eventOperations: INodeProperties = {
             action: 'Delete an event'
         },
         {
-            name: 'Get',
+            name: 'Get Event Details',
             value: 'get',
             action: 'Get an event'
         },
         {
-            name: 'Get Many',
+            name: 'List Events',
             value: 'getMany',
             action: 'Get many events'
         },
@@ -220,7 +221,7 @@ export const eventAdditionalFields: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['event'],
-            operation: ['create', 'update', 'getMany', 'get']
+            operation: ['create', 'update', 'getMany', 'get', 'delete']
         }
     },
     options: [
@@ -247,6 +248,15 @@ export const eventAdditionalFields: INodeProperties = {
             default: 'public',
             description:
                 'Choose between public view (excludes sensitive data) or admin view (includes private fields)'
+        },
+        // Fields for delete operation
+        {
+            ...forceDeleteField,
+            displayOptions: {
+                show: {
+                    '/operation': ['delete']
+                }
+            }
         },
         // Fields for update operations - event name
         {

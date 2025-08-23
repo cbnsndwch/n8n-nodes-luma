@@ -27,7 +27,7 @@ export class EventOperations extends BaseOperations {
         ) as IDataObject;
 
         const qs: IDataObject = {
-            event_id: eventId
+            api_id: eventId
         };
 
         // Add view parameter if specified
@@ -38,9 +38,7 @@ export class EventOperations extends BaseOperations {
         const responseData = await this.executeRequest(context, {
             method: 'GET',
             url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_GET),
-            qs: {
-                api_id: eventId,
-            }
+            qs
         });
 
         return this.createReturnItem(responseData, context.itemIndex);
@@ -242,13 +240,25 @@ export class EventOperations extends BaseOperations {
             'eventId',
             context.itemIndex
         ) as string;
+        
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: IDataObject = {
+            event_id: eventId
+        };
+
+        // Add force parameter for hard delete if specified
+        if (additionalFields.force === true) {
+            body.force = true;
+        }
 
         const responseData = await this.executeRequest(context, {
             method: 'POST',
             url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_DELETE),
-            body: {
-                event_id: eventId
-            }
+            body
         });
 
         return this.createReturnItem(responseData, context.itemIndex);
