@@ -97,7 +97,17 @@ class N8nStarter {
    * Prepare environment for n8n startup
    */
   private prepareEnvironment(): Record<string, string> {
-    const env = { ...process.env, ...this.envVars };
+    const env: Record<string, string> = {};
+    
+    // Copy process.env, filtering out undefined values
+    for (const [key, value] of Object.entries(process.env)) {
+      if (value !== undefined) {
+        env[key] = value;
+      }
+    }
+    
+    // Add our custom environment variables
+    Object.assign(env, this.envVars);
 
     // Add tunnel option if requested
     if (this.options.tunnel) {
@@ -130,17 +140,19 @@ class N8nStarter {
       
       console.log('\n');
 
-      // Start n8n using npx
-      const n8nArgs = ['n8n'];
+      // Start n8n using pnpm dlx (with shell option for Windows compatibility)
+      const command = 'pnpm';
+      const n8nArgs = ['dlx', 'n8n'];
       
       if (this.options.tunnel) {
         n8nArgs.push('--tunnel');
       }
 
-      const n8nProcess = spawn('npx', n8nArgs, {
+      const n8nProcess = spawn(command, n8nArgs, {
         stdio: 'inherit',
         env,
-        cwd: PROJECT_ROOT
+        cwd: PROJECT_ROOT,
+        shell: true
       });
 
       // Handle process events
