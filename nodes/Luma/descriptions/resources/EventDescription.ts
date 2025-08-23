@@ -160,6 +160,29 @@ export const eventStateField: INodeProperties = {
     description: 'Filter events by state (for getMany operation)'
 };
 
+// Event state field for update operations (state transitions)
+export const eventUpdateStateField: INodeProperties = {
+    displayName: 'Event State',
+    name: 'state',
+    type: 'options',
+    options: [
+        {
+            name: 'Draft',
+            value: 'draft'
+        },
+        {
+            name: 'Active',
+            value: 'active'
+        },
+        {
+            name: 'Cancelled',
+            value: 'cancelled'
+        }
+    ],
+    default: 'active',
+    description: 'Update the state of the event (draft, active, or cancelled)'
+};
+
 export const seriesIdField: INodeProperties = {
     displayName: 'Series ID',
     name: 'seriesId',
@@ -225,10 +248,37 @@ export const eventAdditionalFields: INodeProperties = {
             description:
                 'Choose between public view (excludes sensitive data) or admin view (includes private fields)'
         },
+        // Fields for update operations - event name
+        {
+            displayName: 'Event Name',
+            name: 'name',
+            type: 'string',
+            displayOptions: {
+                show: {
+                    '/operation': ['update']
+                }
+            },
+            default: '',
+            description: 'Update the name of the event'
+        },
+        // Fields for update operations - start date
+        {
+            displayName: 'Start Date',
+            name: 'startAt',
+            type: 'dateTime',
+            displayOptions: {
+                show: {
+                    '/operation': ['update']
+                }
+            },
+            default: '',
+            description: 'Update the start date and time of the event'
+        },
         // Fields for create/update operations
         approvalRequiredField,
         capacityField,
         endDateField,
+        eventUpdateStateField,
         locationAddressField,
         locationNameField,
         locationTypeField,
