@@ -6,16 +6,19 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 import {
-    eventResource,
     eventOperations,
     eventIdField,
     calendarIdField,
     eventNameField,
     eventDescriptionField,
     eventStartDateField,
-    eventAdditionalFields
+    eventAdditionalFields,
+    utilityOperations,
+    slugField,
+    utilityAdditionalFields,
+    combinedResource
 } from './descriptions';
-import { EventOperations } from './operations';
+import { EventOperations, UtilityOperations } from './operations';
 
 export class Luma implements INodeType {
     description: INodeTypeDescription = {
@@ -39,14 +42,17 @@ export class Luma implements INodeType {
             }
         ],
         properties: [
-            eventResource,
+            combinedResource,
             eventOperations,
+            utilityOperations,
             eventIdField,
             calendarIdField,
             eventNameField,
             eventDescriptionField,
             eventStartDateField,
-            eventAdditionalFields
+            eventAdditionalFields,
+            slugField,
+            utilityAdditionalFields
         ]
     };
 
@@ -96,6 +102,27 @@ export class Luma implements INodeType {
                     } else {
                         returnData.push(result);
                     }
+                } else if (resource === 'utility') {
+                    const context = {
+                        executeFunctions: this,
+                        itemIndex: i
+                    };
+
+                    let result: INodeExecutionData;
+
+                    switch (operation) {
+                        case 'entityLookup':
+                            result =
+                                await UtilityOperations.entityLookup(context);
+                            break;
+                        default:
+                            throw new NodeOperationError(
+                                this.getNode(),
+                                `The operation "${operation}" is not supported!`
+                            );
+                    }
+
+                    returnData.push(result);
                 } else {
                     throw new NodeOperationError(
                         this.getNode(),

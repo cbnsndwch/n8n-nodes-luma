@@ -240,7 +240,7 @@ export class EventOperations extends BaseOperations {
             'eventId',
             context.itemIndex
         ) as string;
-        
+
         const additionalFields = context.executeFunctions.getNodeParameter(
             'additionalFields',
             context.itemIndex
