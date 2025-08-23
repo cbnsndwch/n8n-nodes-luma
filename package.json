@@ -33,6 +33,7 @@
         "npm-check-updates": "^18.0.2",
         "prettier": "^3.6.2",
         "rimraf": "^6.0.1",
+        "tsx": "^4.20.4",
         "typescript": "~5.8.2"
     },
     "peerDependencies": {
