@@ -9,15 +9,19 @@
 
 ### Functional Requirements
 - [ ] User can select "Calendar" resource and "Lookup Event" operation
-- [ ] User can specify calendar API ID and event identifier
+- [ ] User can specify event identifier (URL or API ID)
+- [ ] User can specify platform type (external or luma)
 - [ ] Node returns event information if found
 - [ ] Node returns appropriate response if event not found
-- [ ] Support for various event lookup methods (name, slug, etc.)
+- [ ] Support for various event lookup methods
 
 ### API Implementation
 - **Endpoint:** `GET /public/v1/calendar/lookup-event`
-- **Required Parameters:** `calendar_api_id`
-- **Optional Parameters:** `event_name`, `event_slug`, other lookup criteria
+- **Required Parameters:** At least one of the lookup parameters
+- **Optional Parameters:** 
+  - `platform` - external or luma
+  - `url` - Event URL to lookup
+  - `event_api_id` - Event API ID to lookup
 
 ### Data Structure
 ```typescript

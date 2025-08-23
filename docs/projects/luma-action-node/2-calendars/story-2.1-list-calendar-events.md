@@ -9,15 +9,22 @@
 
 ### Functional Requirements
 - [ ] User can select "Calendar" resource and "List Events" operation
-- [ ] User can specify calendar API ID
-- [ ] User can configure optional filtering parameters
+- [ ] User can configure optional filtering and sorting parameters
+- [ ] User can set time range filters (before/after dates)
+- [ ] User can configure pagination options
 - [ ] Node returns paginated list of calendar events
 - [ ] Each event includes complete metadata structure
 
 ### API Implementation
 - **Endpoint:** `GET /public/v1/calendar/list-events`
-- **Required Parameters:** `calendar_api_id`
-- **Optional Parameters:** `pagination_limit`, `pagination_cursor`
+- **Required Parameters:** None (calendar determined by API credentials)
+- **Optional Parameters:** 
+  - `before` - ISO 8601 datetime filter for events before this time
+  - `after` - ISO 8601 datetime filter for events after this time
+  - `sort_direction` - asc, desc, asc nulls last, desc nulls last
+  - `sort_column` - start_at
+  - `pagination_cursor` - For pagination
+  - `pagination_limit` - Number of items to return
 
 ### Data Structure
 ```typescript

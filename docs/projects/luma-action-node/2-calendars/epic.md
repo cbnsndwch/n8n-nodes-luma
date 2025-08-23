@@ -29,7 +29,7 @@ Based on Luma's actual API structure (`/public/v1/calendar/{action}`):
 
 ## User Stories
 
-This epic contains 7 user stories that implement calendar management functionality:
+This epic contains 12 user stories that implement calendar management functionality:
 
 ### [Story 2.1: List Calendar Events](./story-2.1-list-calendar-events.md)
 Retrieve a list of events managed by a calendar.
@@ -49,31 +49,61 @@ Add an event to a calendar programmatically.
 - **Story Points:** 8
 - **API:** `POST /public/v1/calendar/add-event`
 
-### [Story 2.4: List Calendar People](./story-2.4-list-calendar-people.md)
-Retrieve a list of people associated with a calendar.
-- **Priority:** Medium
-- **Story Points:** 5
-- **API:** `GET /public/v1/calendar/list-people`
-
-### [Story 2.5: Manage Calendar People](./story-2.5-manage-calendar-people.md)
+### [Story 2.4: Import People to Calendar](./story-2.4-import-people-to-calendar.md)
 Import and manage people associated with a calendar.
 - **Priority:** Medium
 - **Story Points:** 5
 - **API:** `POST /public/v1/calendar/import-people`
 
-### [Story 2.6: Manage Person Tags](./story-2.6-manage-person-tags.md)
-Create, update, and manage person tags for calendar organization.
-- **Priority:** Low
-- **Story Points:** 5
-- **API:** `GET/POST/PUT/DELETE /public/v1/calendar/*-person-tag`
-
-### [Story 2.7: Manage Calendar Coupons](./story-2.7-manage-calendar-coupons.md)
-Create and manage coupons for calendar events.
+### [Story 2.5: List Calendar People](./story-2.5-list-calendar-people.md)
+Retrieve a list of people associated with a calendar.
 - **Priority:** Medium
-- **Story Points:** 8
-- **API:** `GET/POST/PUT /public/v1/calendar/coupons*`
+- **Story Points:** 5
+- **API:** `GET /public/v1/calendar/list-people`
 
-**Total Story Points:** 39
+### [Story 2.6: List Person Tags](./story-2.6-list-person-tags.md)
+Retrieve person tags for calendar organization.
+- **Priority:** Low
+- **Story Points:** 3
+- **API:** `GET /public/v1/calendar/list-person-tags`
+
+### [Story 2.7: Create Person Tag](./story-2.7-create-person-tag.md)
+Create new person tags for calendar organization.
+- **Priority:** Low
+- **Story Points:** 3
+- **API:** `POST /public/v1/calendar/create-person-tag`
+
+### [Story 2.8: Update Person Tag](./story-2.8-update-person-tag.md)
+Update existing person tags for calendar organization.
+- **Priority:** Low
+- **Story Points:** 3
+- **API:** `PUT /public/v1/calendar/update-person-tag`
+
+### [Story 2.9: Delete Person Tag](./story-2.9-delete-person-tag.md)
+Delete person tags from calendar.
+- **Priority:** Low
+- **Story Points:** 3
+- **API:** `DELETE /public/v1/calendar/delete-person-tag`
+
+### [Story 2.10: List Calendar Coupons](./story-2.10-list-calendar-coupons.md)
+Retrieve list of coupons for calendar events.
+- **Priority:** Medium
+- **Story Points:** 3
+- **API:** `GET /public/v1/calendar/coupons`
+
+### [Story 2.11: Create Calendar Coupon](./story-2.11-create-calendar-coupon.md)
+Create new coupons for calendar events.
+- **Priority:** Medium
+- **Story Points:** 5
+- **API:** `POST /public/v1/calendar/coupons/create`
+
+### [Story 2.12: Update Calendar Coupon](./story-2.12-update-calendar-coupon.md)
+Update existing coupons for calendar events.
+- **Priority:** Medium
+- **Story Points:** 5
+- **API:** `PUT /public/v1/calendar/coupons/update`
+
+**Total Story Points:** 51
 
 ---
 
