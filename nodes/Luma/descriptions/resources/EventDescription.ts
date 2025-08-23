@@ -59,12 +59,12 @@ export const eventOperations: INodeProperties = {
             action: 'Delete an event'
         },
         {
-            name: 'Get',
+            name: 'Get Event Details',
             value: 'get',
             action: 'Get an event'
         },
         {
-            name: 'Get Many',
+            name: 'List Events',
             value: 'getMany',
             action: 'Get many events'
         },
