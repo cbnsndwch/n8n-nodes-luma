@@ -38,7 +38,13 @@
       "dist/credentials/LumaApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Luma/Luma.node.js"
+      "dist/nodes/Luma/Luma.node.js",
+      "dist/nodes/LumaEventsTrigger/LumaEventsTrigger.node.js",
+      "dist/nodes/LumaPeopleTrigger/LumaPeopleTrigger.node.js",
+      "dist/nodes/LumaPersonTagsTrigger/LumaPersonTagsTrigger.node.js",
+      "dist/nodes/LumaCalendarCouponsTrigger/LumaCalendarCouponsTrigger.node.js",
+      "dist/nodes/LumaEventGuestsTrigger/LumaEventGuestsTrigger.node.js",
+      "dist/nodes/LumaEventCouponsTrigger/LumaEventCouponsTrigger.node.js"
     ]
   },
   "devDependencies": {
