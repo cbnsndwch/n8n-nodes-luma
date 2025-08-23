@@ -6,16 +6,17 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 import {
-    eventResource,
     eventOperations,
     eventIdField,
     calendarIdField,
     eventNameField,
     eventDescriptionField,
     eventStartDateField,
-    eventAdditionalFields
+    eventAdditionalFields,
+    userOperations,
+    userAdditionalFields
 } from './descriptions';
-import { EventOperations } from './operations';
+import { EventOperations, UserOperations } from './operations';
 
 export class Luma implements INodeType {
     description: INodeTypeDescription = {
@@ -39,14 +40,37 @@ export class Luma implements INodeType {
             }
         ],
         properties: [
-            eventResource,
+            // Combined resource selection
+            {
+                displayName: 'Resource',
+                name: 'resource',
+                type: 'options',
+                noDataExpression: true,
+                options: [
+                    {
+                        name: 'Event',
+                        value: 'event'
+                    },
+                    {
+                        name: 'User',
+                        value: 'user'
+                    }
+                ],
+                default: 'event'
+            },
+            // Event operations
             eventOperations,
+            // User operations
+            userOperations,
+            // Event-specific fields
             eventIdField,
             calendarIdField,
             eventNameField,
             eventDescriptionField,
             eventStartDateField,
-            eventAdditionalFields
+            eventAdditionalFields,
+            // User-specific fields
+            userAdditionalFields
         ]
     };
 
@@ -96,6 +120,26 @@ export class Luma implements INodeType {
                     } else {
                         returnData.push(result);
                     }
+                } else if (resource === 'user') {
+                    const context = {
+                        executeFunctions: this,
+                        itemIndex: i
+                    };
+
+                    let result: INodeExecutionData;
+
+                    switch (operation) {
+                        case 'getSelf':
+                            result = await UserOperations.getSelf(context);
+                            break;
+                        default:
+                            throw new NodeOperationError(
+                                this.getNode(),
+                                `The operation "${operation}" is not supported for user resource!`
+                            );
+                    }
+
+                    returnData.push(result);
                 } else {
                     throw new NodeOperationError(
                         this.getNode(),
