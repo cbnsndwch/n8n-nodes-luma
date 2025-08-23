@@ -65,3 +65,19 @@ export const capacityField: INodeProperties = {
     default: '',
     description: 'Maximum number of attendees'
 };
+
+export const afterCursorField: INodeProperties = {
+    displayName: 'After Cursor',
+    name: 'after',
+    type: 'string',
+    default: '',
+    description: 'Pagination cursor to get results after this point'
+};
+
+export const beforeCursorField: INodeProperties = {
+    displayName: 'Before Cursor',
+    name: 'before',
+    type: 'string',
+    default: '',
+    description: 'Pagination cursor to get results before this point'
+};

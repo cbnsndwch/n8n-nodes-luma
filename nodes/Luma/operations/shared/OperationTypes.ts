@@ -44,4 +44,6 @@ export interface EventFilters extends IDataObject {
     limit?: number;
     series_id?: string;
     event_state?: string;
+    after?: string; // pagination cursor
+    before?: string; // pagination cursor
 }
