@@ -7,6 +7,7 @@ import type {
     IHttpRequestMethods
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../Luma/utils/constants';
 
 export class LumaTrigger implements INodeType {
     description: INodeTypeDescription = {
@@ -575,7 +576,7 @@ function getApiConfig(
                 params.event_state = additionalFields.eventState;
             }
             return {
-                url: 'https://api.lu.ma/public/v1/calendar/list-events',
+                url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_EVENTS),
                 params
             };
 
@@ -585,35 +586,35 @@ function getApiConfig(
                 params.approval_status = additionalFields.approvalStatus;
             }
             return {
-                url: 'https://api.lu.ma/public/v1/event/get-guests',
+                url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_GET_GUESTS),
                 params
             };
 
         case 'people':
             params.calendar_id = calendarId;
             return {
-                url: 'https://api.lu.ma/public/v1/calendar/list-people',
+                url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_PEOPLE),
                 params
             };
 
         case 'person_tags':
             params.calendar_id = calendarId;
             return {
-                url: 'https://api.lu.ma/public/v1/calendar/list-person-tags',
+                url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_PERSON_TAGS),
                 params
             };
 
         case 'event_coupons':
             params.event_id = eventId;
             return {
-                url: 'https://api.lu.ma/public/v1/event/list-coupons',
+                url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_LIST_COUPONS),
                 params
             };
 
         case 'calendar_coupons':
             params.calendar_id = calendarId;
             return {
-                url: 'https://api.lu.ma/public/v1/calendar/list-coupons',
+                url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_COUPONS),
                 params
             };
 

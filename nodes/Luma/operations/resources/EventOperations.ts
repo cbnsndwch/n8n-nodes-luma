@@ -1,5 +1,6 @@
 import type { IDataObject, INodeExecutionData } from 'n8n-workflow';
 import { BaseOperations } from '../shared/BaseOperations';
+import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../../utils/constants';
 import type {
     LumaOperationContext,
     EventData,
@@ -36,8 +37,10 @@ export class EventOperations extends BaseOperations {
 
         const responseData = await this.executeRequest(context, {
             method: 'GET',
-            url: 'https://api.lu.ma/public/v1/event/get',
-            qs
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_GET),
+            qs: {
+                api_id: eventId,
+            }
         });
 
         return this.createReturnItem(responseData, context.itemIndex);
@@ -81,7 +84,7 @@ export class EventOperations extends BaseOperations {
 
         const responseData = await this.executeRequest(context, {
             method: 'GET',
-            url: 'https://api.lu.ma/public/v1/calendar/list-events',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_EVENTS),
             qs
         });
 
@@ -152,7 +155,7 @@ export class EventOperations extends BaseOperations {
 
         const responseData = await this.executeRequest(context, {
             method: 'POST',
-            url: 'https://api.lu.ma/public/v1/event/create',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_CREATE),
             body
         });
 
@@ -222,7 +225,7 @@ export class EventOperations extends BaseOperations {
 
         const responseData = await this.executeRequest(context, {
             method: 'POST',
-            url: 'https://api.lu.ma/public/v1/event/update',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_UPDATE),
             body
         });
 
@@ -242,7 +245,7 @@ export class EventOperations extends BaseOperations {
 
         const responseData = await this.executeRequest(context, {
             method: 'POST',
-            url: 'https://api.lu.ma/public/v1/event/delete',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_DELETE),
             body: {
                 event_id: eventId
             }
