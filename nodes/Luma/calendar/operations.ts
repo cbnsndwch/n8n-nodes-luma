@@ -16,7 +16,8 @@ import type {
     ImportPeopleRequest,
     PersonData,
     CalendarPeopleFilters,
-    PersonTagsFilters
+    PersonTagsFilters,
+    DeletePersonTagRequest
 } from './contracts';
 
 /**
@@ -331,6 +332,40 @@ class CalendarOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+
+    /**
+     * Delete a person tag
+     */
+    static async deletePersonTag(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const tagApiId = context.executeFunctions.getNodeParameter(
+            'tagApiId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: DeletePersonTagRequest = {
+            api_id: tagApiId
+        };
+
+        // Add force delete parameter if specified
+        if (additionalFields.forceDelete === true) {
+            body.force_delete = true;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_DELETE_PERSON_TAG),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
 }
 
 export async function handleCalendarOperation(
@@ -342,6 +377,9 @@ export async function handleCalendarOperation(
     switch (operation) {
         case 'addEvent':
             result = await CalendarOperations.addEvent(context);
+            break;
+        case 'deletePersonTag':
+            result = await CalendarOperations.deletePersonTag(context);
             break;
         case 'importPeople':
             result = await CalendarOperations.importPeople(context);
