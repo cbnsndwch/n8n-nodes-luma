@@ -12,6 +12,11 @@ const ticketOperations: INodeProperties = {
     },
     options: [
         {
+            name: 'Create New Ticket Type',
+            value: 'create',
+            action: 'Create new ticket type'
+        },
+        {
             name: 'Get Ticket Type Details',
             value: 'get',
             action: 'Get ticket type details'
@@ -22,7 +27,7 @@ const ticketOperations: INodeProperties = {
             action: 'List event ticket types'
         }
     ],
-    default: 'get'
+    default: 'create'
 };
 
 // Event ID field for ticket operations
@@ -35,10 +40,42 @@ const eventIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['ticket'],
-            operation: ['list']
+            operation: ['list', 'create']
         }
     },
-    description: 'The ID of the event to list ticket types for'
+    description:
+        'The ID of the event to list ticket types for or create a ticket type in'
+};
+
+// Required fields for create operation
+const ticketNameField: INodeProperties = {
+    displayName: 'Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['create']
+        }
+    },
+    description: 'The name of the ticket type'
+};
+
+const ticketPriceField: INodeProperties = {
+    displayName: 'Price (in Cents)',
+    name: 'price',
+    type: 'number',
+    required: true,
+    default: 0,
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['create']
+        }
+    },
+    description: 'The price of the ticket in cents (e.g., 2500 for $25.00)'
 };
 
 // Ticket Type ID field for get operation
@@ -190,10 +227,203 @@ const ticketGetAdditionalFields: INodeProperties = {
     ]
 };
 
+// Additional fields for ticket create operation
+const ticketCreateAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['create']
+        }
+    },
+    options: [
+        {
+            displayName: 'Capacity',
+            name: 'capacity',
+            type: 'number',
+            default: undefined,
+            description:
+                'Maximum number of tickets available (leave empty for unlimited)'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            description: 'Description of the ticket type'
+        },
+        {
+            displayName: 'Minimum Quantity',
+            name: 'minQuantity',
+            type: 'number',
+            default: 1,
+            description: 'Minimum number of tickets a user can purchase'
+        },
+        {
+            displayName: 'Maximum Quantity',
+            name: 'maxQuantity',
+            type: 'number',
+            default: 10,
+            description: 'Maximum number of tickets a user can purchase'
+        },
+        {
+            displayName: 'Sale Start Date',
+            name: 'saleStartAt',
+            type: 'dateTime',
+            default: '',
+            description: 'When ticket sales should start (ISO 8601 format)'
+        },
+        {
+            displayName: 'Sale End Date',
+            name: 'saleEndAt',
+            type: 'dateTime',
+            default: '',
+            description: 'When ticket sales should end (ISO 8601 format)'
+        },
+        {
+            displayName: 'Is Hidden',
+            name: 'isHidden',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether the ticket type should be hidden from public view'
+        },
+        {
+            displayName: 'Requires Approval',
+            name: 'requiresApproval',
+            type: 'boolean',
+            default: false,
+            description: 'Whether ticket purchases require manual approval'
+        },
+        {
+            displayName: 'Pricing Tiers',
+            name: 'pricingTiers',
+            type: 'fixedCollection',
+            default: {},
+            description: 'Time-based pricing tiers for early bird pricing',
+            typeOptions: {
+                multipleValues: true
+            },
+            options: [
+                {
+                    name: 'tier',
+                    displayName: 'Pricing Tier',
+                    values: [
+																	{
+																		displayName: 'Capacity',
+																		name: 'capacity',
+																		type: 'number',
+																		default: 0,
+																		description: 'Number of tickets available at this price tier',
+																	},
+																	{
+																		displayName: 'End Date',
+																		name: 'endAt',
+																		type: 'dateTime',
+																		default: '',
+																		description: 'When this pricing tier ends (optional)',
+																	},
+																	{
+																		displayName: 'Name',
+																		name: 'name',
+																		type: 'string',
+																		default: '',
+																		description: 'Name of this pricing tier',
+																	},
+																	{
+																		displayName: 'Price (in Cents)',
+																		name: 'price',
+																		type: 'number',
+																		default: 0,
+																		description: 'Price for this tier in cents',
+																	},
+																	{
+																		displayName: 'Start Date',
+																		name: 'startAt',
+																		type: 'dateTime',
+																		default: '',
+																		description: 'When this pricing tier becomes active',
+																	},
+																]
+                }
+            ]
+        },
+        {
+            displayName: 'Discount Rules',
+            name: 'discountRules',
+            type: 'fixedCollection',
+            default: {},
+            description: 'Discount rules for bulk purchases, early bird discounts, etc',
+            typeOptions: {
+                multipleValues: true
+            },
+            options: [
+                {
+                    name: 'rule',
+                    displayName: 'Discount Rule',
+                    values: [
+                        {
+                            displayName: 'Type',
+                            name: 'type',
+                            type: 'options',
+                            options: [
+                                {
+                                    name: 'Early Bird',
+                                    value: 'early_bird'
+                                },
+                                {
+                                    name: 'Bulk Purchase',
+                                    value: 'bulk'
+                                },
+                                {
+                                    name: 'Promo Code',
+                                    value: 'promo_code'
+                                }
+                            ],
+                            default: 'early_bird',
+                            description: 'Type of discount rule'
+                        },
+                        {
+                            displayName: 'Value',
+                            name: 'value',
+                            type: 'number',
+                            default: 0,
+                            description:
+                                'Discount value (percentage or fixed amount in cents)'
+                        },
+                        {
+                            displayName: 'Minimum Quantity',
+                            name: 'minQuantity',
+                            type: 'number',
+                            default: 1,
+                            description:
+                                'Minimum quantity required for this discount'
+                        },
+                        {
+                            displayName: 'Valid Until',
+                            name: 'validUntil',
+                            type: 'dateTime',
+                            default: '',
+                            description: 'When this discount rule expires'
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
 export const ticketProps: INodeProperties[] = [
     ticketOperations,
     eventIdField,
+    ticketNameField,
+    ticketPriceField,
     ticketTypeIdField,
     ticketAdditionalFields,
-    ticketGetAdditionalFields
+    ticketGetAdditionalFields,
+    ticketCreateAdditionalFields
 ];
