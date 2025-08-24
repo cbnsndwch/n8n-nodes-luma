@@ -162,4 +162,178 @@ describe('Workflow Execution Tests', () => {
       expect(credential.properties).toBeDefined();
     });
   });
+
+  describe('Ticket Operations', () => {
+    it('should support ticket create operation', async () => {
+      const { handleTicketOperation } = await import('../../dist/nodes/Luma/ticket/operations.js');
+      
+      expect(typeof handleTicketOperation).toBe('function');
+      
+      // Test that create operation is handled
+      const mockContext = {
+        executeFunctions: {
+          getNodeParameter: vi.fn()
+            .mockReturnValueOnce('event-123') // eventId
+            .mockReturnValueOnce('VIP Ticket') // name  
+            .mockReturnValueOnce(5000) // price (in cents)
+            .mockReturnValueOnce({}), // additionalFields
+          getNode: vi.fn().mockReturnValue({ name: 'test-ticket-node' }),
+          helpers: {
+            requestWithAuthentication: {
+              call: vi.fn().mockResolvedValue({
+                ticket_type: {
+                  ticket_type_id: 'tt-123',
+                  event_id: 'event-123',
+                  name: 'VIP Ticket',
+                  price: 5000
+                }
+              })
+            }
+          }
+        },
+        itemIndex: 0
+      };
+
+      const result = await handleTicketOperation('create', mockContext);
+      expect(result).toBeDefined();
+      expect(result.json).toBeDefined();
+    });
+
+    it('should handle ticket create with additional fields', async () => {
+      const { handleTicketOperation } = await import('../../dist/nodes/Luma/ticket/operations.js');
+      
+      const mockContext = {
+        executeFunctions: {
+          getNodeParameter: vi.fn()
+            .mockReturnValueOnce('event-123') // eventId
+            .mockReturnValueOnce('Early Bird Ticket') // name
+            .mockReturnValueOnce(2500) // price
+            .mockReturnValueOnce({ // additionalFields
+              description: 'Early bird special pricing',
+              capacity: 100,
+              minQuantity: 1,
+              maxQuantity: 5,
+              isHidden: false
+            }),
+          getNode: vi.fn().mockReturnValue({ name: 'test-ticket-node' }),
+          helpers: {
+            requestWithAuthentication: {
+              call: vi.fn().mockResolvedValue({
+                ticket_type: {
+                  ticket_type_id: 'tt-456',
+                  event_id: 'event-123',
+                  name: 'Early Bird Ticket',
+                  price: 2500,
+                  description: 'Early bird special pricing',
+                  capacity: 100
+                }
+              })
+            }
+          }
+        },
+        itemIndex: 0
+      };
+
+      const result = await handleTicketOperation('create', mockContext);
+      expect(result).toBeDefined();
+      expect(result.json.ticket_type.description).toBe('Early bird special pricing');
+    });
+
+    it('should handle pricing tiers in ticket create', async () => {
+      const { handleTicketOperation } = await import('../../dist/nodes/Luma/ticket/operations.js');
+      
+      const mockContext = {
+        executeFunctions: {
+          getNodeParameter: vi.fn()
+            .mockReturnValueOnce('event-123') // eventId
+            .mockReturnValueOnce('Tiered Ticket') // name
+            .mockReturnValueOnce(3000) // price
+            .mockReturnValueOnce({ // additionalFields
+              pricingTiers: {
+                tier: [
+                  {
+                    name: 'Early Bird',
+                    price: 2000,
+                    startAt: '2024-01-01T00:00:00Z',
+                    endAt: '2024-01-15T00:00:00Z',
+                    capacity: 50
+                  }
+                ]
+              }
+            }),
+          getNode: vi.fn().mockReturnValue({ name: 'test-ticket-node' }),
+          helpers: {
+            requestWithAuthentication: {
+              call: vi.fn().mockResolvedValue({
+                ticket_type: {
+                  ticket_type_id: 'tt-789',
+                  event_id: 'event-123',
+                  name: 'Tiered Ticket',
+                  price: 3000,
+                  pricing_tiers: [{
+                    name: 'Early Bird',
+                    price: 2000,
+                    start_at: '2024-01-01T00:00:00Z'
+                  }]
+                }
+              })
+            }
+          }
+        },
+        itemIndex: 0
+      };
+
+      const result = await handleTicketOperation('create', mockContext);
+      expect(result).toBeDefined();
+      expect(result.json.ticket_type.pricing_tiers).toBeDefined();
+    });
+
+    it('should handle discount rules in ticket create', async () => {
+      const { handleTicketOperation } = await import('../../dist/nodes/Luma/ticket/operations.js');
+      
+      const mockContext = {
+        executeFunctions: {
+          getNodeParameter: vi.fn()
+            .mockReturnValueOnce('event-123') // eventId
+            .mockReturnValueOnce('Discount Ticket') // name
+            .mockReturnValueOnce(4000) // price
+            .mockReturnValueOnce({ // additionalFields
+              discountRules: {
+                rule: [
+                  {
+                    type: 'bulk',
+                    value: 10,
+                    minQuantity: 5,
+                    validUntil: '2024-12-31T23:59:59Z'
+                  }
+                ]
+              }
+            }),
+          getNode: vi.fn().mockReturnValue({ name: 'test-ticket-node' }),
+          helpers: {
+            requestWithAuthentication: {
+              call: vi.fn().mockResolvedValue({
+                ticket_type: {
+                  ticket_type_id: 'tt-999',
+                  event_id: 'event-123',
+                  name: 'Discount Ticket',
+                  price: 4000,
+                  discount_rules: [{
+                    type: 'bulk',
+                    value: 10,
+                    min_quantity: 5
+                  }]
+                }
+              })
+            }
+          }
+        },
+        itemIndex: 0
+      };
+
+      const result = await handleTicketOperation('create', mockContext);
+      expect(result).toBeDefined();
+      expect(result.json.ticket_type.discount_rules).toBeDefined();
+    });
+  });
 });

@@ -155,4 +155,161 @@ describe('Frontend User Experience', () => {
       expect(resourceProperty?.noDataExpression).toBe(true);
     });
   });
+
+  describe('Ticket Create Parameter Structure', () => {
+    it('should have ticket create operation available', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      
+      // Find operation property for ticket resource
+      const operationProps = properties.filter((p: any) => 
+        p.name === 'operation' && 
+        p.displayOptions?.show?.resource?.includes('ticket')
+      );
+      
+      expect(operationProps.length).toBeGreaterThan(0);
+      
+      const ticketOperations = operationProps[0];
+      const createOption = ticketOperations.options.find((opt: any) => opt.value === 'create');
+      expect(createOption).toBeDefined();
+      expect(createOption.name).toBe('Create New Ticket Type');
+    });
+
+    it('should have required fields for ticket create', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      
+      // Check for eventId field
+      const eventIdField = properties.find((p: any) => 
+        p.name === 'eventId' && 
+        p.displayOptions?.show?.operation?.includes('create')
+      );
+      expect(eventIdField).toBeDefined();
+      expect(eventIdField?.required).toBe(true);
+      
+      // Check for name field 
+      const nameField = properties.find((p: any) => 
+        p.name === 'name' && 
+        p.displayOptions?.show?.operation?.includes('create')
+      );
+      expect(nameField).toBeDefined();
+      expect(nameField?.required).toBe(true);
+      
+      // Check for price field
+      const priceField = properties.find((p: any) => 
+        p.name === 'price' && 
+        p.displayOptions?.show?.operation?.includes('create')
+      );
+      expect(priceField).toBeDefined();
+      expect(priceField?.required).toBe(true);
+      expect(priceField?.type).toBe('number');
+    });
+
+    it('should have additional fields for ticket create', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      
+      // Check for additionalFields specifically for ticket create operation
+      const additionalFieldsProps = properties.filter((p: any) => 
+        p.name === 'additionalFields' && 
+        p.displayOptions?.show?.resource?.includes('ticket') &&
+        p.displayOptions?.show?.operation?.includes('create')
+      );
+      
+      expect(additionalFieldsProps.length).toBeGreaterThan(0);
+      const additionalFields = additionalFieldsProps.find((p: any) => 
+        p.options && p.options.some((opt: any) => opt.name === 'description')
+      );
+      
+      expect(additionalFields).toBeDefined();
+      expect(additionalFields?.type).toBe('collection');
+      
+      // Check for specific optional fields
+      const options = additionalFields?.options || [];
+      const fieldNames = options.map((opt: any) => opt.name);
+      
+      expect(fieldNames).toContain('description');
+      expect(fieldNames).toContain('capacity');
+      expect(fieldNames).toContain('minQuantity');
+      expect(fieldNames).toContain('maxQuantity');
+      expect(fieldNames).toContain('isHidden');
+      expect(fieldNames).toContain('requiresApproval');
+    });
+
+    it('should have pricing tiers configuration', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      
+      const additionalFieldsProps = properties.filter((p: any) => 
+        p.name === 'additionalFields' && 
+        p.displayOptions?.show?.resource?.includes('ticket') &&
+        p.displayOptions?.show?.operation?.includes('create')
+      );
+      
+      const additionalFields = additionalFieldsProps.find((p: any) => 
+        p.options && p.options.some((opt: any) => opt.name === 'pricingTiers')
+      );
+      
+      const pricingTiers = additionalFields?.options?.find((opt: any) => opt.name === 'pricingTiers');
+      expect(pricingTiers).toBeDefined();
+      expect(pricingTiers?.type).toBe('fixedCollection');
+      expect(pricingTiers?.typeOptions?.multipleValues).toBe(true);
+      
+      // Check pricing tier fields
+      const tierFields = pricingTiers?.options?.[0]?.values || [];
+      const tierFieldNames = tierFields.map((field: any) => field.name);
+      
+      expect(tierFieldNames).toContain('name');
+      expect(tierFieldNames).toContain('price');
+      expect(tierFieldNames).toContain('startAt');
+      expect(tierFieldNames).toContain('endAt');
+      expect(tierFieldNames).toContain('capacity');
+    });
+
+    it('should have discount rules configuration', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      
+      const additionalFieldsProps = properties.filter((p: any) => 
+        p.name === 'additionalFields' && 
+        p.displayOptions?.show?.resource?.includes('ticket') &&
+        p.displayOptions?.show?.operation?.includes('create')
+      );
+      
+      const additionalFields = additionalFieldsProps.find((p: any) => 
+        p.options && p.options.some((opt: any) => opt.name === 'discountRules')
+      );
+      
+      const discountRules = additionalFields?.options?.find((opt: any) => opt.name === 'discountRules');
+      expect(discountRules).toBeDefined();
+      expect(discountRules?.type).toBe('fixedCollection');
+      expect(discountRules?.typeOptions?.multipleValues).toBe(true);
+      
+      // Check discount rule fields
+      const ruleFields = discountRules?.options?.[0]?.values || [];
+      const ruleFieldNames = ruleFields.map((field: any) => field.name);
+      
+      expect(ruleFieldNames).toContain('type');
+      expect(ruleFieldNames).toContain('value');
+      expect(ruleFieldNames).toContain('minQuantity');
+      expect(ruleFieldNames).toContain('validUntil');
+      
+      // Check discount types
+      const typeField = ruleFields.find((field: any) => field.name === 'type');
+      const typeOptions = typeField?.options?.map((opt: any) => opt.value) || [];
+      expect(typeOptions).toContain('early_bird');
+      expect(typeOptions).toContain('bulk');
+      expect(typeOptions).toContain('promo_code');
+    });
+  });
 });

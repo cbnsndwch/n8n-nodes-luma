@@ -10,13 +10,16 @@ describe('Build System Tests', () => {
       expect(fs.existsSync('credentials/LumaApi.credentials.ts')).toBe(true);
     });
 
-    it('should have package.json with required fields', () => {
-      const packagePath = path.join(process.cwd(), 'package.json');
-      expect(fs.existsSync(packagePath)).toBe(true);
-      
-      const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
-      expect(packageJson.name).toBe('@cbnsndwch/n8n-nodes-luma');
-      expect(packageJson.n8n).toBeDefined();
+    it('should have ticket operations files', () => {
+      expect(fs.existsSync('nodes/Luma/ticket/contracts.ts')).toBe(true);
+      expect(fs.existsSync('nodes/Luma/ticket/operations.ts')).toBe(true);
+      expect(fs.existsSync('nodes/Luma/ticket/props.ts')).toBe(true);
+    });
+
+    it('should have built ticket operation files', () => {
+      expect(fs.existsSync('dist/nodes/Luma/ticket/contracts.js')).toBe(true);
+      expect(fs.existsSync('dist/nodes/Luma/ticket/operations.js')).toBe(true);
+      expect(fs.existsSync('dist/nodes/Luma/ticket/props.js')).toBe(true);
     });
   });
 

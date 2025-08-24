@@ -139,4 +139,65 @@ describe('Node Registration Tests', () => {
       expect(triggerNode.description.outputs).toEqual(['main']);
     });
   });
+
+  describe('Ticket Operation Registration', () => {
+    it('should register ticket create operation in resource handlers', async () => {
+      const { RESOURCE_HANDLERS } = await import('../../dist/nodes/Luma/operations.js');
+      
+      expect(RESOURCE_HANDLERS).toBeDefined();
+      expect(RESOURCE_HANDLERS.ticket).toBeDefined();
+      expect(typeof RESOURCE_HANDLERS.ticket).toBe('function');
+    });
+
+    it('should have ticket resource in main node properties', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const resourceProperty = lumaNode.description.properties.find((p: any) => p.name === 'resource');
+      expect(resourceProperty).toBeDefined();
+      
+      const ticketResource = resourceProperty?.options?.find((opt: any) => opt.value === 'ticket');
+      expect(ticketResource).toBeDefined();
+      expect(ticketResource?.name).toBe('Ticket');
+    });
+
+    it('should have ticket operations properly configured', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const operationProperty = lumaNode.description.properties.find((p: any) => 
+        p.name === 'operation' && 
+        p.displayOptions?.show?.resource?.includes('ticket')
+      );
+      
+      expect(operationProperty).toBeDefined();
+      expect(operationProperty?.options).toBeDefined();
+      
+      const operations = operationProperty?.options?.map((opt: any) => opt.value) || [];
+      expect(operations).toContain('create');
+      expect(operations).toContain('get');
+      expect(operations).toContain('list');
+    });
+
+    it('should have ticket create operation as default', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const operationProperty = lumaNode.description.properties.find((p: any) => 
+        p.name === 'operation' && 
+        p.displayOptions?.show?.resource?.includes('ticket')
+      );
+      
+      expect(operationProperty?.default).toBe('create');
+    });
+
+    it('should validate ticket operation contracts', async () => {
+      // Test that the contracts module exports the expected types
+      const contracts = await import('../../dist/nodes/Luma/ticket/contracts.js');
+      
+      // The module should be defined (TypeScript interfaces are compiled away but exports exist)
+      expect(contracts).toBeDefined();
+      expect(typeof contracts).toBe('object');
+    });
+  });
 });

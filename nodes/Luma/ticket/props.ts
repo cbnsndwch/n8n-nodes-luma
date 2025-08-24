@@ -240,6 +240,7 @@ const ticketCreateAdditionalFields: INodeProperties = {
             operation: ['create']
         }
     },
+    // eslint-disable-next-line n8n-nodes-base/node-param-collection-type-unsorted-items
     options: [
         {
             displayName: 'Capacity',
