@@ -81,10 +81,97 @@ describe('CI Workflow Tests', () => {
             expect(installStep.run).toBe('pnpm install');
         });
 
-        it('should be structured for extension', () => {
+        it('should not contain placeholder text after test integration', () => {
             const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
-            expect(content).toContain(
+            expect(content).not.toContain(
                 'Additional steps will be added in subsequent stories'
+            );
+        });
+    });
+
+    describe('Test Execution Integration', () => {
+        it('should include main test execution step', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const testStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Run tests'
+            );
+            expect(testStep).toBeDefined();
+            expect(testStep.run).toBe('pnpm run test');
+        });
+
+        it('should include unit test execution step', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const unitTestStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Run unit tests'
+            );
+            expect(unitTestStep).toBeDefined();
+            expect(unitTestStep.run).toBe('pnpm run test:unit');
+        });
+
+        it('should include integration test execution step', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const integrationTestStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Run integration tests'
+            );
+            expect(integrationTestStep).toBeDefined();
+            expect(integrationTestStep.run).toBe('pnpm run test:integration');
+        });
+
+        it('should include frontend test execution step', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const frontendTestStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Run frontend tests'
+            );
+            expect(frontendTestStep).toBeDefined();
+            expect(frontendTestStep.run).toBe('pnpm run test:frontend');
+        });
+
+        it('should have test steps in correct order after dependency installation', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const steps = workflow.jobs.test.steps;
+
+            const installIndex = steps.findIndex(
+                (step: any) => step.name === 'Install dependencies'
+            );
+            const runTestsIndex = steps.findIndex(
+                (step: any) => step.name === 'Run tests'
+            );
+            const unitTestsIndex = steps.findIndex(
+                (step: any) => step.name === 'Run unit tests'
+            );
+            const integrationTestsIndex = steps.findIndex(
+                (step: any) => step.name === 'Run integration tests'
+            );
+            const frontendTestsIndex = steps.findIndex(
+                (step: any) => step.name === 'Run frontend tests'
+            );
+
+            expect(installIndex).toBeGreaterThan(-1);
+            expect(runTestsIndex).toBeGreaterThan(installIndex);
+            expect(unitTestsIndex).toBeGreaterThan(runTestsIndex);
+            expect(integrationTestsIndex).toBeGreaterThan(unitTestsIndex);
+            expect(frontendTestsIndex).toBeGreaterThan(integrationTestsIndex);
+        });
+
+        it('should have all required test commands available in package.json', () => {
+            const packageContent = fs.readFileSync('package.json', 'utf8');
+            const packageJson = JSON.parse(packageContent);
+
+            expect(packageJson.scripts).toBeDefined();
+            expect(packageJson.scripts.test).toBe('vitest');
+            expect(packageJson.scripts['test:unit']).toBe(
+                'vitest run tests/unit'
+            );
+            expect(packageJson.scripts['test:integration']).toBe(
+                'vitest run tests/integration'
+            );
+            expect(packageJson.scripts['test:frontend']).toBe(
+                'vitest run tests/frontend'
             );
         });
     });
