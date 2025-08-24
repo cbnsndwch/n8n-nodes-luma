@@ -162,4 +162,107 @@ describe('Workflow Execution Tests', () => {
       expect(credential.properties).toBeDefined();
     });
   });
+
+  describe('Guest Operations Integration', () => {
+    describe('Reject Operation Validation', () => {
+      it('should include reject in guest operations', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const guestOperationProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'operation' && p.displayOptions?.show?.resource?.includes('guest')
+        );
+        
+        expect(guestOperationProperty).toBeDefined();
+        expect(guestOperationProperty?.options).toBeDefined();
+        
+        const rejectOption = guestOperationProperty?.options.find((option: any) => 
+          option.value === 'reject'
+        );
+        
+        expect(rejectOption).toBeDefined();
+        expect(rejectOption?.name).toBe('Reject');
+        expect(rejectOption?.description).toContain('Reject');
+        expect(rejectOption?.action).toBe('Reject guest registration');
+      });
+
+      it('should have rejection reason field for reject operation', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const rejectionReasonProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'rejectionReason'
+        );
+        
+        expect(rejectionReasonProperty).toBeDefined();
+        expect(rejectionReasonProperty?.required).toBe(true);
+        expect(rejectionReasonProperty?.type).toBe('string');
+        expect(rejectionReasonProperty?.displayOptions?.show?.operation).toContain('reject');
+      });
+
+      it('should support guest ID for reject operation', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const guestIdProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'guestId'
+        );
+        
+        expect(guestIdProperty).toBeDefined();
+        expect(guestIdProperty?.required).toBe(true);
+        expect(guestIdProperty?.displayOptions?.show?.operation).toContain('reject');
+        expect(guestIdProperty?.description).toContain('bulk');
+      });
+
+      it('should have additional fields for reject operation', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const additionalFieldsProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'additionalFields' && 
+          p.displayOptions?.show?.operation?.includes('reject')
+        );
+        
+        expect(additionalFieldsProperty).toBeDefined();
+        expect(additionalFieldsProperty?.type).toBe('collection');
+        expect(additionalFieldsProperty?.options).toBeDefined();
+        
+        const options = additionalFieldsProperty?.options;
+        const sendNotificationOption = options?.find((opt: any) => opt.name === 'sendNotification');
+        const customMessageOption = options?.find((opt: any) => opt.name === 'customMessage');
+        const allowReapplyOption = options?.find((opt: any) => opt.name === 'allowReapply');
+        
+        expect(sendNotificationOption).toBeDefined();
+        expect(customMessageOption).toBeDefined();
+        expect(allowReapplyOption).toBeDefined();
+      });
+    });
+
+    describe('Guest Operation Handler Integration', () => {
+      it('should support reject operation in handler', async () => {
+        // Import the handleGuestOperation function
+        const { handleGuestOperation } = await import('../../dist/nodes/Luma/guest/operations.js');
+        expect(typeof handleGuestOperation).toBe('function');
+        
+        // Test that reject operation exists by checking it doesn't throw for unknown operation
+        const mockContext = {
+          executeFunctions: {
+            getNodeParameter: vi.fn(),
+            getNode: vi.fn().mockReturnValue({ name: 'test-node' }),
+            continueOnFail: vi.fn().mockReturnValue(false),
+            getCredentials: vi.fn().mockResolvedValue({ apiKey: 'test-key' })
+          },
+          itemIndex: 0
+        };
+        
+        // Should not throw error for reject operation (though it will fail due to missing parameters)
+        try {
+          await handleGuestOperation('reject', mockContext);
+        } catch (error: any) {
+          // Should fail due to missing parameters, not unknown operation
+          expect(error.message).not.toContain('not supported');
+        }
+      });
+    });
+  });
 });
