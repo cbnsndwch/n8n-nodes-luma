@@ -166,5 +166,63 @@ describe('Ticket Operations Unit Tests', () => {
                 throw new Error('Bulk update contracts should be compilable');
             }
         });
+
+        it('should have update ticket endpoint defined', async () => {
+            const { LUMA_ENDPOINTS } = await import(
+                '../../../dist/nodes/Luma/shared/constants.js'
+            );
+
+            expect(LUMA_ENDPOINTS.TICKET_TYPE_UPDATE).toBeDefined();
+            expect(LUMA_ENDPOINTS.TICKET_TYPE_UPDATE).toBe(
+                '/v1/event/ticket-types/update'
+            );
+        });
+    });
+
+    describe('Update Operation Support', () => {
+        it('should include update operation in ticket operations', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+            expect(operationField?.options).toBeDefined();
+
+            const updateOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'update'
+            );
+            expect(updateOption).toBeDefined();
+            expect(updateOption?.name).toBe('Update Ticket Type Configuration');
+        });
+
+        it('should have update-specific fields', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check for ticketTypeId field for update operation
+            const ticketTypeIdField = ticketProps.find(
+                prop => prop.name === 'ticketTypeId'
+            );
+            expect(ticketTypeIdField).toBeDefined();
+            expect(
+                ticketTypeIdField?.displayOptions?.show?.operation
+            ).toContain('update');
+
+            // Check for updateFields collection for update operation
+            const updateFieldsCollection = ticketProps.find(
+                prop =>
+                    prop.name === 'updateFields' &&
+                    prop.displayOptions?.show?.operation?.includes('update')
+            );
+            expect(updateFieldsCollection).toBeDefined();
+            expect(updateFieldsCollection?.type).toBe('collection');
+            expect(
+                updateFieldsCollection?.displayOptions?.show?.operation
+            ).toContain('update');
+        });
     });
 });

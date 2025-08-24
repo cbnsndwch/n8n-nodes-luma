@@ -35,6 +35,11 @@ const ticketOperations: INodeProperties = {
             name: 'List Event Ticket Types',
             value: 'list',
             action: 'List event ticket types'
+        },
+        {
+            name: 'Update Ticket Type Configuration',
+            value: 'update',
+            action: 'Update ticket type configuration'
         }
     ],
     default: 'create'
@@ -98,10 +103,11 @@ const ticketTypeIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['ticket'],
-            operation: ['get', 'delete']
+            operation: ['get', 'delete', 'update']
         }
     },
-    description: 'The ID of the ticket type to get details for or delete'
+    description:
+        'The ID of the ticket type to get details for or update or delete'
 };
 
 // Ticket Type IDs field for bulk update operation
@@ -447,6 +453,254 @@ const ticketCreateAdditionalFields: INodeProperties = {
     ]
 };
 
+// Update fields for ticket update operation
+const ticketUpdateFields: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['update']
+        }
+    },
+    // eslint-disable-next-line n8n-nodes-base/node-param-collection-type-unsorted-items
+    options: [
+        {
+            displayName: 'Name',
+            name: 'name',
+            type: 'string',
+            default: '',
+            description: 'The name of the ticket type'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            description: 'Description of the ticket type'
+        },
+        {
+            displayName: 'Capacity',
+            name: 'capacity',
+            type: 'number',
+            default: undefined,
+            description:
+                'Maximum number of tickets available (leave empty for unlimited)'
+        },
+        {
+            displayName: 'Maximum Quantity',
+            name: 'maxQuantity',
+            type: 'number',
+            description: 'Maximum number of tickets a user can purchase',
+            default: undefined
+        },
+        {
+            displayName: 'Minimum Quantity',
+            name: 'minQuantity',
+            type: 'number',
+            description: 'Minimum number of tickets a user can purchase',
+            default: 1
+        },
+        {
+            displayName: 'Price (in Cents)',
+            name: 'price',
+            type: 'number',
+            default: undefined,
+            description:
+                'The price of the ticket in cents (e.g., 2500 for $25.00)'
+        },
+        {
+            displayName: 'Sale Start Date',
+            name: 'saleStartAt',
+            type: 'dateTime',
+            default: '',
+            description: 'When ticket sales should start (ISO 8601 format)'
+        },
+        {
+            displayName: 'Sale End Date',
+            name: 'saleEndAt',
+            type: 'dateTime',
+            default: '',
+            description: 'When ticket sales should end (ISO 8601 format)'
+        },
+        {
+            displayName: 'Is Hidden',
+            name: 'isHidden',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether the ticket type should be hidden from public view'
+        },
+        {
+            displayName: 'Requires Approval',
+            name: 'requiresApproval',
+            type: 'boolean',
+            default: false,
+            description: 'Whether ticket purchases require manual approval'
+        },
+        {
+            displayName: 'Pricing Tiers',
+            name: 'pricingTiers',
+            type: 'fixedCollection',
+            default: {},
+            description: 'Time-based pricing tiers for early bird pricing',
+            typeOptions: {
+                multipleValues: true
+            },
+            options: [
+                {
+                    name: 'tier',
+                    displayName: 'Pricing Tier',
+                    values: [
+                        {
+                            displayName: 'Capacity',
+                            name: 'capacity',
+                            type: 'number',
+                            default: 0,
+                            description:
+                                'Number of tickets available at this price tier'
+                        },
+                        {
+                            displayName: 'End Date',
+                            name: 'endAt',
+                            type: 'dateTime',
+                            default: '',
+                            description:
+                                'When this pricing tier ends (optional)'
+                        },
+                        {
+                            displayName: 'Name',
+                            name: 'name',
+                            type: 'string',
+                            default: '',
+                            description: 'Name of this pricing tier'
+                        },
+                        {
+                            displayName: 'Price (in Cents)',
+                            name: 'price',
+                            type: 'number',
+                            default: 0,
+                            description: 'Price for this tier in cents'
+                        },
+                        {
+                            displayName: 'Start Date',
+                            name: 'startAt',
+                            type: 'dateTime',
+                            default: '',
+                            description: 'When this pricing tier becomes active'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            displayName: 'Discount Rules',
+            name: 'discountRules',
+            type: 'fixedCollection',
+            default: {},
+            description:
+                'Discount rules for bulk purchases, early bird discounts, etc',
+            typeOptions: {
+                multipleValues: true
+            },
+            options: [
+                {
+                    name: 'rule',
+                    displayName: 'Discount Rule',
+                    values: [
+                        {
+                            displayName: 'Type',
+                            name: 'type',
+                            type: 'options',
+                            options: [
+                                {
+                                    name: 'Early Bird',
+                                    value: 'early_bird'
+                                },
+                                {
+                                    name: 'Bulk Purchase',
+                                    value: 'bulk'
+                                },
+                                {
+                                    name: 'Promo Code',
+                                    value: 'promo_code'
+                                }
+                            ],
+                            default: 'early_bird',
+                            description: 'Type of discount rule'
+                        },
+                        {
+                            displayName: 'Value',
+                            name: 'value',
+                            type: 'number',
+                            default: 0,
+                            description:
+                                'Discount value (percentage or fixed amount in cents)'
+                        },
+                        {
+                            displayName: 'Minimum Quantity',
+                            name: 'minQuantity',
+                            type: 'number',
+                            default: 1,
+                            description:
+                                'Minimum quantity required for this discount'
+                        },
+                        {
+                            displayName: 'Valid Until',
+                            name: 'validUntil',
+                            type: 'dateTime',
+                            default: '',
+                            description: 'When this discount rule expires'
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
+// Additional fields for ticket update operation
+const ticketUpdateAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['update']
+        }
+    },
+    options: [
+        {
+            displayName: 'Preserve Existing Sales',
+            name: 'preserveExistingSales',
+            type: 'boolean',
+            default: true,
+            description:
+                'Whether to preserve existing sales data during updates'
+        },
+        {
+            displayName: 'Notify Existing Buyers',
+            name: 'notifyExistingBuyers',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to notify existing ticket buyers of changes'
+        },
+        {
+            displayName: 'Reason for Change',
+            name: 'reasonForChange',
+            type: 'string',
+            default: '',
+            description: 'Optional reason for the ticket type update'
+        }
+    ]
+};
+
 // Update Type field for bulk update operation
 const updateTypeField: INodeProperties = {
     displayName: 'Update Type',
@@ -707,6 +961,8 @@ export const ticketProps: INodeProperties[] = [
     ticketAdditionalFields,
     ticketGetAdditionalFields,
     ticketCreateAdditionalFields,
+    ticketUpdateFields,
+    ticketUpdateAdditionalFields,
     bulkUpdateAdditionalFields,
     ticketDeleteAdditionalFields
 ];
