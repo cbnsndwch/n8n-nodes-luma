@@ -155,4 +155,122 @@ describe('Frontend User Experience', () => {
       expect(resourceProperty?.noDataExpression).toBe(true);
     });
   });
+
+  describe('Guest Reject Operation UX', () => {
+    it('should have user-friendly reject operation option', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const guestOperationProperty = properties.find((p: any) => 
+        p.name === 'operation' && 
+        p.displayOptions?.show?.resource?.includes('guest')
+      );
+      
+      expect(guestOperationProperty).toBeDefined();
+      
+      const rejectOption = guestOperationProperty?.options?.find((option: any) => 
+        option.value === 'reject'
+      );
+      
+      expect(rejectOption).toBeDefined();
+      expect(rejectOption?.name).toBe('Reject');
+      expect(rejectOption?.description).toBe('Reject pending guest registrations');
+      expect(rejectOption?.action).toBe('Reject guest registration');
+    });
+
+    it('should have intuitive rejection reason field', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const rejectionReasonProperty = properties.find((p: any) => p.name === 'rejectionReason');
+      
+      expect(rejectionReasonProperty).toBeDefined();
+      expect(rejectionReasonProperty?.displayName).toBe('Rejection Reason');
+      expect(rejectionReasonProperty?.required).toBe(true);
+      expect(rejectionReasonProperty?.type).toBe('string');
+      expect(rejectionReasonProperty?.typeOptions?.rows).toBe(3);
+      expect(rejectionReasonProperty?.placeholder).toContain('Reason for rejecting');
+    });
+
+    it('should have logical field progression for reject operation', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      
+      // Find reject-specific fields
+      const guestIdField = properties.find((p: any) => 
+        p.name === 'guestId' && 
+        p.displayOptions?.show?.operation?.includes('reject')
+      );
+      const rejectionReasonField = properties.find((p: any) => 
+        p.name === 'rejectionReason'
+      );
+      const additionalFields = properties.find((p: any) => 
+        p.name === 'additionalFields' && 
+        p.displayOptions?.show?.operation?.includes('reject')
+      );
+      
+      expect(guestIdField).toBeDefined();
+      expect(rejectionReasonField).toBeDefined();
+      expect(additionalFields).toBeDefined();
+      
+      // Guest ID and rejection reason should be required
+      expect(guestIdField?.required).toBe(true);
+      expect(rejectionReasonField?.required).toBe(true);
+      expect(additionalFields?.required).toBeFalsy();
+    });
+
+    it('should have helpful additional fields for reject operation', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const rejectAdditionalFields = properties.find((p: any) => 
+        p.name === 'additionalFields' && 
+        p.displayOptions?.show?.operation?.includes('reject')
+      );
+      
+      expect(rejectAdditionalFields).toBeDefined();
+      expect(rejectAdditionalFields?.type).toBe('collection');
+      expect(rejectAdditionalFields?.displayName).toBe('Additional Fields');
+      
+      const options = rejectAdditionalFields?.options || [];
+      
+      // Check send notification option
+      const sendNotificationOption = options.find((opt: any) => opt.name === 'sendNotification');
+      expect(sendNotificationOption?.displayName).toBe('Send Notification');
+      expect(sendNotificationOption?.type).toBe('boolean');
+      expect(sendNotificationOption?.default).toBe(true);
+      
+      // Check custom message option
+      const customMessageOption = options.find((opt: any) => opt.name === 'customMessage');
+      expect(customMessageOption?.displayName).toBe('Custom Message');
+      expect(customMessageOption?.type).toBe('string');
+      expect(customMessageOption?.typeOptions?.rows).toBe(3);
+      
+      // Check allow reapply option
+      const allowReapplyOption = options.find((opt: any) => opt.name === 'allowReapply');
+      expect(allowReapplyOption?.displayName).toBe('Allow Reapply');
+      expect(allowReapplyOption?.type).toBe('boolean');
+      expect(allowReapplyOption?.default).toBe(false);
+    });
+
+    it('should support bulk operations with clear messaging', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const guestIdField = properties.find((p: any) => 
+        p.name === 'guestId' && 
+        p.displayOptions?.show?.operation?.includes('reject')
+      );
+      
+      expect(guestIdField?.placeholder).toContain('multiple');
+      expect(guestIdField?.description).toContain('bulk');
+      expect(guestIdField?.description).toContain('comma-separated');
+    });
+  });
 });

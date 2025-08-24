@@ -76,3 +76,11 @@ export interface GuestApprovalData extends IDataObject {
     ticket_type_id?: string;
     custom_message?: string;
 }
+
+export interface GuestRejectionData extends IDataObject {
+    guest_id: string | string[]; // Required guest ID(s)
+    rejection_reason: string; // Required rejection reason
+    send_notification?: boolean;
+    custom_message?: string;
+    allow_reapply?: boolean;
+}

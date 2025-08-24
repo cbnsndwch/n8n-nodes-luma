@@ -13,7 +13,8 @@ import type {
     GuestFilters,
     GuestRegistrationData,
     GuestUpdateData,
-    GuestApprovalData
+    GuestApprovalData,
+    GuestRejectionData
 } from './contracts';
 
 // Guest-specific operations
@@ -361,6 +362,92 @@ class GuestOperations extends BaseOperations {
 
         return this.createReturnItem(responseData, context.itemIndex);
     }
+
+    /**
+     * Reject guest registration(s)
+     */
+    static async reject(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const guestId = context.executeFunctions.getNodeParameter(
+            'guestId',
+            context.itemIndex
+        ) as string;
+
+        const rejectionReason = context.executeFunctions.getNodeParameter(
+            'rejectionReason',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        // Parse guest ID(s) - support both single and comma-separated values
+        let guestIds: string | string[];
+        // Validate guestId input for malformed comma-separated values
+        if (typeof guestId !== 'string' || guestId.trim() === '') {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Guest ID is required and cannot be empty.'
+            );
+        }
+        if (guestId.includes(',')) {
+            // Check for leading/trailing commas or consecutive commas
+            if (/^,|,,|,$/.test(guestId)) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'Malformed guest ID input: leading/trailing or consecutive commas are not allowed. Please provide a comma-separated list of valid guest IDs.'
+                );
+            }
+            guestIds = guestId
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id);
+            if (guestIds.length === 0) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'No valid guest IDs found. Please provide at least one valid guest ID.'
+                );
+            }
+        } else {
+            guestIds = guestId;
+        }
+
+        // Validate rejection reason is provided
+        if (!rejectionReason || rejectionReason.trim() === '') {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Rejection reason is required and cannot be empty.'
+            );
+        }
+
+        const body: GuestRejectionData = {
+            guest_id: guestIds,
+            rejection_reason: rejectionReason.trim()
+        };
+
+        // Apply additional fields
+        if (additionalFields.sendNotification !== undefined) {
+            body.send_notification =
+                additionalFields.sendNotification as boolean;
+        }
+        if (additionalFields.customMessage) {
+            body.custom_message = additionalFields.customMessage as string;
+        }
+        if (additionalFields.allowReapply !== undefined) {
+            body.allow_reapply = additionalFields.allowReapply as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.GUEST_REJECT),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
 }
 
 export async function handleGuestOperation(
@@ -381,6 +468,9 @@ export async function handleGuestOperation(
             break;
         case 'register':
             result = await GuestOperations.register(context);
+            break;
+        case 'reject':
+            result = await GuestOperations.reject(context);
             break;
         case 'update':
             result = await GuestOperations.update(context);

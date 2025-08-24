@@ -39,6 +39,12 @@ const guestOperations: INodeProperties = {
             action: 'Register guest for event'
         },
         {
+            name: 'Reject',
+            value: 'reject',
+            description: 'Reject pending guest registrations',
+            action: 'Reject guest registration'
+        },
+        {
             name: 'Update',
             value: 'update',
             description: 'Update guest information and status',
@@ -78,14 +84,14 @@ const guestIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['guest'],
-            operation: ['get', 'update', 'approve']
+            operation: ['get', 'update', 'approve', 'reject']
         }
     },
     default: '',
     placeholder:
         'gst-abc123def456 or gst-abc123def456,gst-def789ghi012 for multiple',
     description:
-        'The unique identifier(s) of the guest(s). For approve operation, can be a single ID or comma-separated IDs for bulk approval.'
+        'The unique identifier(s) of the guest(s). For approve and reject operations, can be a single ID or comma-separated IDs for bulk operations.'
 };
 
 /**
@@ -602,6 +608,72 @@ const guestApproveAdditionalFields: INodeProperties = {
 };
 
 /**
+ * Rejection reason field for guest reject operation
+ */
+const guestRejectionReasonField: INodeProperties = {
+    displayName: 'Rejection Reason',
+    name: 'rejectionReason',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['reject']
+        }
+    },
+    typeOptions: {
+        rows: 3
+    },
+    default: '',
+    placeholder: 'Reason for rejecting the guest registration',
+    description: 'The reason for rejecting the guest registration'
+};
+
+/**
+ * Additional fields collection for guest reject operation
+ */
+const guestRejectAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['reject']
+        }
+    },
+    options: [
+        {
+            displayName: 'Send Notification',
+            name: 'sendNotification',
+            type: 'boolean',
+            default: true,
+            description: 'Whether to send rejection notification to the guest'
+        },
+        {
+            displayName: 'Custom Message',
+            name: 'customMessage',
+            type: 'string',
+            typeOptions: {
+                rows: 3
+            },
+            default: '',
+            description:
+                'Custom message to include in the rejection notification'
+        },
+        {
+            displayName: 'Allow Reapply',
+            name: 'allowReapply',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to allow the guest to reapply for the event'
+        }
+    ]
+};
+
+/**
  * Export all guest properties
  */
 export const guestProps: INodeProperties[] = [
@@ -610,10 +682,12 @@ export const guestProps: INodeProperties[] = [
     guestIdField,
     guestNameField,
     guestEmailField,
+    guestRejectionReasonField,
     guestAdditionalFields,
     guestGetAdditionalFields,
     guestRegistrationAdditionalFields,
     guestUpdateFields,
     guestUpdateAdditionalFields,
-    guestApproveAdditionalFields
+    guestApproveAdditionalFields,
+    guestRejectAdditionalFields
 ];
