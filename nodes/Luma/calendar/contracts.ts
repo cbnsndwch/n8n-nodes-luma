@@ -22,3 +22,29 @@ export interface AddEventRequest extends IDataObject {
     event_api_id: string;
     role?: 'host' | 'co-host' | 'organizer';
 }
+
+export interface PersonData extends IDataObject {
+    email: string;
+    name?: string;
+    role?: 'admin' | 'member' | 'follower';
+    tags?: string[];
+}
+
+export interface ImportPeopleRequest extends IDataObject {
+    calendar_api_id: string;
+    people: PersonData[];
+    skip_duplicates?: boolean;
+    notify_users?: boolean;
+    default_role?: 'admin' | 'member' | 'follower';
+}
+
+export interface ImportPeopleResult extends IDataObject {
+    total_processed: number;
+    successful_imports: number;
+    failed_imports: number;
+    duplicate_emails: number;
+    errors?: Array<{
+        email: string;
+        error: string;
+    }>;
+}

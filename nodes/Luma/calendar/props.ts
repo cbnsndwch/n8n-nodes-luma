@@ -30,6 +30,12 @@ const calendarOperations: INodeProperties = {
             description: 'Add an existing event to a calendar'
         },
         {
+            name: 'Import People',
+            value: 'importPeople',
+            action: 'Import people to a calendar',
+            description: 'Import multiple people to a calendar in bulk'
+        },
+        {
             name: 'List Events',
             value: 'listEvents',
             action: 'List events in a calendar',
@@ -56,7 +62,7 @@ const calendarApiIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['calendar'],
-            operation: ['listEvents', 'lookupEvent', 'addEvent']
+            operation: ['listEvents', 'lookupEvent', 'addEvent', 'importPeople']
         }
     },
     description: 'The API ID of the calendar'
@@ -286,12 +292,139 @@ const addEventAdditionalFields: INodeProperties = {
     options: [roleField]
 };
 
+// Import People specific fields
+
+const peopleDataField: INodeProperties = {
+    displayName: 'People',
+    name: 'people',
+    type: 'fixedCollection',
+    required: true,
+    typeOptions: {
+        multipleValues: true
+    },
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['importPeople']
+        }
+    },
+    default: {},
+    description: 'List of people to import to the calendar',
+    options: [
+        {
+            name: 'person',
+            displayName: 'Person',
+            values: [
+                {
+                    displayName: 'Email',
+                    name: 'email',
+                    type: 'string',
+                    required: true,
+                    placeholder: 'user@example.com',
+                    default: '',
+                    description: 'Email address of the person (required)'
+                },
+                {
+                    displayName: 'Name',
+                    name: 'name',
+                    type: 'string',
+                    default: '',
+                    description: 'Display name of the person'
+                },
+                {
+                    displayName: 'Role',
+                    name: 'role',
+                    type: 'options',
+                    options: [
+                        {
+                            name: 'Admin',
+                            value: 'admin'
+                        },
+                        {
+                            name: 'Member',
+                            value: 'member'
+                        },
+                        {
+                            name: 'Follower',
+                            value: 'follower'
+                        }
+                    ],
+                    default: 'member',
+                    description: 'Role for the person in the calendar'
+                },
+                {
+                    displayName: 'Tags',
+                    name: 'tags',
+                    type: 'string',
+                    default: '',
+                    description: 'Comma-separated list of tags for the person'
+                }
+            ]
+        }
+    ]
+};
+
+const defaultRoleField: INodeProperties = {
+    displayName: 'Default Role',
+    name: 'defaultRole',
+    type: 'options',
+    options: [
+        {
+            name: 'Admin',
+            value: 'admin'
+        },
+        {
+            name: 'Member',
+            value: 'member'
+        },
+        {
+            name: 'Follower',
+            value: 'follower'
+        }
+    ],
+    default: 'member',
+    description: 'Default role for people who do not have a role specified'
+};
+
+const skipDuplicatesField: INodeProperties = {
+    displayName: 'Skip Duplicates',
+    name: 'skipDuplicates',
+    type: 'boolean',
+    default: true,
+    description: 'Whether to skip people with duplicate email addresses'
+};
+
+const notifyUsersField: INodeProperties = {
+    displayName: 'Notify Users',
+    name: 'notifyUsers',
+    type: 'boolean',
+    default: false,
+    description: 'Whether to send notification emails to imported users'
+};
+
+const importPeopleAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['importPeople']
+        }
+    },
+    options: [defaultRoleField, skipDuplicatesField, notifyUsersField]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
     addEventApiIdField,
+    peopleDataField,
     calendarAdditionalFields,
     lookupAdditionalFields,
-    addEventAdditionalFields
+    addEventAdditionalFields,
+    importPeopleAdditionalFields
 ];

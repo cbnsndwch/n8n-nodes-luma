@@ -12,7 +12,9 @@ import type { LumaOperationContext } from '../shared/contracts';
 import type {
     CalendarEventFilters,
     EventLookupFilters,
-    AddEventRequest
+    AddEventRequest,
+    ImportPeopleRequest,
+    PersonData
 } from './contracts';
 
 /**
@@ -158,6 +160,99 @@ class CalendarOperations extends BaseOperations {
 
         return [this.createReturnItem(responseData, context.itemIndex)];
     }
+
+    /**
+     * Import people to a calendar
+     */
+    static async importPeople(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const calendarApiId = context.executeFunctions.getNodeParameter(
+            'calendarApiId',
+            context.itemIndex
+        ) as string;
+
+        const peopleData = context.executeFunctions.getNodeParameter(
+            'people',
+            context.itemIndex
+        ) as IDataObject;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        // Process people data from the fixed collection
+        const people: PersonData[] = [];
+        if (peopleData.person && Array.isArray(peopleData.person)) {
+            for (const person of peopleData.person) {
+                const personData: PersonData = {
+                    email: person.email as string
+                };
+
+                if (person.name) {
+                    personData.name = person.name as string;
+                }
+
+                if (person.role) {
+                    personData.role = person.role as
+                        | 'admin'
+                        | 'member'
+                        | 'follower';
+                }
+
+                if (person.tags) {
+                    // Convert comma-separated tags to array
+                    const tagsString = person.tags as string;
+                    if (tagsString.trim()) {
+                        personData.tags = tagsString
+                            .split(',')
+                            .map(tag => tag.trim())
+                            .filter(tag => tag.length > 0);
+                    }
+                }
+
+                people.push(personData);
+            }
+        }
+
+        if (people.length === 0) {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'At least one person must be specified for import'
+            );
+        }
+
+        const requestBody: ImportPeopleRequest = {
+            calendar_api_id: calendarApiId,
+            people
+        };
+
+        // Add optional fields from additional fields
+        if (additionalFields.defaultRole) {
+            requestBody.default_role = additionalFields.defaultRole as
+                | 'admin'
+                | 'member'
+                | 'follower';
+        }
+
+        if (additionalFields.skipDuplicates !== undefined) {
+            requestBody.skip_duplicates =
+                additionalFields.skipDuplicates as boolean;
+        }
+
+        if (additionalFields.notifyUsers !== undefined) {
+            requestBody.notify_users = additionalFields.notifyUsers as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_IMPORT_PEOPLE),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
 }
 
 export async function handleCalendarOperation(
@@ -169,6 +264,9 @@ export async function handleCalendarOperation(
     switch (operation) {
         case 'addEvent':
             result = await CalendarOperations.addEvent(context);
+            break;
+        case 'importPeople':
+            result = await CalendarOperations.importPeople(context);
             break;
         case 'listEvents':
             result = await CalendarOperations.listEvents(context);
