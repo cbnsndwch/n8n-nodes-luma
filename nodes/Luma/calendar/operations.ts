@@ -430,7 +430,11 @@ class CalendarOperations extends BaseOperations {
         }
 
         // Validate that at least one update field is provided
-        if (!requestBody.name && !requestBody.color && requestBody.description === undefined) {
+        if (
+            !requestBody.name &&
+            !requestBody.color &&
+            requestBody.description === undefined
+        ) {
             throw new NodeOperationError(
                 context.executeFunctions.getNode(),
                 'At least one update field (name, color, or description) must be provided'
