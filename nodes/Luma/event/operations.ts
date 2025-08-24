@@ -259,10 +259,15 @@ class EventOperations extends BaseOperations {
             qs.include_inactive = additionalFields.includeInactive as boolean;
         }
         if (additionalFields.includeUsageStats !== undefined) {
-            qs.include_usage_stats = additionalFields.includeUsageStats as boolean;
+            qs.include_usage_stats =
+                additionalFields.includeUsageStats as boolean;
         }
         if (additionalFields.sortBy) {
-            qs.sort_by = additionalFields.sortBy as 'name' | 'created_at' | 'expires_at' | 'usage';
+            qs.sort_by = additionalFields.sortBy as
+                | 'name'
+                | 'created_at'
+                | 'expires_at'
+                | 'usage';
         }
         if (additionalFields.sortOrder) {
             qs.sort_order = additionalFields.sortOrder as 'asc' | 'desc';
