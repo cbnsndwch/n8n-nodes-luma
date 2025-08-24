@@ -22,23 +22,7 @@ import {
     timezoneField
 } from '../shared/props/date-time.props';
 
-// Event resource parameter descriptions
-
-export const eventResource: INodeProperties = {
-    displayName: 'Resource',
-    name: 'resource',
-    type: 'options',
-    noDataExpression: true,
-    options: [
-        {
-            name: 'Event',
-            value: 'event'
-        }
-    ],
-    default: 'event'
-};
-
-export const eventOperations: INodeProperties = {
+const eventOperations: INodeProperties = {
     displayName: 'Operation',
     name: 'operation',
     type: 'options',
@@ -78,28 +62,15 @@ export const eventOperations: INodeProperties = {
     default: 'get'
 };
 
-// Event-specific required fields
-export const eventIdField = idField(
-    'Event ID',
-    'eventId',
-    'The ID of the event',
-    {
-        resource: ['event'],
-        operation: ['get', 'update', 'delete']
-    }
-);
+/**
+ * Event-specific required fields
+ */
+const eventIdField = idField('Event ID', 'eventId', 'The ID of the event', {
+    resource: ['event'],
+    operation: ['get', 'update', 'delete']
+});
 
-export const calendarIdField = idField(
-    'Calendar ID',
-    'calendarId',
-    'The ID of the calendar',
-    {
-        resource: ['event'],
-        operation: ['getMany', 'create']
-    }
-);
-
-export const eventNameField: INodeProperties = {
+const eventNameField: INodeProperties = {
     displayName: 'Event Name',
     name: 'eventName',
     type: 'string',
@@ -114,7 +85,7 @@ export const eventNameField: INodeProperties = {
     description: 'The name of the event'
 };
 
-export const eventDescriptionField: INodeProperties = {
+const eventDescriptionField: INodeProperties = {
     displayName: 'Event Description',
     name: 'eventDescription',
     type: 'string',
@@ -128,8 +99,10 @@ export const eventDescriptionField: INodeProperties = {
     description: 'The description of the event'
 };
 
-// Event start date with display conditions
-export const eventStartDateField: INodeProperties = {
+/**
+ * Event start date with display conditions
+ */
+const eventStartDateField: INodeProperties = {
     ...startDateField,
     displayOptions: {
         show: {
@@ -139,8 +112,10 @@ export const eventStartDateField: INodeProperties = {
     }
 };
 
-// Event state filter for getMany operation
-export const eventStateField: INodeProperties = {
+/**
+ * Event state filter for getMany operation
+ */
+const eventStateField: INodeProperties = {
     displayName: 'Event State',
     name: 'eventState',
     type: 'options',
@@ -162,8 +137,10 @@ export const eventStateField: INodeProperties = {
     description: 'Filter events by state (for getMany operation)'
 };
 
-// Event state field for update operations (state transitions)
-export const eventUpdateStateField: INodeProperties = {
+/**
+ * Event state field for update operations (state transitions)
+ */
+const eventUpdateStateField: INodeProperties = {
     displayName: 'Event State',
     name: 'state',
     type: 'options',
@@ -185,7 +162,7 @@ export const eventUpdateStateField: INodeProperties = {
     description: 'Update the state of the event (draft, active, or cancelled)'
 };
 
-export const seriesIdField: INodeProperties = {
+const seriesIdField: INodeProperties = {
     displayName: 'Series ID',
     name: 'seriesId',
     type: 'string',
@@ -193,8 +170,10 @@ export const seriesIdField: INodeProperties = {
     description: 'Filter events by series ID (for getMany operation)'
 };
 
-// Pagination cursor fields for getMany operation
-export const eventAfterCursorField: INodeProperties = {
+/**
+ * Pagination cursor fields for getMany operation
+ */
+const eventAfterCursorField: INodeProperties = {
     ...afterCursorField,
     displayOptions: {
         show: {
@@ -203,7 +182,7 @@ export const eventAfterCursorField: INodeProperties = {
     }
 };
 
-export const eventBeforeCursorField: INodeProperties = {
+const eventBeforeCursorField: INodeProperties = {
     ...beforeCursorField,
     displayOptions: {
         show: {
@@ -212,8 +191,10 @@ export const eventBeforeCursorField: INodeProperties = {
     }
 };
 
-// Additional fields collection for events
-export const eventAdditionalFields: INodeProperties = {
+/**
+ * Additional fields collection for events
+ */
+const eventAdditionalFields: INodeProperties = {
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',
@@ -304,3 +285,12 @@ export const eventAdditionalFields: INodeProperties = {
         eventBeforeCursorField
     ]
 };
+
+export const eventProps = [
+    eventOperations,
+    eventIdField,
+    eventNameField,
+    eventDescriptionField,
+    eventStartDateField,
+    eventAdditionalFields
+];

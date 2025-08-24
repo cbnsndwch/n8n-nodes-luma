@@ -2,7 +2,7 @@ import type { INodeProperties } from 'n8n-workflow';
 
 // User resource parameter descriptions
 
-export const userResource: INodeProperties = {
+const userResource: INodeProperties = {
     displayName: 'Resource',
     name: 'resource',
     type: 'options',
@@ -16,7 +16,7 @@ export const userResource: INodeProperties = {
     default: 'user'
 };
 
-export const userOperations: INodeProperties = {
+const userOperations: INodeProperties = {
     displayName: 'Operation',
     name: 'operation',
     type: 'options',
@@ -37,7 +37,7 @@ export const userOperations: INodeProperties = {
 };
 
 // No additional fields needed for getSelf operation
-export const userAdditionalFields: INodeProperties = {
+const userAdditionalFields: INodeProperties = {
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',
@@ -54,3 +54,5 @@ export const userAdditionalFields: INodeProperties = {
         // The API endpoint requires no parameters beyond authentication
     ]
 };
+
+export const userProps = [userResource, userOperations, userAdditionalFields];

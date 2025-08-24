@@ -58,6 +58,45 @@ class UtilityOperations extends BaseOperations {
 
         return this.createReturnItem(responseData, context.itemIndex);
     }
+
+    /**
+     * Lookup entity by slug
+     */
+    static async entityLookup(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const slug = context.executeFunctions.getNodeParameter(
+            'slug',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: IDataObject = {
+            slug: slug
+        };
+
+        // Add optional entity type filter
+        if (additionalFields.entityType) {
+            qs.entity_type = additionalFields.entityType as string;
+        }
+
+        // Add optional include details flag
+        if (additionalFields.includeDetails) {
+            qs.include_details = additionalFields.includeDetails as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.ENTITY_LOOKUP),
+            qs
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
 }
 
 export async function handleUtilityOperation(
@@ -69,6 +108,9 @@ export async function handleUtilityOperation(
     switch (operation) {
         case 'createImageUploadUrl':
             result = await UtilityOperations.createImageUploadUrl(context);
+            break;
+        case 'entityLookup':
+            result = await UtilityOperations.entityLookup(context);
             break;
         default:
             throw new Error(

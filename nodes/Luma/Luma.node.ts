@@ -7,31 +7,13 @@ import {
     NodeOperationError
 } from 'n8n-workflow';
 
-import { lumaResource, ResourceId } from './shared/props';
+import { lumaResource, type ResourceId } from './shared/props';
 
-import {
-    calendarOperations,
-    calendarApiIdField,
-    calendarAdditionalFields
-} from './calendar/props';
+import { calendarProps } from './calendar/props';
+import { eventProps } from './event/props';
+import { userProps } from './user/props';
+import { utilityProps } from './utility/props';
 
-import {
-    eventOperations,
-    eventIdField,
-    calendarIdField,
-    eventNameField,
-    eventDescriptionField,
-    eventStartDateField,
-    eventAdditionalFields
-} from './event/props';
-
-import { userOperations, userAdditionalFields } from './user/props';
-
-import {
-    imageTypeField,
-    utilityOperations,
-    utilityAdditionalFields
-} from './utility/props';
 import { RESOURCE_HANDLERS } from './operations';
 
 export class Luma implements INodeType {
@@ -57,25 +39,10 @@ export class Luma implements INodeType {
         ],
         properties: [
             lumaResource,
-            // Event-specific fields
-            eventOperations,
-            eventIdField,
-            eventNameField,
-            eventDescriptionField,
-            eventStartDateField,
-            eventAdditionalFields,
-            // Calendar-specific fields
-            calendarOperations,
-            calendarIdField,
-            calendarApiIdField,
-            calendarAdditionalFields,
-            // User-specific fields
-            userOperations,
-            userAdditionalFields,
-            // Utility-specific fields
-            utilityOperations,
-            imageTypeField,
-            utilityAdditionalFields
+            ...eventProps,
+            ...calendarProps,
+            ...userProps,
+            ...utilityProps
         ]
     };
 

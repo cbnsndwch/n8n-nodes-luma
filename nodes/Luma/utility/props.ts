@@ -1,8 +1,9 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-// Utility resource parameter descriptions
-
-export const utilityOperations: INodeProperties = {
+/**
+ * Utility resource parameter descriptions
+ */
+const utilityOperations: INodeProperties = {
     displayName: 'Operation',
     name: 'operation',
     type: 'options',
@@ -17,13 +18,22 @@ export const utilityOperations: INodeProperties = {
             name: 'Create Image Upload URL',
             value: 'createImageUploadUrl',
             action: 'Create image upload URL'
+        },
+        {
+            name: 'Entity Lookup',
+            value: 'entityLookup',
+            action: 'Lookup entity by slug'
         }
     ],
     default: 'createImageUploadUrl'
 };
 
-// Image type field for upload URL creation
-export const imageTypeField: INodeProperties = {
+//#region Image Upload URL Creation
+
+/**
+ * Image type field for upload URL creation
+ */
+const imageTypeField: INodeProperties = {
     displayName: 'Image Type',
     name: 'imageType',
     type: 'options',
@@ -51,8 +61,10 @@ export const imageTypeField: INodeProperties = {
     description: 'The type of image to upload'
 };
 
-// Additional fields for image upload URL creation
-export const utilityAdditionalFields: INodeProperties = {
+/**
+ * Additional fields for image upload URL creation
+ */
+const createImageUploadUrlAdditionalFields: INodeProperties = {
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',
@@ -110,3 +122,83 @@ export const utilityAdditionalFields: INodeProperties = {
         }
     ]
 };
+
+//#endregion Image Upload URL Creation
+
+//#region Entity Slug Lookup
+
+/**
+ * Required slug field for entity lookup
+ */
+const slugField: INodeProperties = {
+    displayName: 'Slug',
+    name: 'slug',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['utility'],
+            operation: ['entityLookup']
+        }
+    },
+    default: '',
+    description: 'The slug identifier for the entity to lookup'
+};
+
+/**
+ * Additional fields collection for entity slug lookup
+ */
+const entityLookupAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['utility'],
+            operation: ['entityLookup']
+        }
+    },
+    options: [
+        {
+            displayName: 'Entity Type',
+            name: 'entityType',
+            type: 'options',
+            options: [
+                {
+                    name: 'Event',
+                    value: 'event'
+                },
+                {
+                    name: 'Calendar',
+                    value: 'calendar'
+                },
+                {
+                    name: 'User',
+                    value: 'user'
+                }
+            ],
+            default: 'event',
+            description: 'Filter by specific entity type'
+        },
+        {
+            displayName: 'Include Details',
+            name: 'includeDetails',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to include additional entity details in the response'
+        }
+    ]
+};
+
+//#endregion Entity Slug Lookup
+
+export const utilityProps = [
+    utilityOperations,
+    imageTypeField,
+    createImageUploadUrlAdditionalFields,
+    slugField,
+    entityLookupAdditionalFields
+];

@@ -1,22 +1,18 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-// Calendar resource parameter descriptions
+import { idField } from '../shared/props';
 
-export const calendarResource: INodeProperties = {
-    displayName: 'Resource',
-    name: 'resource',
-    type: 'options',
-    noDataExpression: true,
-    options: [
-        {
-            name: 'Calendar',
-            value: 'calendar'
-        }
-    ],
-    default: 'calendar'
-};
+const calendarIdField = idField(
+    'Calendar ID',
+    'calendarId',
+    'The ID of the calendar',
+    {
+        resource: ['event'],
+        operation: ['getMany', 'create']
+    }
+);
 
-export const calendarOperations: INodeProperties = {
+const calendarOperations: INodeProperties = {
     displayName: 'Operation',
     name: 'operation',
     type: 'options',
@@ -39,7 +35,7 @@ export const calendarOperations: INodeProperties = {
 
 // Calendar-specific required fields
 
-export const calendarApiIdField: INodeProperties = {
+const calendarApiIdField: INodeProperties = {
     displayName: 'Calendar API ID',
     name: 'calendarApiId',
     type: 'string',
@@ -56,7 +52,7 @@ export const calendarApiIdField: INodeProperties = {
 
 // Time range filter fields for calendar events
 
-export const beforeDateField: INodeProperties = {
+const beforeDateField: INodeProperties = {
     displayName: 'Before Date',
     name: 'before',
     type: 'dateTime',
@@ -64,7 +60,7 @@ export const beforeDateField: INodeProperties = {
     description: 'Filter events before this time (ISO 8601 datetime)'
 };
 
-export const afterDateField: INodeProperties = {
+const afterDateField: INodeProperties = {
     displayName: 'After Date',
     name: 'after',
     type: 'dateTime',
@@ -72,7 +68,7 @@ export const afterDateField: INodeProperties = {
     description: 'Filter events after this time (ISO 8601 datetime)'
 };
 
-export const sortDirectionField: INodeProperties = {
+const sortDirectionField: INodeProperties = {
     displayName: 'Sort Direction',
     name: 'sortDirection',
     type: 'options',
@@ -98,7 +94,7 @@ export const sortDirectionField: INodeProperties = {
     description: 'Sort direction for results'
 };
 
-export const sortColumnField: INodeProperties = {
+const sortColumnField: INodeProperties = {
     displayName: 'Sort Column',
     name: 'sortColumn',
     type: 'options',
@@ -112,7 +108,7 @@ export const sortColumnField: INodeProperties = {
     description: 'Column to sort by'
 };
 
-export const paginationCursorField: INodeProperties = {
+const paginationCursorField: INodeProperties = {
     displayName: 'Pagination Cursor',
     name: 'paginationCursor',
     type: 'string',
@@ -120,7 +116,7 @@ export const paginationCursorField: INodeProperties = {
     description: 'Cursor for pagination through results'
 };
 
-export const paginationLimitField: INodeProperties = {
+const paginationLimitField: INodeProperties = {
     displayName: 'Pagination Limit',
     name: 'paginationLimit',
     type: 'number',
@@ -133,7 +129,7 @@ export const paginationLimitField: INodeProperties = {
 };
 
 // Calendar additional fields for listEvents operation
-export const calendarAdditionalFields: INodeProperties = {
+const calendarAdditionalFields: INodeProperties = {
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',
@@ -154,3 +150,10 @@ export const calendarAdditionalFields: INodeProperties = {
         paginationLimitField
     ]
 };
+
+export const calendarProps = [
+    calendarOperations,
+    calendarIdField,
+    calendarApiIdField,
+    calendarAdditionalFields
+];
