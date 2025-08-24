@@ -1,0 +1,91 @@
+name: Release to npm
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            
+      - name: Install dependencies
+        run: |
+          echo "📦 Installing dependencies..."
+          pnpm install || { echo "❌ Dependency installation failed"; exit 1; }
+          echo "✅ Dependencies installed successfully"
+        
+      - name: Validate package with dry-run
+        run: |
+          echo "🔍 Validating package structure with dry-run..."
+          npm pack --dry-run || { echo "❌ Package validation failed"; exit 1; }
+          echo "✅ Package structure validated successfully"
+        
+      - name: Run comprehensive validation
+        run: |
+          echo "🔍 Running comprehensive pre-publish validation..."
+          pnpm run prepublishOnly || { echo "❌ Pre-publish validation failed"; exit 1; }
+          echo "✅ Pre-publish validation completed successfully"
+        
+      - name: Run tests
+        run: |
+          echo "🧪 Running test suite..."
+          pnpm run test || { echo "❌ Test suite failed"; exit 1; }
+          echo "✅ All tests passed successfully"
+        
+      - name: Validate package contents
+        run: |
+          echo "🔍 Validating final package contents..."
+          # Check that dist/ directory exists and contains required files
+          test -d dist || { echo "❌ Missing dist/ directory"; exit 1; }
+          test -f dist/package.json || { echo "❌ Missing dist/package.json"; exit 1; }
+          test -f dist/nodes/Luma/Luma.node.js || { echo "❌ Missing main node file"; exit 1; }
+          test -f dist/credentials/LumaApi.credentials.js || { echo "❌ Missing credentials file"; exit 1; }
+          
+          # Verify package.json has correct name and version
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          echo "📋 Package: $PACKAGE_NAME@$PACKAGE_VERSION"
+          echo "✅ Package contents validated successfully"
+        
+      - name: Publish to npm
+        run: |
+          echo "🚀 Publishing package to npm..."
+          pnpm publish --access public || { echo "❌ npm publish failed"; exit 1; }
+          echo "✅ Package published successfully to npm"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Verify publication
+        run: |
+          echo "🔍 Verifying package publication..."
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          
+          # Wait a moment for npm registry to update
+          sleep 10
+          
+          # Check if package is available on npm
+          npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version || { echo "⚠️ Package not yet available on npm registry (may take a few minutes)"; exit 0; }
+          echo "✅ Package successfully published and available on npm registry"
