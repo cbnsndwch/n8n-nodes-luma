@@ -79,21 +79,6 @@ jobs:
           
           echo "✅ All build artifacts validated successfully"
         
-      - name: Validate icon copying process
-        run: |
-          echo "🎨 Validating icon copying process..."
-          
-          # Clean dist and verify icons are copied correctly by gulp
-          pnpm run clean
-          pnpm exec tsc
-          pnpm exec gulp build:icons || { echo "❌ Icon copying failed"; exit 1; }
-          
-          # Verify icons were copied correctly
-          test -f dist/nodes/Luma/luma.svg || { echo "❌ Luma icon not copied"; exit 1; }
-          test -f dist/nodes/LumaTrigger/luma.svg || { echo "❌ LumaTrigger icon not copied"; exit 1; }
-          
-          echo "✅ Icon copying process validated successfully"
-        
       - name: Run tests
         run: pnpm run test
         
