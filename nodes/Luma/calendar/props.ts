@@ -83,6 +83,12 @@ const calendarOperations: INodeProperties = {
             value: 'updateCoupon',
             action: 'Update a calendar coupon',
             description: 'Update existing coupon settings for a calendar'
+        },
+        {
+            name: 'Update Person Tag',
+            value: 'updatePersonTag',
+            action: 'Update a person tag in a calendar',
+            description: 'Update the properties of an existing person tag'
         }
     ],
     default: 'listEvents'
@@ -107,6 +113,7 @@ const calendarApiIdField: INodeProperties = {
                 'importPeople',
                 'listPeople',
                 'listPersonTags',
+                'updatePersonTag',
                 'deletePersonTag',
                 'createPersonTag',
                 'updateCoupon'
@@ -116,7 +123,7 @@ const calendarApiIdField: INodeProperties = {
     description: 'The API ID of the calendar'
 };
 
-const tagApiIdField: INodeProperties = {
+const deleteTagApiIdField: INodeProperties = {
     displayName: 'Tag API ID',
     name: 'tagApiId',
     type: 'string',
@@ -317,6 +324,24 @@ const addEventApiIdField: INodeProperties = {
         }
     },
     description: 'The API ID of the event to add to the calendar'
+};
+
+// Update Person Tag specific fields
+
+const updateTagApiIdField: INodeProperties = {
+    displayName: 'Tag API ID',
+    name: 'tagApiId',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: 'tag_123abc...',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updatePersonTag']
+        }
+    },
+    description: 'API ID of the person tag to update'
 };
 
 const roleField: INodeProperties = {
@@ -692,6 +717,47 @@ const listPersonTagsAdditionalFields: INodeProperties = {
     options: [paginationCursorField, paginationLimitField]
 };
 
+// Update fields for updatePersonTag operation
+const updatePersonTagFields: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updatePersonTag']
+        }
+    },
+    options: [
+        {
+            displayName: 'Name',
+            name: 'name',
+            type: 'string',
+            default: '',
+            placeholder: 'Updated tag name',
+            description: 'Updated name for the tag'
+        },
+        {
+            displayName: 'Color',
+            name: 'color',
+            type: 'color',
+            default: '',
+            placeholder: '#FF5733',
+            description: 'Updated hex color code for the tag (e.g., #FF5733)'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            placeholder: 'Updated tag description',
+            description: 'Updated description for the tag'
+        }
+    ]
+};
+
 // Additional fields for deletePersonTag operation
 const deletePersonTagAdditionalFields: INodeProperties = {
     displayName: 'Additional Fields',
@@ -871,8 +937,9 @@ export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
-    tagApiIdField,
+    deleteTagApiIdField,
     addEventApiIdField,
+    updateTagApiIdField,
     couponApiIdField,
     peopleDataField,
     personTagNameField,
@@ -887,6 +954,7 @@ export const calendarProps = [
     createCouponAdditionalFields,
     listPeopleAdditionalFields,
     listPersonTagsAdditionalFields,
+    updatePersonTagFields,
     deletePersonTagAdditionalFields,
     createPersonTagAdditionalFields,
     updateCouponFields
