@@ -18,6 +18,26 @@ describe('Ticket Frontend User Experience', () => {
             expect(operationProp?.displayName).toBeDefined();
         });
 
+        it('should include update operation option', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField?.options).toBeDefined();
+
+            const updateOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'update'
+            );
+            expect(updateOption).toBeDefined();
+            expect(updateOption?.name).toBe('Update Ticket Type Configuration');
+            expect(updateOption?.action).toBe(
+                'Update ticket type configuration'
+            );
+        });
+
         it('should have clear operation labeling', async () => {
             const { ticketProps } = await import(
                 '../../../dist/nodes/Luma/ticket/props.js'
@@ -76,6 +96,33 @@ describe('Ticket Frontend User Experience', () => {
                 prop => prop.displayName && prop.displayName.length > 0
             );
             expect(fieldsWithDisplayNames.length).toBeGreaterThan(0);
+        });
+
+        it('should have update fields collection with proper structure', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const updateFieldsCollection = ticketProps.find(
+                prop => prop.name === 'updateFields'
+            );
+            expect(updateFieldsCollection).toBeDefined();
+            expect(updateFieldsCollection?.displayName).toBe('Update Fields');
+            expect(updateFieldsCollection?.type).toBe('collection');
+            expect(updateFieldsCollection?.options).toBeDefined();
+
+            // Check that update fields include common ticket properties
+            const nameOption = updateFieldsCollection?.options?.find(
+                (opt: any) => opt.name === 'name'
+            );
+            expect(nameOption).toBeDefined();
+            expect(nameOption?.displayName).toBe('Name');
+
+            const priceOption = updateFieldsCollection?.options?.find(
+                (opt: any) => opt.name === 'price'
+            );
+            expect(priceOption).toBeDefined();
+            expect(priceOption?.displayName).toBe('Price (in Cents)');
         });
 
         it('should have helpful descriptions for complex fields', async () => {

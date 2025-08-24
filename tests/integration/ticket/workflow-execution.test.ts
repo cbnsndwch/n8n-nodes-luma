@@ -40,6 +40,50 @@ describe('Ticket Workflow Execution Tests', () => {
             );
         });
 
+        it('should handle ticket type update operation', async () => {
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('ticket')
+                .mockReturnValueOnce('update')
+                .mockReturnValueOnce('ticket-456')
+                .mockReturnValueOnce({
+                    name: 'Updated VIP Pass',
+                    price: 5000
+                })
+                .mockReturnValueOnce({
+                    preserveExistingSales: true,
+                    reasonForChange: 'Price adjustment'
+                });
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+            expect(inputData[0]).toHaveProperty('json');
+
+            // Verify parameters
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'update'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('ticketTypeId')).toBe(
+                'ticket-456'
+            );
+
+            const updateFields =
+                mockExecuteFunctions.getNodeParameter('updateFields');
+            expect(updateFields).toEqual({
+                name: 'Updated VIP Pass',
+                price: 5000
+            });
+
+            const additionalFields =
+                mockExecuteFunctions.getNodeParameter('additionalFields');
+            expect(additionalFields).toEqual({
+                preserveExistingSales: true,
+                reasonForChange: 'Price adjustment'
+            });
+        });
+
         it('should handle ticket type list operation', async () => {
             mockExecuteFunctions.getNodeParameter
                 .mockReturnValueOnce('ticket')
