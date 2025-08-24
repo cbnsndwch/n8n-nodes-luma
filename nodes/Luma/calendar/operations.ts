@@ -17,6 +17,10 @@ import type {
     PersonData,
     CalendarPeopleFilters,
     PersonTagsFilters,
+    DeletePersonTagRequest,
+    CreatePersonTagRequest,
+    CreateCalendarCouponRequest,
+    UpdateCalendarCouponRequest,
     UpdatePersonTagRequest
 } from './contracts';
 
@@ -158,6 +162,67 @@ class CalendarOperations extends BaseOperations {
         const responseData = await this.executeRequest(context, {
             method: 'POST',
             url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_ADD_EVENT),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
+
+    /**
+     * Create a coupon for calendar events
+     */
+    static async createCoupon(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const name = context.executeFunctions.getNodeParameter(
+            'name',
+            context.itemIndex
+        ) as string;
+
+        const code = context.executeFunctions.getNodeParameter(
+            'code',
+            context.itemIndex
+        ) as string;
+
+        const discountType = context.executeFunctions.getNodeParameter(
+            'discountType',
+            context.itemIndex
+        ) as 'percentage' | 'fixed_amount';
+
+        const discountValue = context.executeFunctions.getNodeParameter(
+            'discountValue',
+            context.itemIndex
+        ) as number;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: CreateCalendarCouponRequest = {
+            name,
+            code,
+            discount_type: discountType,
+            discount_value: discountValue
+        };
+
+        // Add optional fields from additional fields
+        if (additionalFields.maxUses !== undefined) {
+            requestBody.max_uses = additionalFields.maxUses as number;
+        }
+        if (additionalFields.expiresAt) {
+            requestBody.expires_at = additionalFields.expiresAt as string;
+        }
+        if (additionalFields.description) {
+            requestBody.description = additionalFields.description as string;
+        }
+        if (additionalFields.isActive !== undefined) {
+            requestBody.is_active = additionalFields.isActive as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_CREATE_COUPON),
             body: requestBody
         });
 
@@ -380,6 +445,140 @@ class CalendarOperations extends BaseOperations {
 
         return [this.createReturnItem(responseData, context.itemIndex)];
     }
+
+    /**
+     * Delete a person tag
+     */
+    static async deletePersonTag(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const tagApiId = context.executeFunctions.getNodeParameter(
+            'tagApiId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: DeletePersonTagRequest = {
+            api_id: tagApiId
+        };
+
+        // Add force delete parameter if specified
+        if (additionalFields.forceDelete === true) {
+            body.force_delete = true;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_DELETE_PERSON_TAG),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
+
+    /**
+     * Create a person tag in a calendar
+     */
+    static async createPersonTag(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const calendarApiId = context.executeFunctions.getNodeParameter(
+            'calendarApiId',
+            context.itemIndex
+        ) as string;
+
+        const name = context.executeFunctions.getNodeParameter(
+            'name',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: CreatePersonTagRequest = {
+            calendar_api_id: calendarApiId,
+            name
+        };
+
+        // Add optional fields from additional fields
+        if (additionalFields.color) {
+            requestBody.color = additionalFields.color as string;
+        }
+        if (additionalFields.description) {
+            requestBody.description = additionalFields.description as string;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_CREATE_PERSON_TAG),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
+
+    /**
+     * Update a calendar coupon
+     */
+    static async updateCoupon(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const apiId = context.executeFunctions.getNodeParameter(
+            'apiId',
+            context.itemIndex
+        ) as string;
+
+        const updateFields = context.executeFunctions.getNodeParameter(
+            'updateFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: UpdateCalendarCouponRequest = {
+            api_id: apiId
+        };
+
+        // Apply optional update fields
+        if (updateFields.name) {
+            requestBody.name = updateFields.name as string;
+        }
+        if (updateFields.code) {
+            requestBody.code = updateFields.code as string;
+        }
+        if (updateFields.discountType) {
+            requestBody.discount_type = updateFields.discountType as
+                | 'percentage'
+                | 'fixed_amount';
+        }
+        if (updateFields.discountValue !== undefined) {
+            requestBody.discount_value = updateFields.discountValue as number;
+        }
+        if (updateFields.maxUses !== undefined) {
+            requestBody.max_uses = updateFields.maxUses as number;
+        }
+        if (updateFields.expiresAt) {
+            requestBody.expires_at = updateFields.expiresAt as string;
+        }
+        if (updateFields.description) {
+            requestBody.description = updateFields.description as string;
+        }
+        if (updateFields.isActive !== undefined) {
+            requestBody.is_active = updateFields.isActive as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_UPDATE_COUPON),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
 }
 
 export async function handleCalendarOperation(
@@ -391,6 +590,15 @@ export async function handleCalendarOperation(
     switch (operation) {
         case 'addEvent':
             result = await CalendarOperations.addEvent(context);
+            break;
+        case 'deletePersonTag':
+            result = await CalendarOperations.deletePersonTag(context);
+            break;
+        case 'createPersonTag':
+            result = await CalendarOperations.createPersonTag(context);
+            break;
+        case 'createCoupon':
+            result = await CalendarOperations.createCoupon(context);
             break;
         case 'importPeople':
             result = await CalendarOperations.importPeople(context);
@@ -409,6 +617,9 @@ export async function handleCalendarOperation(
             break;
         case 'lookupEvent':
             result = await CalendarOperations.lookupEvent(context);
+            break;
+        case 'updateCoupon':
+            result = await CalendarOperations.updateCoupon(context);
             break;
         default:
             throw new NodeOperationError(

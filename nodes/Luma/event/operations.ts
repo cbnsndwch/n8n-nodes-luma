@@ -283,6 +283,74 @@ class EventOperations extends BaseOperations {
     }
 
     /**
+     * Create a new event coupon
+     */
+    static async createCoupon(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const eventId = context.executeFunctions.getNodeParameter(
+            'eventId',
+            context.itemIndex
+        ) as string;
+        const couponName = context.executeFunctions.getNodeParameter(
+            'couponName',
+            context.itemIndex
+        ) as string;
+        const couponCode = context.executeFunctions.getNodeParameter(
+            'couponCode',
+            context.itemIndex
+        ) as string;
+        const discountType = context.executeFunctions.getNodeParameter(
+            'discountType',
+            context.itemIndex
+        ) as 'percentage' | 'fixed_amount';
+        const discountValue = context.executeFunctions.getNodeParameter(
+            'discountValue',
+            context.itemIndex
+        ) as number;
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: IDataObject = {
+            event_api_id: eventId,
+            name: couponName,
+            code: couponCode,
+            discount_type: discountType,
+            discount_value: discountValue
+        };
+
+        // Add optional fields
+        if (additionalFields.description) {
+            body.description = additionalFields.description as string;
+        }
+        if (additionalFields.maxUses) {
+            body.max_uses = additionalFields.maxUses as number;
+        }
+        if (additionalFields.maxUsesPerUser) {
+            body.max_uses_per_user = additionalFields.maxUsesPerUser as number;
+        }
+        if (additionalFields.startsAt) {
+            body.starts_at = additionalFields.startsAt as string;
+        }
+        if (additionalFields.expiresAt) {
+            body.expires_at = additionalFields.expiresAt as string;
+        }
+        if (additionalFields.isPublic !== undefined) {
+            body.is_public = additionalFields.isPublic as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_CREATE_COUPON),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
+
+    /**
      * Delete an event
      */
     static async delete(
@@ -335,6 +403,9 @@ export async function handleEventOperation(
             break;
         case 'create':
             result = await EventOperations.create(context);
+            break;
+        case 'createCoupon':
+            result = await EventOperations.createCoupon(context);
             break;
         case 'update':
             result = await EventOperations.update(context);
