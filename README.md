@@ -44,6 +44,40 @@ pnpm run lint
 pnpm run format
 ```
 
+## Release Process (Maintainers)
+
+This package uses automated GitHub workflows for releasing. To set up npm authentication:
+
+### npm Token Setup
+
+1. **Generate npm token**:
+   ```bash
+   npm login  # If not already logged in
+   npm token create --read-only=false --cidr-whitelist=0.0.0.0/0
+   ```
+
+2. **Configure GitHub Secret**:
+   - Go to **Repository Settings > Secrets and Variables > Actions**
+   - Add new secret named `NPM_TOKEN`
+   - Use the token value from step 1
+
+### Release Process
+
+1. **Create a GitHub release** with semantic version tag (e.g., `v1.0.0`)
+2. **Automated workflow** handles:
+   - Build validation
+   - npm authentication verification  
+   - Package publishing
+   - Publication verification
+
+### Token Management
+
+- **Permissions**: Use automation tokens with publish-only access
+- **Rotation**: Update tokens quarterly for security
+- **Scope**: Minimal permissions (package publishing only)
+
+For detailed authentication configuration, see the [npm authentication documentation](docs/projects/005-npm-release-workflows/2-release-automation/story-2.2-npm-authentication.md).
+
 ## License
 
 [MIT](LICENSE.md)

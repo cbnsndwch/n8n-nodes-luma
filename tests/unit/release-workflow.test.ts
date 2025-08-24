@@ -289,4 +289,115 @@ describe('Release Workflow Tests', () => {
             expect(fs.existsSync('.npmignore')).toBe(true);
         });
     });
+
+    describe('npm Authentication Configuration', () => {
+        it('should include npm authentication validation step', () => {
+            const content = fs.readFileSync(
+                '.github/workflows/release.yml',
+                'utf8'
+            );
+            const workflow = parse(content);
+            const authStep = workflow.jobs.publish.steps.find(
+                (step: any) => step.name === 'Validate npm authentication'
+            );
+            expect(authStep).toBeDefined();
+            expect(authStep.env).toBeDefined();
+            expect(authStep.env.NODE_AUTH_TOKEN).toBe(
+                '${{ secrets.NPM_TOKEN }}'
+            );
+        });
+
+        it('should validate NPM_TOKEN secret is available', () => {
+            const content = fs.readFileSync(
+                '.github/workflows/release.yml',
+                'utf8'
+            );
+            const workflow = parse(content);
+            const authStep = workflow.jobs.publish.steps.find(
+                (step: any) => step.name === 'Validate npm authentication'
+            );
+            expect(authStep).toBeDefined();
+            expect(authStep.run).toContain('NODE_AUTH_TOKEN');
+            expect(authStep.run).toContain('NPM_TOKEN secret is not set');
+        });
+
+        it('should test npm whoami for authentication validation', () => {
+            const content = fs.readFileSync(
+                '.github/workflows/release.yml',
+                'utf8'
+            );
+            const workflow = parse(content);
+            const authStep = workflow.jobs.publish.steps.find(
+                (step: any) => step.name === 'Validate npm authentication'
+            );
+            expect(authStep).toBeDefined();
+            expect(authStep.run).toContain('npm whoami');
+        });
+
+        it('should provide clear error messages for authentication failures', () => {
+            const content = fs.readFileSync(
+                '.github/workflows/release.yml',
+                'utf8'
+            );
+            const workflow = parse(content);
+            const authStep = workflow.jobs.publish.steps.find(
+                (step: any) => step.name === 'Validate npm authentication'
+            );
+            expect(authStep).toBeDefined();
+            expect(authStep.run).toContain('npm authentication failed');
+            expect(authStep.run).toContain('https://www.npmjs.com/settings/tokens');
+            expect(authStep.run).toContain('repository settings');
+        });
+
+        it('should validate authentication before publishing', () => {
+            const content = fs.readFileSync(
+                '.github/workflows/release.yml',
+                'utf8'
+            );
+            const workflow = parse(content);
+            const steps = workflow.jobs.publish.steps;
+
+            const authIndex = steps.findIndex(
+                (step: any) => step.name === 'Validate npm authentication'
+            );
+            const publishIndex = steps.findIndex(
+                (step: any) => step.name === 'Publish to npm'
+            );
+
+            expect(authIndex).toBeGreaterThan(-1);
+            expect(publishIndex).toBeGreaterThan(-1);
+            expect(authIndex).toBeLessThan(publishIndex);
+        });
+
+        it('should have enhanced error messages in publish step', () => {
+            const content = fs.readFileSync(
+                '.github/workflows/release.yml',
+                'utf8'
+            );
+            const workflow = parse(content);
+            const publishStep = workflow.jobs.publish.steps.find(
+                (step: any) => step.name === 'Publish to npm'
+            );
+            expect(publishStep).toBeDefined();
+            expect(publishStep.run).toContain('Common causes and solutions');
+            expect(publishStep.run).toContain('Authentication failed');
+            expect(publishStep.run).toContain('Permission denied');
+            expect(publishStep.run).toContain('Version already exists');
+        });
+
+        it('should provide troubleshooting commands in publish errors', () => {
+            const content = fs.readFileSync(
+                '.github/workflows/release.yml',
+                'utf8'
+            );
+            const workflow = parse(content);
+            const publishStep = workflow.jobs.publish.steps.find(
+                (step: any) => step.name === 'Publish to npm'
+            );
+            expect(publishStep).toBeDefined();
+            expect(publishStep.run).toContain('npm view');
+            expect(publishStep.run).toContain('npm whoami');
+            expect(publishStep.run).toContain('npm access list packages');
+        });
+    });
 });

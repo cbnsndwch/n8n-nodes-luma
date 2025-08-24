@@ -69,11 +69,53 @@ jobs:
           echo "📋 Package: $PACKAGE_NAME@$PACKAGE_VERSION"
           echo "✅ Package contents validated successfully"
         
+      - name: Validate npm authentication
+        run: |
+          echo "🔐 Validating npm authentication..."
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "❌ NPM_TOKEN secret is not set. Please configure the NPM_TOKEN secret in repository settings."
+            echo "💡 Go to: Repository Settings > Secrets and Variables > Actions > New repository secret"
+            echo "💡 Name: NPM_TOKEN"
+            echo "💡 Value: Your npm authentication token with publish permissions"
+            exit 1
+          fi
+          
+          # Test npm authentication by checking whoami
+          npm whoami || {
+            echo "❌ npm authentication failed. The NPM_TOKEN may be invalid or expired."
+            echo "💡 Please verify your npm token has the following permissions:"
+            echo "   - Read and write access to packages"
+            echo "   - Automation scope (if available)"
+            echo "💡 Generate a new token at: https://www.npmjs.com/settings/tokens"
+            echo "💡 Then update the NPM_TOKEN secret in repository settings"
+            exit 1
+          }
+          
+          CURRENT_USER=$(npm whoami)
+          echo "✅ npm authentication successful as user: $CURRENT_USER"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
       - name: Publish to npm
         run: |
           echo "🚀 Publishing package to npm..."
-          pnpm publish --access public || { echo "❌ npm publish failed"; exit 1; }
-          echo "✅ Package published successfully to npm"
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          
+          pnpm publish --access public || {
+            echo "❌ npm publish failed for $PACKAGE_NAME@$PACKAGE_VERSION"
+            echo "💡 Common causes and solutions:"
+            echo "   - Version already exists: Check if this version is already published"
+            echo "   - Authentication failed: Verify NPM_TOKEN secret is valid"
+            echo "   - Permission denied: Ensure token has publish permissions for this package"
+            echo "   - Network issues: Check npm registry connectivity"
+            echo "💡 Manual verification commands:"
+            echo "   npm view $PACKAGE_NAME versions --json  # Check existing versions"
+            echo "   npm whoami                              # Verify authentication"
+            echo "   npm access list packages                # Check package permissions"
+            exit 1
+          }
+          echo "✅ Package $PACKAGE_NAME@$PACKAGE_VERSION published successfully to npm"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
