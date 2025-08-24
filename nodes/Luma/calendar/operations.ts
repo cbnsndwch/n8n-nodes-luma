@@ -1,14 +1,20 @@
-import type { IDataObject, INodeExecutionData } from 'n8n-workflow';
-import { BaseOperations } from '../shared/BaseOperations';
-import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../../utils/constants';
-import type {
-    LumaOperationContext,
-    CalendarEventFilters
-} from '../shared/OperationTypes';
+import {
+    NodeOperationError,
+    type IDataObject,
+    type INodeExecutionData
+} from 'n8n-workflow';
 
-// Calendar-specific operations
+import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 
-export class CalendarOperations extends BaseOperations {
+import { BaseOperations } from '../shared/operations.base';
+import type { LumaOperationContext } from '../shared/contracts';
+
+import type { CalendarEventFilters } from './contracts';
+
+/**
+ * Calendar-specific operations
+ */
+class CalendarOperations extends BaseOperations {
     /**
      * List events in a calendar
      */
@@ -57,4 +63,23 @@ export class CalendarOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+}
+
+export async function handleCalendarOperation(
+    operation: string,
+    context: LumaOperationContext
+) {
+    let result: INodeExecutionData | INodeExecutionData[];
+
+    switch (operation) {
+        case 'listEvents':
+            result = await CalendarOperations.listEvents(context);
+            break;
+        default:
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                `The operation "${operation}" is not supported for calendar resource!`
+            );
+    }
+    return result;
 }

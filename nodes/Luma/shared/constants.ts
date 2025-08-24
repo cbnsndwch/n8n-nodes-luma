@@ -36,5 +36,8 @@ export const LUMA_ENDPOINTS = {
     CALENDAR_LIST_EVENTS: '/public/v1/calendar/list-events',
     CALENDAR_LIST_PEOPLE: '/public/v1/calendar/list-people',
     CALENDAR_LIST_PERSON_TAGS: '/public/v1/calendar/list-person-tags',
-    CALENDAR_LIST_COUPONS: '/public/v1/calendar/list-coupons'
+    CALENDAR_LIST_COUPONS: '/public/v1/calendar/list-coupons',
+
+    // Image endpoints
+    IMAGE_CREATE_UPLOAD_URL: '/public/v1/images/create-upload-url'
 } as const;

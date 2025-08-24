@@ -7,7 +7,7 @@ import type {
     IHttpRequestMethods
 } from 'n8n-workflow';
 import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
-import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../Luma/utils/constants';
+import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../Luma/shared/constants';
 
 export class LumaTrigger implements INodeType {
     description: INodeTypeDescription = {

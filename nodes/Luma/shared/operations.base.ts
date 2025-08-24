@@ -1,12 +1,14 @@
 import type { IDataObject, INodeExecutionData } from 'n8n-workflow';
+
 import type {
     LumaApiRequest,
     LumaOperationContext,
     LocationData
-} from './OperationTypes';
+} from './contracts';
 
-// Base operation patterns for common CRUD operations
-
+/**
+ * Base operation patterns for common CRUD operations
+ */
 export abstract class BaseOperations {
     /**
      * Execute an authenticated API request to Luma

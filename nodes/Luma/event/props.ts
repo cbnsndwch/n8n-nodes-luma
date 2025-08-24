@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+
 import {
     idField,
     limitField,
@@ -8,18 +9,18 @@ import {
     afterCursorField,
     beforeCursorField,
     forceDeleteField
-} from '../shared/CommonFields';
+} from '../shared/props/common.props';
 import {
     locationTypeField,
     locationNameField,
     locationAddressField,
     locationUrlField
-} from '../shared/LocationFields';
+} from '../shared/props/location.props';
 import {
     startDateField,
     endDateField,
     timezoneField
-} from '../shared/DateTimeFields';
+} from '../shared/props/date-time.props';
 
 // Event resource parameter descriptions
 

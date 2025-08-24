@@ -7,7 +7,7 @@ import {
 import {
     LUMA_API_BASE_URL,
     LUMA_ENDPOINTS
-} from '../nodes/Luma/utils/constants';
+} from '../nodes/Luma/shared/constants';
 
 export class LumaApi implements ICredentialType {
     name = 'lumaApi';

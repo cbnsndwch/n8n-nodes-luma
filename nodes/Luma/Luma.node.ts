@@ -1,10 +1,20 @@
-import type {
-    IExecuteFunctions,
-    INodeExecutionData,
-    INodeType,
-    INodeTypeDescription
+import {
+    type IExecuteFunctions,
+    type INodeExecutionData,
+    type INodeType,
+    type INodeTypeDescription,
+    NodeConnectionType,
+    NodeOperationError
 } from 'n8n-workflow';
-import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+
+import { lumaResource, ResourceId } from './shared/props';
+
+import {
+    calendarOperations,
+    calendarApiIdField,
+    calendarAdditionalFields
+} from './calendar/props';
+
 import {
     eventOperations,
     eventIdField,
@@ -12,19 +22,17 @@ import {
     eventNameField,
     eventDescriptionField,
     eventStartDateField,
-    eventAdditionalFields,
-    calendarOperations,
-    calendarApiIdField,
-    calendarAdditionalFields,
-    lumaResource,
-    userOperations,
-    userAdditionalFields
-} from './descriptions';
+    eventAdditionalFields
+} from './event/props';
+
+import { userOperations, userAdditionalFields } from './user/props';
+
 import {
-    CalendarOperations,
-    EventOperations,
-    UserOperations
-} from './operations';
+    imageTypeField,
+    utilityOperations,
+    utilityAdditionalFields
+} from './utility/props';
+import { RESOURCE_HANDLERS } from './operations';
 
 export class Luma implements INodeType {
     description: INodeTypeDescription = {
@@ -63,7 +71,11 @@ export class Luma implements INodeType {
             calendarAdditionalFields,
             // User-specific fields
             userOperations,
-            userAdditionalFields
+            userAdditionalFields,
+            // Utility-specific fields
+            utilityOperations,
+            imageTypeField,
+            utilityAdditionalFields
         ]
     };
 
@@ -81,85 +93,33 @@ export class Luma implements INodeType {
                     itemIndex: i
                 };
 
-                if (resource === 'event') {
-                    let result: INodeExecutionData | INodeExecutionData[];
+                const handleOperation =
+                    RESOURCE_HANDLERS[resource as ResourceId];
 
-                    switch (operation) {
-                        case 'get':
-                            result = await EventOperations.get(context);
-                            break;
-                        case 'getMany':
-                            result = await EventOperations.getMany(context);
-                            break;
-                        case 'create':
-                            result = await EventOperations.create(context);
-                            break;
-                        case 'update':
-                            result = await EventOperations.update(context);
-                            break;
-                        case 'delete':
-                            result = await EventOperations.delete(context);
-                            break;
-                        default:
-                            throw new NodeOperationError(
-                                this.getNode(),
-                                `The operation "${operation}" is not supported!`
-                            );
-                    }
-
-                    // Handle single vs multiple results
-                    if (Array.isArray(result)) {
-                        returnData.push(...result);
-                    } else {
-                        returnData.push(result);
-                    }
-                } else if (resource === 'calendar') {
-                    let result: INodeExecutionData | INodeExecutionData[];
-
-                    switch (operation) {
-                        case 'listEvents':
-                            result =
-                                await CalendarOperations.listEvents(context);
-                            break;
-                        default:
-                            throw new NodeOperationError(
-                                this.getNode(),
-                                `The operation "${operation}" is not supported for calendar resource!`
-                            );
-                    }
-
-                    // Handle single vs multiple results
-                    if (Array.isArray(result)) {
-                        returnData.push(...result);
-                    } else {
-                        returnData.push(result);
-                    }
-                } else if (resource === 'user') {
-                    let result: INodeExecutionData;
-
-                    switch (operation) {
-                        case 'getSelf':
-                            result = await UserOperations.getSelf(context);
-                            break;
-                        default:
-                            throw new NodeOperationError(
-                                this.getNode(),
-                                `The operation "${operation}" is not supported for user resource!`
-                            );
-                    }
-
-                    returnData.push(result);
-                } else {
+                if (!handleOperation) {
                     throw new NodeOperationError(
                         this.getNode(),
                         `The resource "${resource}" is not supported!`
                     );
                 }
+
+                const result = await handleOperation(operation, context);
+
+                // Handle single vs multiple results
+                if (Array.isArray(result)) {
+                    returnData.push(...result);
+                } else {
+                    returnData.push(result);
+                }
             } catch (error) {
                 if (this.continueOnFail()) {
                     returnData.push({
-                        json: { error: error.message },
-                        pairedItem: { item: i }
+                        json: {
+                            error: error.message
+                        },
+                        pairedItem: {
+                            item: i
+                        }
                     });
                     continue;
                 }

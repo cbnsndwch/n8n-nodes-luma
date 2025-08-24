@@ -1,15 +1,19 @@
-import type { IDataObject, INodeExecutionData } from 'n8n-workflow';
-import { BaseOperations } from '../shared/BaseOperations';
-import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../../utils/constants';
-import type {
-    LumaOperationContext,
-    EventData,
-    EventFilters
-} from '../shared/OperationTypes';
+import {
+    type IDataObject,
+    type INodeExecutionData,
+    NodeOperationError
+} from 'n8n-workflow';
+
+import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
+
+import { BaseOperations } from '../shared/operations.base';
+import type { LumaOperationContext } from '../shared/contracts';
+
+import type { EventData, EventFilters } from './contracts';
 
 // Event-specific operations
 
-export class EventOperations extends BaseOperations {
+class EventOperations extends BaseOperations {
     /**
      * Get a single event by ID
      */
@@ -263,4 +267,35 @@ export class EventOperations extends BaseOperations {
 
         return this.createReturnItem(responseData, context.itemIndex);
     }
+}
+
+export async function handleEventOperation(
+    operation: string,
+    context: LumaOperationContext
+) {
+    let result: INodeExecutionData | INodeExecutionData[];
+
+    switch (operation) {
+        case 'get':
+            result = await EventOperations.get(context);
+            break;
+        case 'getMany':
+            result = await EventOperations.getMany(context);
+            break;
+        case 'create':
+            result = await EventOperations.create(context);
+            break;
+        case 'update':
+            result = await EventOperations.update(context);
+            break;
+        case 'delete':
+            result = await EventOperations.delete(context);
+            break;
+        default:
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                `The operation "${operation}" is not supported!`
+            );
+    }
+    return result;
 }
