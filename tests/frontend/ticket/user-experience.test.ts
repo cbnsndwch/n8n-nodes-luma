@@ -18,6 +18,26 @@ describe('Ticket Frontend User Experience', () => {
             expect(operationProp?.displayName).toBeDefined();
         });
 
+        it('should include update operation option', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField?.options).toBeDefined();
+
+            const updateOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'update'
+            );
+            expect(updateOption).toBeDefined();
+            expect(updateOption?.name).toBe('Update Ticket Type Configuration');
+            expect(updateOption?.action).toBe(
+                'Update ticket type configuration'
+            );
+        });
+
         it('should have clear operation labeling', async () => {
             const { ticketProps } = await import(
                 '../../../dist/nodes/Luma/ticket/props.js'
@@ -78,6 +98,36 @@ describe('Ticket Frontend User Experience', () => {
             expect(fieldsWithDisplayNames.length).toBeGreaterThan(0);
         });
 
+        it('should have update fields collection with proper structure', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Find the updateFields collection specifically for update operation
+            const updateFieldsCollection = ticketProps.find(
+                prop =>
+                    prop.name === 'updateFields' &&
+                    prop.displayOptions?.show?.operation?.includes('update')
+            );
+            expect(updateFieldsCollection).toBeDefined();
+            expect(updateFieldsCollection?.displayName).toBe('Update Fields');
+            expect(updateFieldsCollection?.type).toBe('collection');
+            expect(updateFieldsCollection?.options).toBeDefined();
+
+            // Check that update fields include common ticket properties
+            const nameOption = updateFieldsCollection?.options?.find(
+                (opt: any) => opt.name === 'name'
+            );
+            expect(nameOption).toBeDefined();
+            expect(nameOption?.displayName).toBe('Name');
+
+            const priceOption = updateFieldsCollection?.options?.find(
+                (opt: any) => opt.name === 'price'
+            );
+            expect(priceOption).toBeDefined();
+            expect(priceOption?.displayName).toBe('Price (in Cents)');
+        });
+
         it('should have helpful descriptions for complex fields', async () => {
             const { ticketProps } = await import(
                 '../../../dist/nodes/Luma/ticket/props.js'
@@ -88,6 +138,153 @@ describe('Ticket Frontend User Experience', () => {
                 prop => prop.description && prop.description.length > 0
             );
             expect(fieldsWithDescriptions.length).toBeGreaterThan(0);
+        });
+
+        it('should have delete operation with appropriate fields', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check for delete operation
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            const deleteOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'delete'
+            );
+            expect(deleteOption).toBeDefined();
+            expect(deleteOption?.name).toBe('Delete Ticket Type');
+
+            // Check for delete-specific additional fields
+            const deleteAdditionalFields = ticketProps.find(
+                prop =>
+                    prop.name === 'additionalFields' &&
+                    prop.displayOptions?.show?.operation?.includes('delete')
+            );
+            expect(deleteAdditionalFields).toBeDefined();
+            expect(deleteAdditionalFields?.options).toBeDefined();
+
+            // Verify specific delete options exist
+            const forceDeleteOption = deleteAdditionalFields?.options?.find(
+                (opt: any) => opt.name === 'force'
+            );
+            expect(forceDeleteOption).toBeDefined();
+            expect(forceDeleteOption?.displayName).toBe('Force Delete');
+        });
+    });
+
+    describe('Bulk Update User Experience', () => {
+        it('should have bulk update operation option', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField?.options).toBeDefined();
+
+            const bulkUpdateOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'bulkUpdate'
+            );
+            expect(bulkUpdateOption).toBeDefined();
+            expect(bulkUpdateOption?.name).toBe('Bulk Update Ticket Types');
+            expect(bulkUpdateOption?.action).toBe('Bulk update ticket types');
+        });
+
+        it('should have user-friendly bulk update parameter structure', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check ticket type IDs field
+            const ticketTypeIdsField = ticketProps.find(
+                prop => prop.name === 'ticketTypeIds'
+            );
+            expect(ticketTypeIdsField).toBeDefined();
+            expect(ticketTypeIdsField?.displayName).toBe('Ticket Type IDs');
+            expect(ticketTypeIdsField?.description).toContain(
+                'Comma-separated'
+            );
+
+            // Check update type field
+            const updateTypeField = ticketProps.find(
+                prop => prop.name === 'updateType'
+            );
+            expect(updateTypeField).toBeDefined();
+            expect(updateTypeField?.displayName).toBe('Update Type');
+            expect(updateTypeField?.type).toBe('options');
+            expect(updateTypeField?.options).toBeDefined();
+            expect(updateTypeField?.options?.length).toBe(3); // percentage_change, fixed_change, absolute_value
+        });
+
+        it('should have properly structured update fields collection', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const updateFieldsCollection = ticketProps.find(
+                prop => prop.name === 'updateFields'
+            );
+            expect(updateFieldsCollection).toBeDefined();
+            expect(updateFieldsCollection?.type).toBe('collection');
+            expect(updateFieldsCollection?.displayName).toBe('Update Fields');
+            expect(updateFieldsCollection?.options).toBeDefined();
+            expect(updateFieldsCollection?.options?.length).toBe(4); // priceChange, capacityChange, saleEndAt, isHidden
+        });
+
+        it('should have conditional field visibility for bulk update', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Find fields that should only show for bulk update operation
+            const bulkUpdateSpecificFields = ticketProps.filter(prop =>
+                prop.displayOptions?.show?.operation?.includes('bulkUpdate')
+            );
+
+            expect(bulkUpdateSpecificFields.length).toBeGreaterThan(0);
+
+            // Verify key bulk update fields are present
+            const ticketTypeIdsField = bulkUpdateSpecificFields.find(
+                prop => prop.name === 'ticketTypeIds'
+            );
+            const updateTypeField = bulkUpdateSpecificFields.find(
+                prop => prop.name === 'updateType'
+            );
+            const updateFieldsField = bulkUpdateSpecificFields.find(
+                prop => prop.name === 'updateFields'
+            );
+
+            expect(ticketTypeIdsField).toBeDefined();
+            expect(updateTypeField).toBeDefined();
+            expect(updateFieldsField).toBeDefined();
+        });
+
+        it('should have helpful boolean descriptions starting with "Whether"', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Find additional fields collection for bulk update
+            const bulkUpdateAdditionalFields = ticketProps.find(
+                prop =>
+                    prop.name === 'additionalFields' &&
+                    prop.displayOptions?.show?.operation?.includes('bulkUpdate')
+            );
+
+            expect(bulkUpdateAdditionalFields).toBeDefined();
+            expect(bulkUpdateAdditionalFields?.options).toBeDefined();
+
+            // Check boolean fields have proper descriptions
+            const booleanOptions = bulkUpdateAdditionalFields?.options?.filter(
+                (opt: any) => opt.type === 'boolean'
+            );
+
+            expect(booleanOptions?.length).toBeGreaterThan(0);
+            booleanOptions?.forEach((opt: any) => {
+                expect(opt.description).toMatch(/^Whether to /);
+            });
         });
     });
 

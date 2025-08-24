@@ -9,7 +9,12 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { EventData, EventFilters, CouponFilters } from './contracts';
+import type {
+    EventData,
+    EventFilters,
+    CouponFilters,
+    UpdateEventCouponRequest
+} from './contracts';
 
 // Event-specific operations
 
@@ -351,6 +356,55 @@ class EventOperations extends BaseOperations {
     }
 
     /**
+     * Update an existing event coupon
+     */
+    static async updateCoupon(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const couponId = context.executeFunctions.getNodeParameter(
+            'couponId',
+            context.itemIndex
+        ) as string;
+
+        const updateFields = context.executeFunctions.getNodeParameter(
+            'updateFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: UpdateEventCouponRequest = {
+            coupon_api_id: couponId
+        };
+
+        // Add optional update fields
+        if (updateFields.name) {
+            body.name = updateFields.name as string;
+        }
+        if (updateFields.description) {
+            body.description = updateFields.description as string;
+        }
+        if (updateFields.maxUses !== undefined) {
+            body.max_uses = updateFields.maxUses as number;
+        }
+        if (updateFields.expiresAt) {
+            body.expires_at = updateFields.expiresAt as string;
+        }
+        if (updateFields.isActive !== undefined) {
+            body.is_active = updateFields.isActive as boolean;
+        }
+        if (updateFields.isPublic !== undefined) {
+            body.is_public = updateFields.isPublic as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_UPDATE_COUPON),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
+
+    /**
      * Delete an event
      */
     static async delete(
@@ -406,6 +460,9 @@ export async function handleEventOperation(
             break;
         case 'createCoupon':
             result = await EventOperations.createCoupon(context);
+            break;
+        case 'updateCoupon':
+            result = await EventOperations.updateCoupon(context);
             break;
         case 'update':
             result = await EventOperations.update(context);
