@@ -475,14 +475,12 @@ const ticketUpdateFields: INodeProperties = {
             displayName: 'Minimum Quantity',
             name: 'minQuantity',
             type: 'number',
-            default: undefined,
             description: 'Minimum number of tickets a user can purchase'
         },
         {
             displayName: 'Maximum Quantity',
             name: 'maxQuantity',
             type: 'number',
-            default: undefined,
             description: 'Maximum number of tickets a user can purchase'
         },
         {
