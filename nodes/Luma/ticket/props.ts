@@ -17,6 +17,11 @@ const ticketOperations: INodeProperties = {
             action: 'Create new ticket type'
         },
         {
+            name: 'Delete Ticket Type',
+            value: 'delete',
+            action: 'Delete ticket type'
+        },
+        {
             name: 'Get Ticket Type Details',
             value: 'get',
             action: 'Get ticket type details'
@@ -78,7 +83,7 @@ const ticketPriceField: INodeProperties = {
     description: 'The price of the ticket in cents (e.g., 2500 for $25.00)'
 };
 
-// Ticket Type ID field for get operation
+// Ticket Type ID field for get and delete operations
 const ticketTypeIdField: INodeProperties = {
     displayName: 'Ticket Type ID',
     name: 'ticketTypeId',
@@ -88,10 +93,10 @@ const ticketTypeIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['ticket'],
-            operation: ['get']
+            operation: ['get', 'delete']
         }
     },
-    description: 'The ID of the ticket type to get details for'
+    description: 'The ID of the ticket type to get details for or delete'
 };
 
 // Additional fields for ticket operations
@@ -421,6 +426,55 @@ const ticketCreateAdditionalFields: INodeProperties = {
     ]
 };
 
+// Additional fields for ticket delete operation
+const ticketDeleteAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['delete']
+        }
+    },
+    options: [
+        {
+            displayName: 'Force Delete',
+            name: 'force',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to allow deletion even if there are existing sales for this ticket type'
+        },
+        {
+            displayName: 'Archive Instead',
+            name: 'archiveInstead',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to archive the ticket type instead of permanently deleting it (soft delete)'
+        },
+        {
+            displayName: 'Transfer Sales To Type ID',
+            name: 'transferSalesToTypeId',
+            type: 'string',
+            default: '',
+            description:
+                'Transfer existing sales to another ticket type (provide the target ticket type ID)'
+        },
+        {
+            displayName: 'Refund Existing Sales',
+            name: 'refundExistingSales',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to refund all existing sales for this ticket type before deletion'
+        }
+    ]
+};
+
 export const ticketProps: INodeProperties[] = [
     ticketOperations,
     eventIdField,
@@ -429,5 +483,6 @@ export const ticketProps: INodeProperties[] = [
     ticketTypeIdField,
     ticketAdditionalFields,
     ticketGetAdditionalFields,
-    ticketCreateAdditionalFields
+    ticketCreateAdditionalFields,
+    ticketDeleteAdditionalFields
 ];

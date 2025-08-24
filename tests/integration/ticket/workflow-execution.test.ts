@@ -60,6 +60,31 @@ describe('Ticket Workflow Execution Tests', () => {
                 'event-456'
             );
         });
+
+        it('should handle ticket type delete operation', async () => {
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('ticket')
+                .mockReturnValueOnce('delete')
+                .mockReturnValueOnce('ticket-type-123')
+                .mockReturnValueOnce({
+                    force: true,
+                    archiveInstead: false
+                });
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify parameters
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'delete'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('ticketTypeId')).toBe(
+                'ticket-type-123'
+            );
+        });
     });
 
     describe('Ticket Error Handling', () => {

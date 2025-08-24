@@ -9,7 +9,11 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { TicketTypeFilters, CreateTicketTypeRequest } from './contracts';
+import type {
+    TicketTypeFilters,
+    CreateTicketTypeRequest,
+    DeleteTicketTypeRequest
+} from './contracts';
 
 // Ticket-specific operations
 
@@ -229,6 +233,57 @@ class TicketOperations extends BaseOperations {
             }
         };
     }
+
+    /**
+     * Delete a ticket type
+     */
+    static async delete(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const ticketTypeId = context.executeFunctions.getNodeParameter(
+            'ticketTypeId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex,
+            {}
+        ) as IDataObject;
+
+        // Build the request body
+        const requestBody: DeleteTicketTypeRequest = {
+            ticket_type_id: ticketTypeId
+        };
+
+        // Add optional fields
+        if (additionalFields.force === true) {
+            requestBody.force = true;
+        }
+        if (additionalFields.archiveInstead === true) {
+            requestBody.archive_instead = true;
+        }
+        if (additionalFields.transferSalesToTypeId) {
+            requestBody.transfer_sales_to_type_id =
+                additionalFields.transferSalesToTypeId as string;
+        }
+        if (additionalFields.refundExistingSales === true) {
+            requestBody.refund_existing_sales = true;
+        }
+
+        const response = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.TICKET_TYPE_DELETE),
+            body: requestBody
+        });
+
+        return {
+            json: response,
+            pairedItem: {
+                item: context.itemIndex
+            }
+        };
+    }
 }
 
 /**
@@ -241,6 +296,8 @@ export async function handleTicketOperation(
     switch (operation) {
         case 'create':
             return await TicketOperations.create(context);
+        case 'delete':
+            return await TicketOperations.delete(context);
         case 'get':
             return await TicketOperations.get(context);
         case 'list':
