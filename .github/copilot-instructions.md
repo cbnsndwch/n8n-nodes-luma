@@ -190,6 +190,106 @@ Each user story follows a consistent format:
 - **Complete coverage**: All API functionality should be documented before implementation
 - **Cross-references**: Link related stories, dependencies, and implementation files
 
+### GitHub Project Management Structure
+Projects should be managed using GitHub Projects for enhanced tracking and collaboration:
+
+#### Project Setup
+- **GitHub Project**: Create a dedicated project for each major initiative
+- **Project Naming**: "Project {ID}: {Descriptive Name}" (e.g., "Project 005: GitHub Workflows for NPM Release")
+- **Project Type**: Team or Repository project with multiple views
+- **Views Configuration**:
+  - **Board View**: Kanban-style with columns (To Do, In Progress, In Review, Done)
+  - **Table View**: All issues with custom fields for detailed tracking
+  - **Roadmap View**: Timeline visualization of epics and milestones
+
+#### Custom Fields for Projects
+- **Epic**: Single select field mapping to project epics
+- **Story Points**: Number field for effort estimation (1, 2, 3, 5, 8)
+- **Priority**: Single select field (High, Medium, Low)
+- **Sprint/Iteration**: Iteration field for sprint planning (optional)
+
+#### Issue Structure and Hierarchy
+**Epic Level Issues:**
+- **Purpose**: Top-level GitHub issues representing major functional areas
+- **Labels**: `epic`, `project-{id}`, functional area labels
+- **Milestones**: One milestone per epic for story grouping
+- **Content**: Epic overview, acceptance criteria, linked user stories
+- **Task Lists**: Checkbox list of all user stories with issue references
+
+**Story Level Issues:**
+- **Purpose**: Individual GitHub issues for specific functionality
+- **Labels**: `story`, `epic-{num}`, priority and type labels
+- **Linking**: Referenced in parent epic's task list
+- **Content**: User story format, acceptance criteria, technical details
+- **Pull Request Integration**: Automatic linking via keywords
+
+#### Issue Templates
+**Epic Template Structure:**
+```markdown
+---
+name: Epic
+about: Create a new epic for the project
+title: 'Epic [NUMBER]: [NAME]'
+labels: epic, project-[ID]
+---
+
+## Epic Overview
+[Brief description from epic documentation]
+
+## Acceptance Criteria
+- [ ] All user stories completed
+- [ ] All tests passing
+- [ ] Documentation updated
+
+## User Stories
+- [ ] Story [X.1]: [Name] #[issue-number]
+- [ ] Story [X.2]: [Name] #[issue-number]
+
+## Links
+- [Epic Documentation](link-to-docs)
+```
+
+**Story Template Structure:**
+```markdown
+---
+name: User Story
+about: Create a new user story
+title: 'Story [NUMBER]: [NAME]'
+labels: story, epic-[X]
+---
+
+## User Story
+As a [role], I want to [action], so that [benefit]
+
+## Acceptance Criteria
+- [ ] [Specific criterion 1]
+- [ ] [Specific criterion 2]
+
+## Definition of Done
+- [ ] Code implemented and tested
+- [ ] Documentation updated
+- [ ] Code reviewed and approved
+
+## Links
+- Epic: #[epic-issue-number]
+- [Story Documentation](link-to-story-doc)
+```
+
+#### Project Automation and Integration
+- **Pull Request Integration**: PRs automatically linked to issues via keywords
+- **Status Automation**: Issues move between columns based on PR status
+- **Commit Integration**: Commits can close stories with "closes #issue" keywords
+- **Progress Tracking**: Automatic burndown charts and velocity metrics
+- **Assignment Workflow**: Clear ownership and workload distribution
+
+#### Benefits of GitHub Projects Approach
+- **Enhanced Visibility**: Multiple views (board, table, roadmap) for different stakeholders
+- **Better Organization**: Proper epic/story hierarchy with clear dependencies
+- **Automatic Tracking**: Progress updates based on PR and commit activity
+- **Collaboration**: Clear status, assignment, and communication channels
+- **Metrics**: Burndown charts, velocity tracking, and completion analytics
+- **Integration**: Seamless connection between issues, PRs, and code changes
+
 ## Development Workflow
 
 ### Project Planning and Documentation
@@ -202,6 +302,32 @@ When starting a new project:
 5. **Write epic summaries**: Create EPIC_SUMMARY.md with coverage statistics
 6. **Document user stories**: Break epics into specific, actionable user stories
 7. **Validate completeness**: Ensure 100% API coverage before implementation starts
+8. **Create GitHub Project**: Set up project tracking and issue management
+
+### GitHub Project Setup Process
+**MANDATORY**: All new projects must include GitHub Project setup for tracking:
+
+#### Project Creation Steps
+1. **Create GitHub Project**: Use "Project {ID}: {Descriptive Name}" naming
+2. **Configure Views**: Set up Board, Table, and Roadmap views
+3. **Add Custom Fields**: Epic, Story Points, Priority, Sprint/Iteration
+4. **Create Issue Templates**: Epic and Story templates in `.github/ISSUE_TEMPLATE/`
+5. **Set Up Automation**: Configure status automation and PR integration
+
+#### Issue Creation Process
+1. **Create Epic Issues**: One GitHub issue per epic with milestone
+2. **Create Story Issues**: Individual issues for each user story
+3. **Link Issues**: Reference stories in epic task lists
+4. **Apply Labels**: Consistent labeling (epic, story, project-id)
+5. **Set Custom Fields**: Assign epic, story points, priority
+6. **Add to Project**: Ensure all issues are added to GitHub Project
+
+#### Project Management Workflow
+- **Epic Tracking**: Use milestones to group stories by epic
+- **Sprint Planning**: Organize stories into iterations if using sprints
+- **Progress Monitoring**: Track completion via project views and automation
+- **Status Updates**: Issues automatically move based on PR status
+- **Documentation Links**: Maintain links between issues and documentation
 
 ### Documentation Requirements for New Projects
 **MANDATORY**: All new projects must include complete documentation before implementation:
