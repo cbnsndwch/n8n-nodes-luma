@@ -314,42 +314,44 @@ const ticketCreateAdditionalFields: INodeProperties = {
                     name: 'tier',
                     displayName: 'Pricing Tier',
                     values: [
-                            {
-                                displayName: 'Capacity',
-                                name: 'capacity',
-                                type: 'number',
-                                default: 0,
-                                description: 'Number of tickets available at this price tier',
-                            },
-                            {
-                                displayName: 'End Date',
-                                name: 'endAt',
-                                type: 'dateTime',
-                                default: '',
-                                description: 'When this pricing tier ends (optional)',
-                            },
-                            {
-                                displayName: 'Name',
-                                name: 'name',
-                                type: 'string',
-                                default: '',
-                                description: 'Name of this pricing tier',
-                            },
-                            {
-                                displayName: 'Price (in Cents)',
-                                name: 'price',
-                                type: 'number',
-                                default: 0,
-                                description: 'Price for this tier in cents',
-                            },
-                            {
-                                displayName: 'Start Date',
-                                name: 'startAt',
-                                type: 'dateTime',
-                                default: '',
-                                description: 'When this pricing tier becomes active',
-                            },
-                        ]
+                        {
+                            displayName: 'Capacity',
+                            name: 'capacity',
+                            type: 'number',
+                            default: 0,
+                            description:
+                                'Number of tickets available at this price tier'
+                        },
+                        {
+                            displayName: 'End Date',
+                            name: 'endAt',
+                            type: 'dateTime',
+                            default: '',
+                            description:
+                                'When this pricing tier ends (optional)'
+                        },
+                        {
+                            displayName: 'Name',
+                            name: 'name',
+                            type: 'string',
+                            default: '',
+                            description: 'Name of this pricing tier'
+                        },
+                        {
+                            displayName: 'Price (in Cents)',
+                            name: 'price',
+                            type: 'number',
+                            default: 0,
+                            description: 'Price for this tier in cents'
+                        },
+                        {
+                            displayName: 'Start Date',
+                            name: 'startAt',
+                            type: 'dateTime',
+                            default: '',
+                            description: 'When this pricing tier becomes active'
+                        }
+                    ]
                 }
             ]
         },
@@ -358,7 +360,8 @@ const ticketCreateAdditionalFields: INodeProperties = {
             name: 'discountRules',
             type: 'fixedCollection',
             default: {},
-            description: 'Discount rules for bulk purchases, early bird discounts, etc',
+            description:
+                'Discount rules for bulk purchases, early bird discounts, etc',
             typeOptions: {
                 multipleValues: true
             },

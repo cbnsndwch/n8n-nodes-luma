@@ -15,7 +15,7 @@
         "build": "pnpm run clean && tsc && gulp build:icons",
         "clean": "rimraf dist",
         "dev": "tsc --watch",
-        "format": "prettier nodes credentials --write",
+        "format": "prettier nodes credentials tests --write",
         "lint": "eslint nodes credentials package.json",
         "lintfix": "eslint nodes credentials package.json --fix",
         "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
