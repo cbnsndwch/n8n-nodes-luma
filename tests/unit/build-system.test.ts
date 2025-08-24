@@ -139,4 +139,53 @@ describe('Build System Tests', () => {
       }
     });
   });
+
+  describe('GitHub Workflows', () => {
+    it('should have workflows directory', () => {
+      expect(fs.existsSync('.github')).toBe(true);
+      expect(fs.existsSync('.github/workflows')).toBe(true);
+    });
+
+    it('should have test workflow file', () => {
+      const workflowPath = path.join(process.cwd(), '.github/workflows/test.yml');
+      expect(fs.existsSync(workflowPath)).toBe(true);
+    });
+
+    it('should have valid workflow configuration', () => {
+      const workflowPath = path.join(process.cwd(), '.github/workflows/test.yml');
+      const workflowContent = fs.readFileSync(workflowPath, 'utf-8');
+      
+      // Should trigger on pull requests and main branch pushes
+      expect(workflowContent).toContain('pull_request:');
+      expect(workflowContent).toContain('push:');
+      expect(workflowContent).toContain('branches: [ main ]');
+      
+      // Should use Node.js 22 as specified in package.json
+      expect(workflowContent).toContain('node-version: [22.x]');
+      
+      // Should use pnpm
+      expect(workflowContent).toContain('pnpm/action-setup');
+      
+      // Should run the required build and test steps
+      expect(workflowContent).toContain('pnpm run build');
+      expect(workflowContent).toContain('pnpm run lint');
+      expect(workflowContent).toContain('pnpm run test:run');
+      expect(workflowContent).toContain('prettier nodes credentials --check');
+    });
+
+    it('should use same pnpm version as package manager specification', () => {
+      const packagePath = path.join(process.cwd(), 'package.json');
+      const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
+      const packageManagerSpec = packageJson.packageManager;
+      
+      if (packageManagerSpec && packageManagerSpec.startsWith('pnpm@')) {
+        const pnpmVersion = packageManagerSpec.split('@')[1].split('+')[0];
+        
+        const workflowPath = path.join(process.cwd(), '.github/workflows/test.yml');
+        const workflowContent = fs.readFileSync(workflowPath, 'utf-8');
+        
+        expect(workflowContent).toContain(`version: ${pnpmVersion}`);
+      }
+    });
+  });
 });
