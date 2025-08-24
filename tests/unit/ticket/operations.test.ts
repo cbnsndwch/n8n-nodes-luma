@@ -75,6 +75,28 @@ describe('Ticket Operations Unit Tests', () => {
             expect(LUMA_ENDPOINTS.TICKET_TYPES_LIST).toBe(
                 '/public/v1/event/ticket-types/list'
             );
+            expect(LUMA_ENDPOINTS.TICKET_TYPE_DELETE).toBeDefined();
+            expect(LUMA_ENDPOINTS.TICKET_TYPE_DELETE).toBe(
+                '/public/v1/event/ticket-types/delete'
+            );
+        });
+
+        it('should have delete operation in ticket props', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+            expect(operationField?.options).toBeDefined();
+
+            const deleteOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'delete'
+            );
+            expect(deleteOption).toBeDefined();
+            expect(deleteOption?.name).toBe('Delete Ticket Type');
         });
 
         it('should have bulk update endpoint defined', async () => {

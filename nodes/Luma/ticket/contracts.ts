@@ -154,3 +154,29 @@ export interface BulkUpdateTicketTypesResponse extends IDataObject {
     failed_updates: number;
     errors?: string[];
 }
+
+export interface DeleteTicketTypeRequest extends IDataObject {
+    ticket_type_id: string;
+    force?: boolean; // allow deletion with existing sales
+    archive_instead?: boolean; // soft delete
+    transfer_sales_to_type_id?: string; // transfer to another type
+    refund_existing_sales?: boolean;
+}
+
+export interface DeleteTicketTypeResponse extends IDataObject {
+    success: boolean;
+    message?: string;
+    deleted_ticket_type_id: string;
+    impact_analysis?: {
+        existing_sales_count: number;
+        total_revenue_affected: number;
+        transfer_details?: {
+            transferred_to_type_id: string;
+            transferred_sales_count: number;
+        };
+        refund_details?: {
+            refunded_sales_count: number;
+            total_refund_amount: number;
+        };
+    };
+}

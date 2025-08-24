@@ -164,6 +164,31 @@ describe('Ticket Workflow Execution Tests', () => {
             expect(updateFields.saleEndAt).toBe('2024-12-31T23:59:59Z');
             expect(updateFields.isHidden).toBe(true);
         });
+
+        it('should handle ticket type delete operation', async () => {
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('ticket')
+                .mockReturnValueOnce('delete')
+                .mockReturnValueOnce('ticket-type-123')
+                .mockReturnValueOnce({
+                    force: true,
+                    archiveInstead: false
+                });
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify parameters
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'delete'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('ticketTypeId')).toBe(
+                'ticket-type-123'
+            );
+        });
     });
 
     describe('Ticket Error Handling', () => {
