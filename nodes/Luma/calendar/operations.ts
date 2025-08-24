@@ -14,7 +14,8 @@ import type {
     EventLookupFilters,
     AddEventRequest,
     ImportPeopleRequest,
-    PersonData
+    PersonData,
+    CalendarPeopleFilters
 } from './contracts';
 
 /**
@@ -253,6 +254,52 @@ class CalendarOperations extends BaseOperations {
 
         return [this.createReturnItem(responseData, context.itemIndex)];
     }
+
+    /**
+     * List people in a calendar
+     */
+    static async listPeople(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: CalendarPeopleFilters = {};
+
+        // Apply optional filters from additional fields
+        if (additionalFields.query) {
+            qs.query = additionalFields.query as string;
+        }
+        if (additionalFields.membershipTierApiId) {
+            qs.calendar_membership_tier_api_id =
+                additionalFields.membershipTierApiId as string;
+        }
+        if (additionalFields.memberStatus) {
+            qs.member_status = additionalFields.memberStatus as string;
+        }
+        if (additionalFields.sortDirection) {
+            qs.sort_direction = additionalFields.sortDirection as string;
+        }
+        if (additionalFields.sortColumn) {
+            qs.sort_column = additionalFields.sortColumn as string;
+        }
+        if (additionalFields.paginationCursor) {
+            qs.pagination_cursor = additionalFields.paginationCursor as string;
+        }
+        if (additionalFields.paginationLimit) {
+            qs.pagination_limit = additionalFields.paginationLimit as number;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_PEOPLE),
+            qs
+        });
+
+        return this.handleMultipleItems(responseData, context.itemIndex);
+    }
 }
 
 export async function handleCalendarOperation(
@@ -270,6 +317,9 @@ export async function handleCalendarOperation(
             break;
         case 'listEvents':
             result = await CalendarOperations.listEvents(context);
+            break;
+        case 'listPeople':
+            result = await CalendarOperations.listPeople(context);
             break;
         case 'lookupEvent':
             result = await CalendarOperations.lookupEvent(context);

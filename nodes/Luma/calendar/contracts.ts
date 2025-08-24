@@ -48,3 +48,13 @@ export interface ImportPeopleResult extends IDataObject {
         error: string;
     }>;
 }
+
+export interface CalendarPeopleFilters extends IDataObject {
+    query?: string; // Search over names and emails
+    calendar_membership_tier_api_id?: string; // Filter by membership tier
+    member_status?: string; // Filter by member status
+    sort_direction?: string; // asc, desc, asc nulls last, desc nulls last
+    sort_column?: string; // created_at, event_checked_in_count, event_approved_count, name, revenue_usd_cents
+    pagination_cursor?: string; // For pagination
+    pagination_limit?: number; // Number of items to return
+}
