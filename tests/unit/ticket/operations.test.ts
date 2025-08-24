@@ -75,6 +75,54 @@ describe('Ticket Operations Unit Tests', () => {
             expect(LUMA_ENDPOINTS.TICKET_TYPES_LIST).toBe(
                 '/public/v1/event/ticket-types/list'
             );
+
+            // Check for analytics endpoint
+            expect(LUMA_ENDPOINTS.TICKET_ANALYTICS).toBeDefined();
+            expect(LUMA_ENDPOINTS.TICKET_ANALYTICS).toBe(
+                '/public/v1/event/ticket-types/analytics'
+            );
+        });
+    });
+
+    describe('Ticket Analytics Interface', () => {
+        it('should have analytics operation defined', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+            expect(operationField?.options).toBeDefined();
+
+            const analyticsOption = operationField?.options?.find(
+                (option: any) => option.value === 'analytics'
+            );
+            expect(analyticsOption).toBeDefined();
+            expect(analyticsOption?.name).toBe('Get Ticket Analytics');
+        });
+
+        it('should have analytics parameter fields', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check for analytics event ID field
+            const analyticsEventIdField = ticketProps.find(
+                prop =>
+                    prop.name === 'eventId' &&
+                    prop.displayOptions?.show?.operation?.includes('analytics')
+            );
+            expect(analyticsEventIdField).toBeDefined();
+
+            // Check for analytics ticket type ID field
+            const analyticsTicketTypeIdField = ticketProps.find(
+                prop =>
+                    prop.name === 'ticketTypeId' &&
+                    prop.displayOptions?.show?.operation?.includes('analytics')
+            );
+            expect(analyticsTicketTypeIdField).toBeDefined();
         });
     });
 });

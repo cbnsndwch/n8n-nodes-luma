@@ -117,3 +117,56 @@ export interface CreateTicketTypeRequest extends IDataObject {
 export interface CreateTicketTypeResponse extends IDataObject {
     ticket_type: LumaTicketType;
 }
+
+export interface TicketAnalyticsRequest extends IDataObject {
+    // Option 1: Event-level analytics
+    event_id?: string;
+
+    // Option 2: Ticket type-level analytics
+    ticket_type_id?: string;
+
+    // Date filtering
+    date_from?: string; // ISO 8601
+    date_to?: string; // ISO 8601
+
+    // Options
+    include_refunds?: boolean;
+    include_pending?: boolean;
+    group_by?: 'day' | 'week' | 'month';
+    metrics?: string[]; // specific metrics to include
+}
+
+export interface TicketAnalytics extends IDataObject {
+    event_id: string;
+    ticket_type_id?: string;
+    date_from: string;
+    date_to: string;
+
+    // Overall Metrics
+    total_sales: number;
+    total_revenue: number;
+    total_refunds: number;
+    refund_amount: number;
+    net_revenue: number;
+
+    // Performance Metrics
+    conversion_rate: number;
+    avg_order_value: number;
+    avg_quantity_per_order: number;
+
+    // Time-based Data
+    daily_sales?: Array<{
+        date: string;
+        sales_count: number;
+        revenue: number;
+    }>;
+
+    // Ticket Type Breakdown
+    by_ticket_type?: Array<{
+        ticket_type_id: string;
+        ticket_type_name: string;
+        sales_count: number;
+        revenue: number;
+        percentage_of_total: number;
+    }>;
+}
