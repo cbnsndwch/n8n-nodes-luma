@@ -16,7 +16,8 @@ import type {
     ImportPeopleRequest,
     PersonData,
     CalendarPeopleFilters,
-    PersonTagsFilters
+    PersonTagsFilters,
+    CreateCalendarCouponRequest
 } from './contracts';
 
 /**
@@ -157,6 +158,67 @@ class CalendarOperations extends BaseOperations {
         const responseData = await this.executeRequest(context, {
             method: 'POST',
             url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_ADD_EVENT),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
+
+    /**
+     * Create a coupon for calendar events
+     */
+    static async createCoupon(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const name = context.executeFunctions.getNodeParameter(
+            'name',
+            context.itemIndex
+        ) as string;
+
+        const code = context.executeFunctions.getNodeParameter(
+            'code',
+            context.itemIndex
+        ) as string;
+
+        const discountType = context.executeFunctions.getNodeParameter(
+            'discountType',
+            context.itemIndex
+        ) as 'percentage' | 'fixed_amount';
+
+        const discountValue = context.executeFunctions.getNodeParameter(
+            'discountValue',
+            context.itemIndex
+        ) as number;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: CreateCalendarCouponRequest = {
+            name,
+            code,
+            discount_type: discountType,
+            discount_value: discountValue
+        };
+
+        // Add optional fields from additional fields
+        if (additionalFields.maxUses !== undefined) {
+            requestBody.max_uses = additionalFields.maxUses as number;
+        }
+        if (additionalFields.expiresAt) {
+            requestBody.expires_at = additionalFields.expiresAt as string;
+        }
+        if (additionalFields.description) {
+            requestBody.description = additionalFields.description as string;
+        }
+        if (additionalFields.isActive !== undefined) {
+            requestBody.is_active = additionalFields.isActive as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_CREATE_COUPON),
             body: requestBody
         });
 
@@ -342,6 +404,9 @@ export async function handleCalendarOperation(
     switch (operation) {
         case 'addEvent':
             result = await CalendarOperations.addEvent(context);
+            break;
+        case 'createCoupon':
+            result = await CalendarOperations.createCoupon(context);
             break;
         case 'importPeople':
             result = await CalendarOperations.importPeople(context);
