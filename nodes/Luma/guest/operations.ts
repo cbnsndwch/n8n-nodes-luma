@@ -9,7 +9,14 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { GuestFilters } from './contracts';
+import type {
+    GuestFilters,
+    GuestRegistrationData,
+    GuestUpdateData,
+    GuestApprovalData,
+    GuestRejectionData,
+    GuestCancellationData
+} from './contracts';
 
 // Guest-specific operations
 
@@ -114,6 +121,424 @@ class GuestOperations extends BaseOperations {
 
         return this.createReturnItem(responseData, context.itemIndex);
     }
+
+    /**
+     * Register a guest for an event
+     */
+    static async register(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const eventId = context.executeFunctions.getNodeParameter(
+            'eventId',
+            context.itemIndex
+        ) as string;
+
+        const name = context.executeFunctions.getNodeParameter(
+            'name',
+            context.itemIndex
+        ) as string;
+
+        const email = context.executeFunctions.getNodeParameter(
+            'email',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: GuestRegistrationData = {
+            event_id: eventId,
+            name,
+            email
+        };
+
+        // Apply optional fields from additional fields
+        if (additionalFields.firstName) {
+            body.first_name = additionalFields.firstName as string;
+        }
+        if (additionalFields.lastName) {
+            body.last_name = additionalFields.lastName as string;
+        }
+        if (additionalFields.company) {
+            body.company = additionalFields.company as string;
+        }
+        if (additionalFields.jobTitle) {
+            body.job_title = additionalFields.jobTitle as string;
+        }
+        if (additionalFields.phone) {
+            body.phone = additionalFields.phone as string;
+        }
+        if (additionalFields.ticketTypeId) {
+            body.ticket_type_id = additionalFields.ticketTypeId as string;
+        }
+        if (additionalFields.autoApprove !== undefined) {
+            body.auto_approve = additionalFields.autoApprove as boolean;
+        }
+        if (additionalFields.sendInvite !== undefined) {
+            body.send_invite = additionalFields.sendInvite as boolean;
+        }
+        if (additionalFields.customMessage) {
+            body.custom_message = additionalFields.customMessage as string;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_ADD_GUESTS),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
+
+    /**
+     * Update guest information
+     */
+    static async update(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const guestId = context.executeFunctions.getNodeParameter(
+            'guestId',
+            context.itemIndex
+        ) as string;
+
+        const updateFields = context.executeFunctions.getNodeParameter(
+            'updateFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: GuestUpdateData = {
+            guest_id: guestId
+        };
+
+        // Apply update fields
+        if (updateFields.name) {
+            body.name = updateFields.name as string;
+        }
+        if (updateFields.email) {
+            body.email = updateFields.email as string;
+        }
+        if (updateFields.firstName) {
+            body.first_name = updateFields.firstName as string;
+        }
+        if (updateFields.lastName) {
+            body.last_name = updateFields.lastName as string;
+        }
+        if (updateFields.company) {
+            body.company = updateFields.company as string;
+        }
+        if (updateFields.jobTitle) {
+            body.job_title = updateFields.jobTitle as string;
+        }
+        if (updateFields.phone) {
+            body.phone = updateFields.phone as string;
+        }
+        if (updateFields.approvalStatus) {
+            body.approval_status = updateFields.approvalStatus as
+                | 'approved'
+                | 'pending'
+                | 'rejected';
+        }
+        if (updateFields.registrationStatus) {
+            body.registration_status = updateFields.registrationStatus as
+                | 'confirmed'
+                | 'cancelled'
+                | 'waitlisted';
+        }
+        if (updateFields.notes) {
+            body.notes = updateFields.notes as string;
+        }
+        if (updateFields.customFields) {
+            // Convert fixedCollection format to Record<string, any>
+            const customFieldsCollection =
+                updateFields.customFields as IDataObject;
+            if (
+                customFieldsCollection.customField &&
+                Array.isArray(customFieldsCollection.customField)
+            ) {
+                const customFields: Record<string, any> = {};
+                customFieldsCollection.customField.forEach((field: any) => {
+                    if (field.name && field.value !== undefined) {
+                        customFields[field.name] = field.value;
+                    }
+                });
+                body.custom_fields = customFields;
+            }
+        }
+
+        // Apply additional fields
+        if (additionalFields.notifyGuest !== undefined) {
+            body.notify_guest = additionalFields.notifyGuest as boolean;
+        }
+        if (additionalFields.reasonForChange) {
+            body.reason_for_change = additionalFields.reasonForChange as string;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.UPDATE_GUEST_STATUS),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
+
+    /**
+     * Approve guest registration(s)
+     */
+    static async approve(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const guestId = context.executeFunctions.getNodeParameter(
+            'guestId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        // Parse guest ID(s) - support both single and comma-separated values
+        let guestIds: string | string[];
+        // Validate guestId input for malformed comma-separated values
+        if (typeof guestId !== 'string' || guestId.trim() === '') {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Guest ID is required and cannot be empty.'
+            );
+        }
+        if (guestId.includes(',')) {
+            // Check for leading/trailing commas or consecutive commas
+            if (/^,|,,|,$/.test(guestId)) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'Malformed guest ID input: leading/trailing or consecutive commas are not allowed. Please provide a comma-separated list of valid guest IDs.'
+                );
+            }
+            guestIds = guestId
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id);
+            if (guestIds.length === 0) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'No valid guest IDs found. Please provide at least one valid guest ID.'
+                );
+            }
+        } else {
+            guestIds = guestId;
+        }
+
+        const body: GuestApprovalData = {
+            guest_id: guestIds
+        };
+
+        // Apply additional fields
+        if (additionalFields.sendNotification !== undefined) {
+            body.send_notification =
+                additionalFields.sendNotification as boolean;
+        }
+        if (additionalFields.approvalNotes) {
+            body.approval_notes = additionalFields.approvalNotes as string;
+        }
+        if (additionalFields.ticketTypeId) {
+            body.ticket_type_id = additionalFields.ticketTypeId as string;
+        }
+        if (additionalFields.customMessage) {
+            body.custom_message = additionalFields.customMessage as string;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.GUEST_APPROVE),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
+
+    /**
+     * Reject guest registration(s)
+     */
+    static async reject(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const guestId = context.executeFunctions.getNodeParameter(
+            'guestId',
+            context.itemIndex
+        ) as string;
+
+        const rejectionReason = context.executeFunctions.getNodeParameter(
+            'rejectionReason',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        // Parse guest ID(s) - support both single and comma-separated values
+        let guestIds: string | string[];
+        // Validate guestId input for malformed comma-separated values
+        if (typeof guestId !== 'string' || guestId.trim() === '') {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Guest ID is required and cannot be empty.'
+            );
+        }
+        if (guestId.includes(',')) {
+            // Check for leading/trailing commas or consecutive commas
+            if (/^,|,,|,$/.test(guestId)) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'Malformed guest ID input: leading/trailing or consecutive commas are not allowed. Please provide a comma-separated list of valid guest IDs.'
+                );
+            }
+            guestIds = guestId
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id);
+            if (guestIds.length === 0) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'No valid guest IDs found. Please provide at least one valid guest ID.'
+                );
+            }
+        } else {
+            guestIds = guestId;
+        }
+
+        // Validate rejection reason is provided
+        if (!rejectionReason || rejectionReason.trim() === '') {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Rejection reason is required and cannot be empty.'
+            );
+        }
+
+        const body: GuestRejectionData = {
+            guest_id: guestIds,
+            rejection_reason: rejectionReason.trim()
+        };
+
+        // Apply additional fields
+        if (additionalFields.sendNotification !== undefined) {
+            body.send_notification =
+                additionalFields.sendNotification as boolean;
+        }
+        if (additionalFields.customMessage) {
+            body.custom_message = additionalFields.customMessage as string;
+        }
+        if (additionalFields.allowReapply !== undefined) {
+            body.allow_reapply = additionalFields.allowReapply as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.GUEST_REJECT),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
+
+    /**
+     * Cancel guest registration(s)
+     */
+    static async cancel(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const guestId = context.executeFunctions.getNodeParameter(
+            'guestId',
+            context.itemIndex
+        ) as string;
+
+        const cancelledBy = context.executeFunctions.getNodeParameter(
+            'cancelledBy',
+            context.itemIndex
+        ) as 'guest' | 'organizer';
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        // Parse guest ID(s) - support both single and comma-separated values
+        let guestIds: string | string[];
+        // Validate guestId input for malformed comma-separated values
+        if (typeof guestId !== 'string' || guestId.trim() === '') {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Guest ID is required and cannot be empty.'
+            );
+        }
+        if (guestId.includes(',')) {
+            // Check for leading/trailing commas or consecutive commas
+            if (/^,|,,|,$/.test(guestId)) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'Malformed guest ID input: leading/trailing or consecutive commas are not allowed. Please provide a comma-separated list of valid guest IDs.'
+                );
+            }
+            guestIds = guestId
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id);
+            if (guestIds.length === 0) {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'No valid guest IDs found. Please provide at least one valid guest ID.'
+                );
+            }
+        } else {
+            guestIds = guestId;
+        }
+
+        // Validate cancelledBy is provided
+        if (
+            !cancelledBy ||
+            (cancelledBy !== 'guest' && cancelledBy !== 'organizer')
+        ) {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Cancelled By is required and must be either "guest" or "organizer".'
+            );
+        }
+
+        const body: GuestCancellationData = {
+            guest_id: guestIds,
+            cancelled_by: cancelledBy
+        };
+
+        // Apply additional fields
+        if (additionalFields.cancellationReason) {
+            body.cancellation_reason =
+                additionalFields.cancellationReason as string;
+        }
+        if (additionalFields.sendNotification !== undefined) {
+            body.send_notification =
+                additionalFields.sendNotification as boolean;
+        }
+        if (additionalFields.refundAmount !== undefined) {
+            body.refund_amount = additionalFields.refundAmount as number;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.GUEST_CANCEL),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
 }
 
 export async function handleGuestOperation(
@@ -123,11 +548,26 @@ export async function handleGuestOperation(
     let result: INodeExecutionData | INodeExecutionData[];
 
     switch (operation) {
+        case 'approve':
+            result = await GuestOperations.approve(context);
+            break;
+        case 'cancel':
+            result = await GuestOperations.cancel(context);
+            break;
         case 'get':
             result = await GuestOperations.get(context);
             break;
         case 'list':
             result = await GuestOperations.list(context);
+            break;
+        case 'register':
+            result = await GuestOperations.register(context);
+            break;
+        case 'reject':
+            result = await GuestOperations.reject(context);
+            break;
+        case 'update':
+            result = await GuestOperations.update(context);
             break;
         default:
             throw new NodeOperationError(

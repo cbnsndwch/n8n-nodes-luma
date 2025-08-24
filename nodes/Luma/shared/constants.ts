@@ -31,12 +31,20 @@ export const LUMA_ENDPOINTS = {
     EVENT_DELETE: '/public/v1/event/delete',
     EVENT_GET_GUESTS: '/public/v1/event/get-guests',
     EVENT_LIST_COUPONS: '/public/v1/event/coupons',
+    EVENT_CREATE_COUPON: '/public/v1/event/create-coupon',
 
     // Guest endpoints
     GUEST_GET: '/public/v1/guest/get',
+    EVENT_ADD_GUESTS: '/public/v1/event/add-guests',
+    UPDATE_GUEST_STATUS: '/public/v1/event/update-guest-status',
+    GUEST_APPROVE: '/v1/guest/approve',
+    GUEST_REJECT: '/v1/guest/reject',
+    GUEST_CANCEL: '/v1/guest/cancel',
 
     // Ticket endpoints
     TICKET_TYPES_LIST: '/public/v1/event/ticket-types/list',
+    TICKET_TYPE_GET: '/public/v1/event/ticket-types/get',
+    TICKET_TYPE_CREATE: '/public/v1/event/ticket-types/create',
 
     // Calendar endpoints
     CALENDAR_LIST_EVENTS: '/public/v1/calendar/list-events',
@@ -47,6 +55,8 @@ export const LUMA_ENDPOINTS = {
     CALENDAR_LIST_PERSON_TAGS: '/public/v1/calendar/list-person-tags',
     CALENDAR_CREATE_PERSON_TAG: '/public/v1/calendar/create-person-tag',
     CALENDAR_LIST_COUPONS: '/public/v1/calendar/list-coupons',
+    CALENDAR_CREATE_COUPON: '/public/v1/calendar/coupons/create',
+    CALENDAR_UPDATE_COUPON: '/public/v1/calendar/coupons/update',
 
     // Utility endpoints
     ENTITY_LOOKUP: '/public/v1/entity/lookup',

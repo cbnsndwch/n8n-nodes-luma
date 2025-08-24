@@ -82,3 +82,38 @@ export interface TicketTypesResponse extends IDataObject {
     total_count: number;
     event_id: string;
 }
+
+export interface CreateTicketTypeRequest extends IDataObject {
+    event_id: string;
+    name: string;
+    price: number; // in cents
+    description?: string;
+    capacity?: number;
+    min_quantity?: number;
+    max_quantity?: number;
+    sale_start_at?: string; // ISO 8601
+    sale_end_at?: string; // ISO 8601
+    is_hidden?: boolean;
+    requires_approval?: boolean;
+
+    // Pricing tiers
+    pricing_tiers?: Array<{
+        name: string;
+        price: number;
+        start_at: string;
+        end_at?: string;
+        capacity?: number;
+    }>;
+
+    // Discount rules
+    discount_rules?: Array<{
+        type: 'early_bird' | 'bulk' | 'promo_code';
+        value: number; // percentage or fixed amount
+        min_quantity?: number;
+        valid_until?: string;
+    }>;
+}
+
+export interface CreateTicketTypeResponse extends IDataObject {
+    ticket_type: LumaTicketType;
+}

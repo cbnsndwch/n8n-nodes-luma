@@ -36,6 +36,12 @@ const calendarOperations: INodeProperties = {
             description: 'Create a new person tag for organizing people'
         },
         {
+            name: 'Create Coupon',
+            value: 'createCoupon',
+            action: 'Create a coupon for calendar events',
+            description: 'Create a new coupon for calendar events'
+        },
+        {
             name: 'Import People',
             value: 'importPeople',
             action: 'Import people to a calendar',
@@ -64,6 +70,12 @@ const calendarOperations: INodeProperties = {
             value: 'lookupEvent',
             action: 'Lookup a specific event in a calendar',
             description: 'Check if an event exists in a calendar'
+        },
+        {
+            name: 'Update Coupon',
+            value: 'updateCoupon',
+            action: 'Update a calendar coupon',
+            description: 'Update existing coupon settings for a calendar'
         }
     ],
     default: 'listEvents'
@@ -84,10 +96,12 @@ const calendarApiIdField: INodeProperties = {
                 'listEvents',
                 'lookupEvent',
                 'addEvent',
+                'createCoupon',
                 'importPeople',
                 'listPeople',
                 'listPersonTags',
-                'createPersonTag'
+                'createPersonTag',
+                'updateCoupon'
             ]
         }
     },
@@ -443,6 +457,121 @@ const importPeopleAdditionalFields: INodeProperties = {
     options: [defaultRoleField, skipDuplicatesField, notifyUsersField]
 };
 
+// Create Coupon specific fields
+
+const couponNameField: INodeProperties = {
+    displayName: 'Coupon Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: 'Enter coupon name',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createCoupon']
+        }
+    },
+    description: 'Display name for the coupon'
+};
+
+const couponCodeField: INodeProperties = {
+    displayName: 'Coupon Code',
+    name: 'code',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: 'SAVE20',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createCoupon']
+        }
+    },
+    description: 'Unique coupon code that users will enter'
+};
+
+const discountTypeField: INodeProperties = {
+    displayName: 'Discount Type',
+    name: 'discountType',
+    type: 'options',
+    required: true,
+    default: 'percentage',
+    options: [
+        { name: 'Percentage', value: 'percentage' },
+        { name: 'Fixed Amount', value: 'fixed_amount' }
+    ],
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createCoupon']
+        }
+    },
+    description: 'Type of discount to apply'
+};
+
+const discountValueField: INodeProperties = {
+    displayName: 'Discount Value',
+    name: 'discountValue',
+    type: 'number',
+    required: true,
+    default: 10,
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createCoupon']
+        }
+    },
+    description: 'Discount amount (percentage 0-100 or cents for fixed amount)'
+};
+
+const createCouponAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createCoupon']
+        }
+    },
+    options: [
+        {
+            displayName: 'Max Uses',
+            name: 'maxUses',
+            type: 'number',
+            default: '',
+            description: 'Maximum number of uses (unlimited if not set)',
+            typeOptions: {
+                minValue: 1
+            }
+        },
+        {
+            displayName: 'Expires At',
+            name: 'expiresAt',
+            type: 'dateTime',
+            default: '',
+            description: 'Expiration date (ISO 8601 format)'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            description: 'Optional description for the coupon'
+        },
+        {
+            displayName: 'Is Active',
+            name: 'isActive',
+            type: 'boolean',
+            default: true,
+            description: 'Whether coupon is active'
+        }
+    ]
+};
+
 // List People specific fields
 
 const queryField: INodeProperties = {
@@ -588,18 +717,128 @@ const createPersonTagAdditionalFields: INodeProperties = {
     ]
 };
 
+// Update Coupon specific fields
+
+const couponApiIdField: INodeProperties = {
+    displayName: 'Coupon ID',
+    name: 'apiId',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: 'coupon_123abc...',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updateCoupon']
+        }
+    },
+    description: 'API ID of the coupon to update'
+};
+
+const updateCouponFields: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updateCoupon']
+        }
+    },
+    options: [
+        {
+            displayName: 'Code',
+            name: 'code',
+            type: 'string',
+            default: '',
+            placeholder: 'NEW_CODE',
+            description: 'Updated coupon code'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            description: 'Updated coupon description'
+        },
+        {
+            displayName: 'Discount Type',
+            name: 'discountType',
+            type: 'options',
+            options: [
+                {
+                    name: 'Percentage',
+                    value: 'percentage'
+                },
+                {
+                    name: 'Fixed Amount',
+                    value: 'fixed_amount'
+                }
+            ],
+            default: 'percentage',
+            description: 'Updated discount type'
+        },
+        {
+            displayName: 'Discount Value',
+            name: 'discountValue',
+            type: 'number',
+            default: 0,
+            description:
+                'Updated discount value (percentage: 0-100, fixed amount: cents)'
+        },
+        {
+            displayName: 'Expires At',
+            name: 'expiresAt',
+            type: 'dateTime',
+            default: '',
+            description: 'Updated expiration date (ISO 8601 format)'
+        },
+        {
+            displayName: 'Is Active',
+            name: 'isActive',
+            type: 'boolean',
+            default: true,
+            description: 'Whether the coupon is active'
+        },
+        {
+            displayName: 'Max Uses',
+            name: 'maxUses',
+            type: 'number',
+            default: 0,
+            description: 'Updated maximum number of uses (0 = unlimited)'
+        },
+        {
+            displayName: 'Name',
+            name: 'name',
+            type: 'string',
+            default: '',
+            placeholder: 'New coupon name',
+            description: 'Updated display name for the coupon'
+        }
+    ]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
     addEventApiIdField,
+    couponApiIdField,
     peopleDataField,
     personTagNameField,
+    couponNameField,
+    couponCodeField,
+    discountTypeField,
+    discountValueField,
     calendarAdditionalFields,
     lookupAdditionalFields,
     addEventAdditionalFields,
     importPeopleAdditionalFields,
+    createCouponAdditionalFields,
     listPeopleAdditionalFields,
     listPersonTagsAdditionalFields,
-    createPersonTagAdditionalFields
+    createPersonTagAdditionalFields,
+    updateCouponFields
 ];
