@@ -9,7 +9,7 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { EventData, EventFilters } from './contracts';
+import type { EventData, EventFilters, CouponFilters } from './contracts';
 
 // Event-specific operations
 
@@ -235,6 +235,49 @@ class EventOperations extends BaseOperations {
     }
 
     /**
+     * List coupons for an event
+     */
+    static async listCoupons(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const eventId = context.executeFunctions.getNodeParameter(
+            'eventId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: CouponFilters = {
+            event_id: eventId
+        };
+
+        // Apply filters from additional fields
+        if (additionalFields.includeInactive !== undefined) {
+            qs.include_inactive = additionalFields.includeInactive as boolean;
+        }
+        if (additionalFields.includeUsageStats !== undefined) {
+            qs.include_usage_stats = additionalFields.includeUsageStats as boolean;
+        }
+        if (additionalFields.sortBy) {
+            qs.sort_by = additionalFields.sortBy as 'name' | 'created_at' | 'expires_at' | 'usage';
+        }
+        if (additionalFields.sortOrder) {
+            qs.sort_order = additionalFields.sortOrder as 'asc' | 'desc';
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.EVENT_LIST_COUPONS),
+            qs
+        });
+
+        return this.handleMultipleItems(responseData, context.itemIndex);
+    }
+
+    /**
      * Delete an event
      */
     static async delete(
@@ -281,6 +324,9 @@ export async function handleEventOperation(
             break;
         case 'getMany':
             result = await EventOperations.getMany(context);
+            break;
+        case 'listCoupons':
+            result = await EventOperations.listCoupons(context);
             break;
         case 'create':
             result = await EventOperations.create(context);

@@ -49,6 +49,11 @@ const eventOperations: INodeProperties = {
             action: 'Get an event'
         },
         {
+            name: 'List Coupons',
+            value: 'listCoupons',
+            action: 'List event coupons'
+        },
+        {
             name: 'List Events',
             value: 'getMany',
             action: 'Get many events'
@@ -67,7 +72,7 @@ const eventOperations: INodeProperties = {
  */
 const eventIdField = idField('Event ID', 'eventId', 'The ID of the event', {
     resource: ['event'],
-    operation: ['get', 'update', 'delete']
+    operation: ['get', 'update', 'delete', 'listCoupons']
 });
 
 const eventNameField: INodeProperties = {
@@ -203,10 +208,139 @@ const eventAdditionalFields: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['event'],
-            operation: ['create', 'update', 'getMany', 'get', 'delete']
+            operation: ['create', 'update', 'getMany', 'get', 'delete', 'listCoupons']
         }
     },
     options: [
+        // Fields for getMany operation - after cursor
+        eventAfterCursorField,
+        // Fields for create/update operations
+        approvalRequiredField,
+        // Fields for getMany operation - before cursor
+        eventBeforeCursorField,
+        capacityField,
+        endDateField,
+        // Fields for update operations - event name
+        {
+            displayName: 'Event Name',
+            name: 'name',
+            type: 'string',
+            displayOptions: {
+                show: {
+                    '/operation': ['update']
+                }
+            },
+            default: '',
+            description: 'Update the name of the event'
+        },
+        eventStateField,
+        // Fields for delete operation
+        {
+            ...forceDeleteField,
+            displayOptions: {
+                show: {
+                    '/operation': ['delete']
+                }
+            }
+        },
+        // Fields for listCoupons operation
+        {
+            displayName: 'Include Inactive',
+            name: 'includeInactive',
+            type: 'boolean',
+            displayOptions: {
+                show: {
+                    '/operation': ['listCoupons']
+                }
+            },
+            default: false,
+            description: 'Whether to include inactive coupons in the results'
+        },
+        {
+            displayName: 'Include Usage Stats',
+            name: 'includeUsageStats',
+            type: 'boolean',
+            displayOptions: {
+                show: {
+                    '/operation': ['listCoupons']
+                }
+            },
+            default: true,
+            description: 'Whether to include usage statistics for each coupon'
+        },
+        limitField,
+        locationAddressField,
+        locationNameField,
+        locationTypeField,
+        locationUrlField,
+        seriesIdField,
+        {
+            displayName: 'Sort By',
+            name: 'sortBy',
+            type: 'options',
+            displayOptions: {
+                show: {
+                    '/operation': ['listCoupons']
+                }
+            },
+            options: [
+                {
+                    name: 'Name',
+                    value: 'name'
+                },
+                {
+                    name: 'Created At',
+                    value: 'created_at'
+                },
+                {
+                    name: 'Expires At',
+                    value: 'expires_at'
+                },
+                {
+                    name: 'Usage',
+                    value: 'usage'
+                }
+            ],
+            default: 'created_at',
+            description: 'Field to sort coupons by'
+        },
+        {
+            displayName: 'Sort Order',
+            name: 'sortOrder',
+            type: 'options',
+            displayOptions: {
+                show: {
+                    '/operation': ['listCoupons']
+                }
+            },
+            options: [
+                {
+                    name: 'Ascending',
+                    value: 'asc'
+                },
+                {
+                    name: 'Descending',
+                    value: 'desc'
+                }
+            ],
+            default: 'desc',
+            description: 'Sort order for the coupon list'
+        },
+        // Fields for update operations - start date
+        {
+            displayName: 'Start Date',
+            name: 'startAt',
+            type: 'dateTime',
+            displayOptions: {
+                show: {
+                    '/operation': ['update']
+                }
+            },
+            default: '',
+            description: 'Update the start date and time of the event'
+        },
+        eventUpdateStateField,
+        timezoneField,
         // Fields for get operation
         {
             displayName: 'View',
@@ -231,58 +365,7 @@ const eventAdditionalFields: INodeProperties = {
             description:
                 'Choose between public view (excludes sensitive data) or admin view (includes private fields)'
         },
-        // Fields for delete operation
-        {
-            ...forceDeleteField,
-            displayOptions: {
-                show: {
-                    '/operation': ['delete']
-                }
-            }
-        },
-        // Fields for update operations - event name
-        {
-            displayName: 'Event Name',
-            name: 'name',
-            type: 'string',
-            displayOptions: {
-                show: {
-                    '/operation': ['update']
-                }
-            },
-            default: '',
-            description: 'Update the name of the event'
-        },
-        // Fields for update operations - start date
-        {
-            displayName: 'Start Date',
-            name: 'startAt',
-            type: 'dateTime',
-            displayOptions: {
-                show: {
-                    '/operation': ['update']
-                }
-            },
-            default: '',
-            description: 'Update the start date and time of the event'
-        },
-        // Fields for create/update operations
-        approvalRequiredField,
-        capacityField,
-        endDateField,
-        eventUpdateStateField,
-        locationAddressField,
-        locationNameField,
-        locationTypeField,
-        locationUrlField,
-        timezoneField,
-        visibilityField,
-        // Fields for getMany operation
-        eventStateField,
-        limitField,
-        seriesIdField,
-        eventAfterCursorField,
-        eventBeforeCursorField
+        visibilityField
     ]
 };
 

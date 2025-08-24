@@ -30,7 +30,7 @@ export const LUMA_ENDPOINTS = {
     EVENT_UPDATE: '/public/v1/event/update',
     EVENT_DELETE: '/public/v1/event/delete',
     EVENT_GET_GUESTS: '/public/v1/event/get-guests',
-    EVENT_LIST_COUPONS: '/public/v1/event/list-coupons',
+    EVENT_LIST_COUPONS: '/public/v1/event/coupons',
 
     // Calendar endpoints
     CALENDAR_LIST_EVENTS: '/public/v1/calendar/list-events',
