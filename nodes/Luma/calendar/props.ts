@@ -30,16 +30,16 @@ const calendarOperations: INodeProperties = {
             description: 'Add an existing event to a calendar'
         },
         {
-            name: 'Create Person Tag',
-            value: 'createPersonTag',
-            action: 'Create a person tag in a calendar',
-            description: 'Create a new person tag for organizing people'
-        },
-        {
             name: 'Create Coupon',
             value: 'createCoupon',
             action: 'Create a coupon for calendar events',
             description: 'Create a new coupon for calendar events'
+        },
+        {
+            name: 'Create Person Tag',
+            value: 'createPersonTag',
+            action: 'Create a person tag in a calendar',
+            description: 'Create a new person tag for organizing people'
         },
         {
             name: 'Import People',
