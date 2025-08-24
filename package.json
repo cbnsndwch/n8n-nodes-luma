@@ -34,6 +34,8 @@
         "test:user": "vitest run tests/unit/user tests/integration/user tests/frontend/user",
         "test:utility": "vitest run tests/unit/utility tests/integration/utility tests/frontend/utility",
         "test:shared": "vitest run tests/unit/shared tests/integration/shared tests/frontend/shared",
+        "commitlint": "commitlint --from HEAD~1 --to HEAD --verbose",
+        "commit:validate": "node scripts/validate-commit.js",
         "n8n:setup": "tsx .n8n/scripts/setup.ts",
         "n8n:start": "tsx .n8n/scripts/start-n8n.ts",
         "n8n:link": "tsx .n8n/scripts/link-nodes.ts",
@@ -48,6 +50,14 @@
     ],
     "main": "dist/index.js",
     "devDependencies": {
+        "@commitlint/cli": "^19.8.1",
+        "@commitlint/config-conventional": "^19.8.1",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/commit-analyzer": "^13.0.1",
+        "@semantic-release/git": "^10.0.1",
+        "@semantic-release/github": "^11.0.4",
+        "@semantic-release/npm": "^12.0.2",
+        "@semantic-release/release-notes-generator": "^14.0.3",
         "@testing-library/jest-dom": "^6.8.0",
         "@types/node": "^22.17.2",
         "@types/yaml": "^1.9.7",
@@ -63,6 +73,7 @@
         "npm-check-updates": "^18.0.2",
         "prettier": "^3.6.2",
         "rimraf": "^6.0.1",
+        "semantic-release": "^24.2.7",
         "sqlite3": "^5.1.7",
         "tsx": "^4.20.4",
         "typescript": "~5.8.2",
@@ -84,6 +95,28 @@
         "nodes": [
             "dist/nodes/Luma/Luma.node.js",
             "dist/nodes/LumaTrigger/LumaTrigger.node.js"
+        ]
+    },
+    "release": {
+        "branches": [
+            "main"
+        ],
+        "plugins": [
+            "@semantic-release/commit-analyzer",
+            "@semantic-release/release-notes-generator",
+            "@semantic-release/changelog",
+            "@semantic-release/npm",
+            [
+                "@semantic-release/git",
+                {
+                    "assets": [
+                        "package.json",
+                        "CHANGELOG.md"
+                    ],
+                    "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+                }
+            ],
+            "@semantic-release/github"
         ]
     }
 }
