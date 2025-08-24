@@ -34,4 +34,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         
-      # Additional steps will be added in subsequent stories
+      - name: Run tests
+        run: pnpm run test
+        
+      - name: Run unit tests
+        run: pnpm run test:unit
+        
+      - name: Run integration tests
+        run: pnpm run test:integration
+        
+      - name: Run frontend tests
+        run: pnpm run test:frontend
