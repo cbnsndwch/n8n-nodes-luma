@@ -27,7 +27,7 @@ jobs:
     - name: Install pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: 10.15.0
+        package_json_file: './package.json'
 
     - name: Get pnpm store directory
       shell: bash
@@ -52,7 +52,7 @@ jobs:
       run: pnpm run lint
 
     - name: Check code formatting
-      run: npx prettier nodes credentials --check
+      run: pnpm exec prettier nodes credentials --check
 
     - name: Run test suite
       run: pnpm run test:run

@@ -173,19 +173,21 @@ describe('Build System Tests', () => {
       expect(workflowContent).toContain('prettier nodes credentials --check');
     });
 
-    it('should use same pnpm version as package manager specification', () => {
+    it('should use pnpm version from package.json', () => {
       const packagePath = path.join(process.cwd(), 'package.json');
       const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'));
       const packageManagerSpec = packageJson.packageManager;
       
-      if (packageManagerSpec && packageManagerSpec.startsWith('pnpm@')) {
-        const pnpmVersion = packageManagerSpec.split('@')[1].split('+')[0];
-        
-        const workflowPath = path.join(process.cwd(), '.github/workflows/test.yml');
-        const workflowContent = fs.readFileSync(workflowPath, 'utf-8');
-        
-        expect(workflowContent).toContain(`version: ${pnpmVersion}`);
-      }
+      // Verify package.json has pnpm specification
+      expect(packageManagerSpec).toBeDefined();
+      expect(packageManagerSpec).toContain('pnpm@');
+      
+      const workflowPath = path.join(process.cwd(), '.github/workflows/test.yml');
+      const workflowContent = fs.readFileSync(workflowPath, 'utf-8');
+      
+      // Should reference package.json for pnpm version instead of hardcoding
+      expect(workflowContent).toContain('package_json_file: \'./package.json\'');
+      expect(workflowContent).toContain('pnpm/action-setup@v4');
     });
   });
 });
