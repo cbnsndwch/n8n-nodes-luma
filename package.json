@@ -1,7 +1,7 @@
 {
     "name": "@cbnsndwch/n8n-nodes-luma",
-    "version": "0.1.0",
     "description": "n8n community nodes for Luma's API",
+    "version": "0.1.0",
     "license": "MIT",
     "homepage": "https://github.com/cbnsndwch/n8n-nodes-luma",
     "keywords": [
