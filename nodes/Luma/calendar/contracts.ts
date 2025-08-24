@@ -75,3 +75,28 @@ export interface UpdateCalendarCouponRequest extends IDataObject {
     description?: string; // Optional - new description
     is_active?: boolean; // Optional - activate/deactivate coupon
 }
+export interface CreateCalendarCouponRequest extends IDataObject {
+    name: string; // Required - display name for coupon
+    code: string; // Required - unique coupon code for users
+    discount_type: 'percentage' | 'fixed_amount'; // Required
+    discount_value: number; // Required - percentage (0-100) or cents for fixed
+    max_uses?: number; // Optional - maximum uses (null = unlimited)
+    expires_at?: string; // Optional - ISO 8601 expiration date
+    description?: string; // Optional description
+    is_active?: boolean; // Optional - default true
+}
+
+export interface CalendarCoupon extends IDataObject {
+    api_id: string;
+    name: string;
+    code: string;
+    discount_type: 'percentage' | 'fixed_amount';
+    discount_value: number;
+    max_uses?: number;
+    current_uses: number;
+    expires_at?: string;
+    is_active: boolean;
+    description?: string;
+    created_at: string;
+    updated_at: string;
+}
