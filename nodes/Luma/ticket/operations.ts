@@ -179,13 +179,25 @@ class TicketOperations extends BaseOperations {
             if (pricingTiers.tier && Array.isArray(pricingTiers.tier)) {
                 requestBody.pricing_tiers = (
                     pricingTiers.tier as IDataObject[]
-                ).map(tier => ({
-                    name: tier.name as string,
-                    price: tier.price as number,
-                    start_at: tier.startAt as string,
-                    end_at: tier.endAt as string,
-                    capacity: tier.capacity as number
-                }));
+                ).map(tier => {
+                    if (
+                        tier.name == null ||
+                        tier.price == null ||
+                        tier.startAt == null
+                    ) {
+                        throw new NodeOperationError(
+                            context.executeFunctions.getNode(),
+                            'Each pricing tier must have a name, price, and startAt defined.'
+                        );
+                    }
+                    return {
+                        name: tier.name as string,
+                        price: tier.price as number,
+                        start_at: tier.startAt as string,
+                        end_at: tier.endAt as string,
+                        capacity: tier.capacity as number
+                    };
+                });
             }
         }
 
