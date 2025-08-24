@@ -45,21 +45,48 @@ Always run these commands before committing changes:
    - Auto-fixes ESLint issues where possible
    - Takes approximately 3 seconds
 
-4. **Full validation**: `pnpm run prepublishOnly`
+4. **Run tests**: `pnpm run test`
+   - Executes all unit, integration, and frontend tests with vitest
+   - Takes approximately 3 seconds for full test suite (55 tests)
+   - NEVER CANCEL: Set timeout to 60+ seconds for safety
+
+5. **Full validation**: `pnpm run prepublishOnly`
    - Runs complete build + lint with strict rules
    - Takes approximately 5-8 seconds
    - NEVER CANCEL: Set timeout to 60+ seconds for safety
    - Must pass before publishing to npm
+
+### Testing Requirements
+**CRITICAL**: All new code must include comprehensive tests:
+
+1. **Unit Tests Required** (`tests/unit/`):
+   - New nodes: Test node structure, parameters, and basic functionality
+   - New credentials: Test credential configuration and validation
+   - New utilities: Test helper functions and core logic
+   - File changes: Test build system and source file integrity
+
+2. **Integration Tests Required** (`tests/integration/`):
+   - New API endpoints: Test n8n workflow execution and data flow
+   - New operations: Test parameter handling and error scenarios
+   - New resources: Test node registration and n8n compatibility
+   - Workflow changes: Test end-to-end execution patterns
+
+3. **Frontend/UX Tests Required** (`tests/frontend/`):
+   - New UI elements: Test parameter structure and conditional fields
+   - New user flows: Test credential integration and user experience
+   - Display changes: Test node properties and user-friendly configuration
 
 ### Manual Validation Requirements
 **CRITICAL**: After making code changes, always validate functionality:
 
 1. **Build and verify output**: Check that `dist/` contains expected files after build
    - Should contain: `nodes/Luma/Luma.node.js`, `credentials/LumaApi.credentials.js`, SVG icons
-2. **Test node structure**: Ensure credentials and nodes are properly structured
-3. **Validate TypeScript**: Confirm no compilation errors in watch mode
-4. **Check ESLint rules**: All n8n-specific linting rules must pass
-5. **Test scenario**: If possible, test node functionality in n8n development environment
+2. **Run automated tests**: Execute test suite to ensure no regressions
+   - Use `pnpm run test` for full test suite or category-specific commands
+3. **Test node structure**: Ensure credentials and nodes are properly structured
+4. **Validate TypeScript**: Confirm no compilation errors in watch mode
+5. **Check ESLint rules**: All n8n-specific linting rules must pass
+6. **Test scenario**: If possible, test node functionality in n8n development environment
 
 ### Validation Scenarios
 After making changes, validate these key scenarios:
@@ -78,9 +105,15 @@ After making changes, validate these key scenarios:
 │   └── luma.svg                     # Node icon
 ├── credentials/                     # API credentials configuration
 │   └── LumaApi.credentials.ts       # Luma API key setup
+├── tests/                          # Comprehensive test suite
+│   ├── unit/                       # Unit tests for build system and source files
+│   ├── integration/                # Integration tests for n8n workflow execution
+│   ├── frontend/                   # Frontend/UX tests for user experience
+│   └── setup.ts                    # Test configuration and utilities
 ├── dist/                           # Build output (generated)
 ├── package.json                    # Project configuration
 ├── tsconfig.json                   # TypeScript configuration
+├── vitest.config.ts                # Test runner configuration
 ├── .eslintrc.js                    # ESLint rules for development
 ├── .eslintrc.prepublish.js         # Strict ESLint rules for publishing
 ├── .prettierrc.js                  # Code formatting configuration
@@ -91,6 +124,7 @@ After making changes, validate these key scenarios:
 - **Main node**: `nodes/Luma/Luma.node.ts` - Contains the node description and execution logic
 - **Credentials**: `credentials/LumaApi.credentials.ts` - Handles API authentication
 - **Entry point**: `index.ts` - Package entry point (minimal, mostly empty)
+- **Test suite**: `tests/` - Comprehensive unit, integration, and frontend tests
 
 ## Development Workflow
 
@@ -98,15 +132,19 @@ After making changes, validate these key scenarios:
 1. **Always start with build validation**: Run `pnpm run build` to ensure current state works
 2. **Use watch mode for development**: `pnpm run dev` for automatic recompilation
 3. **Edit node files**: Modify files in `nodes/Luma/` directory
-4. **Test TypeScript compilation**: Watch for errors in dev mode output
-5. **Validate with lint**: Run `pnpm run lint` frequently during development
-6. **Format before committing**: Always run `pnpm run format`
+4. **Write tests for changes**: Add unit, integration, and frontend tests as appropriate
+5. **Test TypeScript compilation**: Watch for errors in dev mode output
+6. **Validate with lint**: Run `pnpm run lint` frequently during development
+7. **Run test suite**: Execute `pnpm run test` to ensure no regressions
+8. **Format before committing**: Always run `pnpm run format`
 
 ### Adding New Operations or Resources
 - Edit `nodes/Luma/Luma.node.ts` to add new resources or operations
 - Follow n8n node development patterns for parameter definitions
 - Ensure proper TypeScript types are used
 - Add appropriate display options and validation
+- **Write comprehensive tests**: Create unit tests for node structure, integration tests for workflow execution, and frontend tests for user experience
+- **Test all scenarios**: Include both success and error cases in test coverage
 
 ### N8N Development Patterns
 **Key patterns to follow when modifying nodes:**
@@ -151,7 +189,7 @@ pnpm install && pnpm run build
 
 # Development cycle (while coding)
 pnpm run dev  # Keep running in separate terminal
-pnpm run format && pnpm run lint  # After making changes
+pnpm run format && pnpm run lint && pnpm run test  # After making changes
 
 # Pre-commit validation
 pnpm run prepublishOnly
@@ -179,7 +217,9 @@ index.ts
 nodes/
 package.json
 pnpm-lock.yaml
+tests/
 tsconfig.json
+vitest.config.ts
 ```
 
 ### Package.json Key Scripts
@@ -191,7 +231,13 @@ tsconfig.json
   "format": "prettier nodes credentials --write",
   "lint": "eslint nodes credentials package.json",
   "lintfix": "eslint nodes credentials package.json --fix",
-  "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+  "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
+  "test": "vitest",
+  "test:run": "vitest run",
+  "test:coverage": "vitest run --coverage",
+  "test:unit": "vitest run tests/unit",
+  "test:integration": "vitest run tests/integration",
+  "test:frontend": "vitest run tests/frontend"
 }
 ```
 
@@ -214,23 +260,68 @@ tsconfig.json
 
 ## Testing and Validation
 
-### Current State
-- **No automated test suite** currently exists in the repository
-- **Manual validation required** for all functionality changes
-- **ESLint serves as primary validation** for code quality
+### Comprehensive Test Suite
+The repository includes a comprehensive test suite using **vitest** with 55 tests across three categories:
+
+- **Unit Tests** (16 tests): Build system validation, source file verification, development workflow testing
+- **Integration Tests** (26 tests): Node registration, workflow execution, parameter handling, error scenarios
+- **Frontend/UX Tests** (13 tests): Node properties, parameter structure, user experience validation
+
+### Test Execution Commands
+```bash
+# Run all tests (55 tests, ~3 seconds)
+pnpm run test
+
+# Run tests by category
+pnpm run test:unit         # Unit tests only
+pnpm run test:integration  # Integration tests only  
+pnpm run test:frontend     # Frontend/UX tests only
+
+# Run tests with coverage report
+pnpm run test:coverage
+
+# Run tests in watch mode (for development)
+pnpm run test:ui          # Interactive UI mode
+```
+
+### Test Requirements for New Code
+**MANDATORY**: All new code changes must include appropriate tests:
+
+#### Unit Tests (`tests/unit/`)
+- **Required for**: New nodes, credentials, utilities, build system changes
+- **Test patterns**: File existence, TypeScript compilation, dependency integrity
+- **Examples**: Build system validation, source file verification, configuration testing
+
+#### Integration Tests (`tests/integration/`)
+- **Required for**: New API operations, workflow changes, n8n compatibility features
+- **Test patterns**: Node registration, workflow execution, parameter validation, error handling
+- **Examples**: n8n node registration, workflow data flow, API integration, error scenarios
+
+#### Frontend/UX Tests (`tests/frontend/`)
+- **Required for**: UI parameter changes, credential flows, user experience modifications
+- **Test patterns**: Parameter structure, conditional fields, user-friendly configuration
+- **Examples**: Node properties validation, credential UX, parameter hierarchy testing
+
+### Testing Guidelines
+1. **Follow existing patterns**: Use established test utilities and structure from `tests/setup.ts`
+2. **Test both success and failure cases**: Include error handling and edge case validation
+3. **Keep tests fast**: All tests should complete in under 5 seconds total
+4. **Use descriptive test names**: Tests should clearly describe what they validate
+5. **Mock external dependencies**: Use vitest mocking for API calls and external services
 
 ### Validation Checklist
 Before completing any changes:
 - [ ] `pnpm run build` succeeds without errors
+- [ ] `pnpm run test` passes all tests (55/55)
 - [ ] `pnpm run lint` passes all checks  
 - [ ] `pnpm run format` applied to all modified files
 - [ ] `pnpm run prepublishOnly` completes successfully
-- [ ] Node functionality manually tested in development environment
-- [ ] API credentials tested with actual Luma API endpoints
+- [ ] New code includes appropriate unit, integration, and/or frontend tests
+- [ ] Test coverage maintained or improved for modified areas
 
 **NEVER CANCEL long-running commands** - builds and validation steps must complete fully.
 
 ---
 
 ## Summary
-This n8n community node package is well-structured and fast to build/test. All development commands are reliable and execute quickly (under 5 seconds each). The main development workflow involves: install dependencies → build → make changes in watch mode → format/lint → validate with prepublishOnly. The package follows n8n community standards and includes comprehensive ESLint rules for maintaining code quality.
+This n8n community node package is well-structured and fast to build/test. All development commands are reliable and execute quickly (under 5 seconds each). The main development workflow involves: install dependencies → build → make changes in watch mode → write tests → format/lint/test → validate with prepublishOnly. The package follows n8n community standards, includes comprehensive ESLint rules for maintaining code quality, and features a robust test suite with 55 tests covering unit, integration, and frontend scenarios.
