@@ -339,12 +339,19 @@ class CalendarOperations extends BaseOperations {
     static async listCoupons(
         context: LumaOperationContext
     ): Promise<INodeExecutionData[]> {
+        const calendarApiId = context.executeFunctions.getNodeParameter(
+            'calendarApiId',
+            context.itemIndex
+        ) as string;
+
         const additionalFields = context.executeFunctions.getNodeParameter(
             'additionalFields',
             context.itemIndex
         ) as IDataObject;
 
-        const qs: CalendarCouponsFilters = {};
+        const qs: CalendarCouponsFilters = {
+            calendar_api_id: calendarApiId
+        };
 
         // Apply pagination parameters from additional fields
         if (additionalFields.paginationCursor) {
