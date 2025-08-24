@@ -12,12 +12,17 @@ const ticketOperations: INodeProperties = {
     },
     options: [
         {
+            name: 'Get Ticket Type Details',
+            value: 'get',
+            action: 'Get ticket type details'
+        },
+        {
             name: 'List Event Ticket Types',
             value: 'list',
             action: 'List event ticket types'
         }
     ],
-    default: 'list'
+    default: 'get'
 };
 
 // Event ID field for ticket operations
@@ -34,6 +39,22 @@ const eventIdField: INodeProperties = {
         }
     },
     description: 'The ID of the event to list ticket types for'
+};
+
+// Ticket Type ID field for get operation
+const ticketTypeIdField: INodeProperties = {
+    displayName: 'Ticket Type ID',
+    name: 'ticketTypeId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['get']
+        }
+    },
+    description: 'The ID of the ticket type to get details for'
 };
 
 // Additional fields for ticket operations
@@ -131,8 +152,48 @@ const ticketAdditionalFields: INodeProperties = {
     ]
 };
 
+// Additional fields for ticket get operation
+const ticketGetAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['get']
+        }
+    },
+    options: [
+        {
+            displayName: 'Include Analytics',
+            name: 'includeAnalytics',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to include analytics data in the response'
+        },
+        {
+            displayName: 'Include Pricing History',
+            name: 'includePricingHistory',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to include pricing history in the response'
+        },
+        {
+            displayName: 'Include Discount Rules',
+            name: 'includeDiscountRules',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to include discount rules in the response'
+        }
+    ]
+};
+
 export const ticketProps: INodeProperties[] = [
     ticketOperations,
     eventIdField,
-    ticketAdditionalFields
+    ticketTypeIdField,
+    ticketAdditionalFields,
+    ticketGetAdditionalFields
 ];
