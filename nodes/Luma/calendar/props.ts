@@ -42,6 +42,12 @@ const calendarOperations: INodeProperties = {
             description: 'List events managed by a calendar'
         },
         {
+            name: 'List People',
+            value: 'listPeople',
+            action: 'List people in a calendar',
+            description: 'List people associated with a calendar'
+        },
+        {
             name: 'Lookup Event',
             value: 'lookupEvent',
             action: 'Lookup a specific event in a calendar',
@@ -62,7 +68,13 @@ const calendarApiIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['calendar'],
-            operation: ['listEvents', 'lookupEvent', 'addEvent', 'importPeople']
+            operation: [
+                'listEvents',
+                'lookupEvent',
+                'addEvent',
+                'importPeople',
+                'listPeople'
+            ]
         }
     },
     description: 'The API ID of the calendar'
@@ -417,6 +429,86 @@ const importPeopleAdditionalFields: INodeProperties = {
     options: [defaultRoleField, skipDuplicatesField, notifyUsersField]
 };
 
+// List People specific fields
+
+const queryField: INodeProperties = {
+    displayName: 'Search Query',
+    name: 'query',
+    type: 'string',
+    default: '',
+    placeholder: 'Search over names and emails',
+    description: 'Search filter for people names and emails'
+};
+
+const membershipTierField: INodeProperties = {
+    displayName: 'Membership Tier API ID',
+    name: 'membershipTierApiId',
+    type: 'string',
+    default: '',
+    description: 'Filter by membership tier API ID'
+};
+
+const memberStatusField: INodeProperties = {
+    displayName: 'Member Status',
+    name: 'memberStatus',
+    type: 'string',
+    default: '',
+    description: 'Filter by member status (relevant for Calendar Memberships)'
+};
+
+const peopleSortColumnField: INodeProperties = {
+    displayName: 'Sort Column',
+    name: 'sortColumn',
+    type: 'options',
+    options: [
+        {
+            name: 'Approved Count',
+            value: 'event_approved_count'
+        },
+        {
+            name: 'Check-in Count',
+            value: 'event_checked_in_count'
+        },
+        {
+            name: 'Created At',
+            value: 'created_at'
+        },
+        {
+            name: 'Name',
+            value: 'name'
+        },
+        {
+            name: 'Revenue',
+            value: 'revenue_usd_cents'
+        }
+    ],
+    default: 'created_at',
+    description: 'Column to sort by'
+};
+
+const listPeopleAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['listPeople']
+        }
+    },
+    options: [
+        queryField,
+        membershipTierField,
+        memberStatusField,
+        sortDirectionField,
+        peopleSortColumnField,
+        paginationCursorField,
+        paginationLimitField
+    ]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
@@ -426,5 +518,6 @@ export const calendarProps = [
     calendarAdditionalFields,
     lookupAdditionalFields,
     addEventAdditionalFields,
-    importPeopleAdditionalFields
+    importPeopleAdditionalFields,
+    listPeopleAdditionalFields
 ];
