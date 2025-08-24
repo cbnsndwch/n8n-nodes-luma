@@ -46,6 +46,7 @@ export const LUMA_ENDPOINTS = {
     CALENDAR_IMPORT_PEOPLE: '/public/v1/calendar/import-people',
     CALENDAR_LIST_PERSON_TAGS: '/public/v1/calendar/list-person-tags',
     CALENDAR_LIST_COUPONS: '/public/v1/calendar/list-coupons',
+    CALENDAR_UPDATE_COUPON: '/public/v1/calendar/coupons/update',
 
     // Utility endpoints
     ENTITY_LOOKUP: '/public/v1/entity/lookup',

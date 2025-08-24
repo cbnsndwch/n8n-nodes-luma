@@ -63,3 +63,15 @@ export interface PersonTagsFilters extends IDataObject {
     pagination_cursor?: string; // For pagination
     pagination_limit?: number; // Number of items to return
 }
+
+export interface UpdateCalendarCouponRequest extends IDataObject {
+    api_id: string; // Required - ID of coupon to update
+    name?: string; // Optional - new display name
+    code?: string; // Optional - new coupon code
+    discount_type?: 'percentage' | 'fixed_amount'; // Optional - new discount type
+    discount_value?: number; // Optional - new discount value
+    max_uses?: number; // Optional - new maximum uses (null = unlimited)
+    expires_at?: string; // Optional - new expiration date (ISO 8601)
+    description?: string; // Optional - new description
+    is_active?: boolean; // Optional - activate/deactivate coupon
+}
