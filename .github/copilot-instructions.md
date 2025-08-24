@@ -100,15 +100,41 @@ After making changes, validate these key scenarios:
 ### Key Directories and Files
 ```
 ├── .github/copilot-instructions.md  # This file
-├── nodes/Luma/                      # Main node implementation
-│   ├── Luma.node.ts                # Node logic and configuration
-│   └── luma.svg                     # Node icon
+├── nodes/                           # Node implementations
+│   ├── Luma/                       # Main action node
+│   │   ├── Luma.node.ts            # Node logic and configuration
+│   │   ├── luma.svg                # Node icon
+│   │   ├── operations.ts           # Operation definitions
+│   │   ├── {resource}/             # Resource-specific implementations
+│   │   │   ├── contracts.ts        # TypeScript types and interfaces
+│   │   │   ├── operations.ts       # Resource operations
+│   │   │   └── props.ts            # n8n parameter definitions
+│   │   └── shared/                 # Shared utilities and base classes
+│   │       ├── constants.ts        # Shared constants
+│   │       ├── contracts.ts        # Base types
+│   │       ├── operations.base.ts  # Base operation class
+│   │       ├── utils.ts            # Utility functions
+│   │       ├── api/                # API client utilities
+│   │       └── props/              # Shared parameter definitions
+│   └── LumaTrigger/                # Trigger node implementation
+│       ├── LumaTrigger.node.ts     # Trigger node logic
+│       └── luma.svg                # Node icon
 ├── credentials/                     # API credentials configuration
 │   └── LumaApi.credentials.ts       # Luma API key setup
+├── docs/                           # Project documentation
+│   ├── luma.openapi.yml            # OpenAPI specification
+│   └── projects/                   # Project-specific documentation
+│       └── {project-id}-{name}/    # Individual project folder
+│           ├── PRD.md              # Product Requirements Document
+│           ├── EPIC_SUMMARY.md     # Epic organization summary
+│           ├── API_COVERAGE.md     # API coverage analysis
+│           └── {epic-num}-{name}/  # Epic-specific documentation
+│               ├── epic-{num}-{name}.md        # Epic overview
+│               └── story-{num}.{sub}-{name}.md # Individual user stories
 ├── tests/                          # Comprehensive test suite
-│   ├── unit/                       # Unit tests for build system and source files
-│   ├── integration/                # Integration tests for n8n workflow execution
-│   ├── frontend/                   # Frontend/UX tests for user experience
+│   ├── unit/                       # Unit tests organized by resource
+│   ├── integration/                # Integration tests organized by resource  
+│   ├── frontend/                   # Frontend/UX tests organized by resource
 │   └── setup.ts                    # Test configuration and utilities
 ├── dist/                           # Build output (generated)
 ├── package.json                    # Project configuration
@@ -121,12 +147,84 @@ After making changes, validate these key scenarios:
 ```
 
 ### Important Implementation Files
-- **Main node**: `nodes/Luma/Luma.node.ts` - Contains the node description and execution logic
+- **Action node**: `nodes/Luma/Luma.node.ts` - Main action node with resource operations
+- **Trigger node**: `nodes/LumaTrigger/LumaTrigger.node.ts` - Event polling and webhook triggers
 - **Credentials**: `credentials/LumaApi.credentials.ts` - Handles API authentication
 - **Entry point**: `index.ts` - Package entry point (minimal, mostly empty)
 - **Test suite**: `tests/` - Comprehensive unit, integration, and frontend tests
+- **Resource implementations**: `nodes/Luma/{resource}/` - Individual API resource modules
+- **Shared utilities**: `nodes/Luma/shared/` - Common utilities and base classes
+
+### Project Documentation Structure
+The repository follows a structured approach to project documentation:
+
+#### Project Organization (`docs/projects/`)
+- **Naming Convention**: `{project-id}-{descriptive-name}/`
+- **Required Files**:
+  - `PRD.md` - Product Requirements Document with overview, scope, and acceptance criteria
+  - `EPIC_SUMMARY.md` - Summary of epics and their organization
+  - `API_COVERAGE.md` - Analysis of API endpoints and coverage mapping
+
+#### Epic Organization (`docs/projects/{project}/`)
+- **Naming Convention**: `{epic-num}-{resource-name}/`
+- **Required Files**:
+  - `epic-{num}-{name}.md` - Epic overview, scope, and user story organization
+  - `story-{num}.{sub}-{name}.md` - Individual user stories with acceptance criteria
+
+#### User Story Structure
+Each user story follows a consistent format:
+- **Header**: Project reference, epic, story ID, priority
+- **User Story**: Standard "As a/I want to/So that" format
+- **Acceptance Criteria**: Specific, testable requirements with checkboxes
+- **Technical Implementation**: Code snippets, parameter definitions
+- **API Endpoint**: Relevant API endpoint(s)
+- **Test Cases**: Expected test scenarios
+- **Definition of Done**: Completion checklist
+- **Dependencies**: Prerequisite stories or epics
+- **Estimated Effort**: Story points and time estimates
+
+#### Documentation Standards
+- **Consistent formatting**: Use standard markdown with code blocks for technical details
+- **Traceability**: Clear mapping between stories, API endpoints, and implementation files
+- **Actionable acceptance criteria**: Each criterion should be verifiable and testable
+- **Complete coverage**: All API functionality should be documented before implementation
+- **Cross-references**: Link related stories, dependencies, and implementation files
 
 ## Development Workflow
+
+### Project Planning and Documentation
+When starting a new project:
+
+1. **Create project directory**: Follow naming convention `{project-id}-{descriptive-name}/`
+2. **Write PRD**: Document project overview, current state, target state, and success criteria
+3. **Analyze API coverage**: Map API endpoints to required functionality
+4. **Organize into epics**: Group related functionality into logical epics
+5. **Write epic summaries**: Create EPIC_SUMMARY.md with coverage statistics
+6. **Document user stories**: Break epics into specific, actionable user stories
+7. **Validate completeness**: Ensure 100% API coverage before implementation starts
+
+### Documentation Requirements for New Projects
+**MANDATORY**: All new projects must include complete documentation before implementation:
+
+#### Project Root Files (`docs/projects/{project}/`)
+- **PRD.md**: Complete product requirements with scope and acceptance criteria
+- **EPIC_SUMMARY.md**: Epic organization with coverage statistics
+- **API_COVERAGE.md**: Mapping of API endpoints to implementation plans
+
+#### Epic Documentation (`docs/projects/{project}/{epic}/`)
+- **epic-{num}-{name}.md**: Epic overview with scope and story organization
+- **story-{num}.{sub}-{name}.md**: Individual user stories with complete specifications
+
+#### Story Documentation Standards
+Each user story must include:
+- Clear user story in standard format
+- Specific, testable acceptance criteria
+- Technical implementation details with code snippets
+- API endpoint mapping
+- Test case specifications
+- Definition of done checklist
+- Dependency analysis
+- Effort estimation
 
 ### Making Changes to Nodes
 1. **Always start with build validation**: Run `pnpm run build` to ensure current state works
