@@ -58,6 +58,12 @@ const calendarOperations: INodeProperties = {
             value: 'lookupEvent',
             action: 'Lookup a specific event in a calendar',
             description: 'Check if an event exists in a calendar'
+        },
+        {
+            name: 'Update Person Tag',
+            value: 'updatePersonTag',
+            action: 'Update a person tag in a calendar',
+            description: 'Update the properties of an existing person tag'
         }
     ],
     default: 'listEvents'
@@ -80,7 +86,8 @@ const calendarApiIdField: INodeProperties = {
                 'addEvent',
                 'importPeople',
                 'listPeople',
-                'listPersonTags'
+                'listPersonTags',
+                'updatePersonTag'
             ]
         }
     },
@@ -272,6 +279,24 @@ const addEventApiIdField: INodeProperties = {
         }
     },
     description: 'The API ID of the event to add to the calendar'
+};
+
+// Update Person Tag specific fields
+
+const tagApiIdField: INodeProperties = {
+    displayName: 'Tag API ID',
+    name: 'tagApiId',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: 'tag_123abc...',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updatePersonTag']
+        }
+    },
+    description: 'API ID of the person tag to update'
 };
 
 const roleField: INodeProperties = {
@@ -532,16 +557,59 @@ const listPersonTagsAdditionalFields: INodeProperties = {
     options: [paginationCursorField, paginationLimitField]
 };
 
+// Update fields for updatePersonTag operation
+const updatePersonTagFields: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updatePersonTag']
+        }
+    },
+    options: [
+        {
+            displayName: 'Name',
+            name: 'name',
+            type: 'string',
+            default: '',
+            placeholder: 'Updated tag name',
+            description: 'Updated name for the tag'
+        },
+        {
+            displayName: 'Color',
+            name: 'color',
+            type: 'color',
+            default: '',
+            placeholder: '#FF5733',
+            description: 'Updated hex color code for the tag (e.g., #FF5733)'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            placeholder: 'Updated tag description',
+            description: 'Updated description for the tag'
+        }
+    ]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
     addEventApiIdField,
+    tagApiIdField,
     peopleDataField,
     calendarAdditionalFields,
     lookupAdditionalFields,
     addEventAdditionalFields,
     importPeopleAdditionalFields,
     listPeopleAdditionalFields,
-    listPersonTagsAdditionalFields
+    listPersonTagsAdditionalFields,
+    updatePersonTagFields
 ];

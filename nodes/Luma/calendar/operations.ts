@@ -16,7 +16,8 @@ import type {
     ImportPeopleRequest,
     PersonData,
     CalendarPeopleFilters,
-    PersonTagsFilters
+    PersonTagsFilters,
+    UpdatePersonTagRequest
 } from './contracts';
 
 /**
@@ -331,6 +332,54 @@ class CalendarOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+
+    /**
+     * Update a person tag in a calendar
+     */
+    static async updatePersonTag(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const tagApiId = context.executeFunctions.getNodeParameter(
+            'tagApiId',
+            context.itemIndex
+        ) as string;
+
+        const updateFields = context.executeFunctions.getNodeParameter(
+            'updateFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: UpdatePersonTagRequest = {
+            api_id: tagApiId
+        };
+
+        // Add optional update fields
+        if (updateFields.name) {
+            requestBody.name = updateFields.name as string;
+        }
+        if (updateFields.color) {
+            requestBody.color = updateFields.color as string;
+        }
+        if (updateFields.description !== undefined) {
+            requestBody.description = updateFields.description as string;
+        }
+
+        // Validate that at least one update field is provided
+        if (!requestBody.name && !requestBody.color && requestBody.description === undefined) {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'At least one update field (name, color, or description) must be provided'
+            );
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_UPDATE_PERSON_TAG),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
 }
 
 export async function handleCalendarOperation(
@@ -354,6 +403,9 @@ export async function handleCalendarOperation(
             break;
         case 'listPersonTags':
             result = await CalendarOperations.listPersonTags(context);
+            break;
+        case 'updatePersonTag':
+            result = await CalendarOperations.updatePersonTag(context);
             break;
         case 'lookupEvent':
             result = await CalendarOperations.lookupEvent(context);
