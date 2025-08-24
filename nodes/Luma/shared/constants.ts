@@ -35,6 +35,7 @@ export const LUMA_ENDPOINTS = {
     // Calendar endpoints
     CALENDAR_LIST_EVENTS: '/public/v1/calendar/list-events',
     CALENDAR_LOOKUP_EVENT: '/public/v1/calendar/lookup-event',
+    CALENDAR_ADD_EVENT: '/public/v1/calendar/add-event',
     CALENDAR_LIST_PEOPLE: '/public/v1/calendar/list-people',
     CALENDAR_LIST_PERSON_TAGS: '/public/v1/calendar/list-person-tags',
     CALENDAR_LIST_COUPONS: '/public/v1/calendar/list-coupons',

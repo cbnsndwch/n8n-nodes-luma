@@ -16,3 +16,9 @@ export interface EventLookupFilters extends IDataObject {
     url?: string; // Event URL to lookup
     event_api_id?: string; // Event API ID to lookup
 }
+
+export interface AddEventRequest extends IDataObject {
+    calendar_api_id: string;
+    event_api_id: string;
+    role?: 'host' | 'co-host' | 'organizer';
+}

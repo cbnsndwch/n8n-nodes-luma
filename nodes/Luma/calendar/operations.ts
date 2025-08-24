@@ -9,7 +9,11 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { CalendarEventFilters, EventLookupFilters } from './contracts';
+import type {
+    CalendarEventFilters,
+    EventLookupFilters,
+    AddEventRequest
+} from './contracts';
 
 /**
  * Calendar-specific operations
@@ -111,6 +115,49 @@ class CalendarOperations extends BaseOperations {
 
         return [this.createReturnItem(responseData, context.itemIndex)];
     }
+
+    /**
+     * Add an event to a calendar
+     */
+    static async addEvent(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const calendarApiId = context.executeFunctions.getNodeParameter(
+            'calendarApiId',
+            context.itemIndex
+        ) as string;
+
+        const eventApiId = context.executeFunctions.getNodeParameter(
+            'eventApiId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: AddEventRequest = {
+            calendar_api_id: calendarApiId,
+            event_api_id: eventApiId
+        };
+
+        // Add optional role from additional fields
+        if (additionalFields.role) {
+            requestBody.role = additionalFields.role as
+                | 'host'
+                | 'co-host'
+                | 'organizer';
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_ADD_EVENT),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
 }
 
 export async function handleCalendarOperation(
@@ -120,6 +167,9 @@ export async function handleCalendarOperation(
     let result: INodeExecutionData | INodeExecutionData[];
 
     switch (operation) {
+        case 'addEvent':
+            result = await CalendarOperations.addEvent(context);
+            break;
         case 'listEvents':
             result = await CalendarOperations.listEvents(context);
             break;

@@ -24,6 +24,12 @@ const calendarOperations: INodeProperties = {
     },
     options: [
         {
+            name: 'Add Event',
+            value: 'addEvent',
+            action: 'Add an event to a calendar',
+            description: 'Add an existing event to a calendar'
+        },
+        {
             name: 'List Events',
             value: 'listEvents',
             action: 'List events in a calendar',
@@ -50,7 +56,7 @@ const calendarApiIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['calendar'],
-            operation: ['listEvents', 'lookupEvent']
+            operation: ['listEvents', 'lookupEvent', 'addEvent']
         }
     },
     description: 'The API ID of the calendar'
@@ -226,10 +232,66 @@ const lookupAdditionalFields: INodeProperties = {
     options: [platformField, eventUrlField, eventApiIdField]
 };
 
+// Add Event specific fields
+
+const addEventApiIdField: INodeProperties = {
+    displayName: 'Event API ID',
+    name: 'eventApiId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['addEvent']
+        }
+    },
+    description: 'The API ID of the event to add to the calendar'
+};
+
+const roleField: INodeProperties = {
+    displayName: 'Role',
+    name: 'role',
+    type: 'options',
+    options: [
+        {
+            name: 'Host',
+            value: 'host'
+        },
+        {
+            name: 'Co-Host',
+            value: 'co-host'
+        },
+        {
+            name: 'Organizer',
+            value: 'organizer'
+        }
+    ],
+    default: 'host',
+    description: 'Role for the event association'
+};
+
+const addEventAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['addEvent']
+        }
+    },
+    options: [roleField]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
+    addEventApiIdField,
     calendarAdditionalFields,
-    lookupAdditionalFields
+    lookupAdditionalFields,
+    addEventAdditionalFields
 ];
