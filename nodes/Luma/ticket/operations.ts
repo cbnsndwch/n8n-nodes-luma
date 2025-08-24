@@ -6,13 +6,15 @@ import {
 
 import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 
-import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
+import { BaseOperations } from '../shared/operations.base';
+import { parseCommaSeparatedIds } from '../shared/utils';
 
 import type {
     TicketTypeFilters,
     CreateTicketTypeRequest,
-    DeleteTicketTypeRequest
+    DeleteTicketTypeRequest,
+    BulkUpdateTicketTypesRequest
 } from './contracts';
 
 // Ticket-specific operations
@@ -235,6 +237,119 @@ class TicketOperations extends BaseOperations {
     }
 
     /**
+     * Bulk update multiple ticket types
+     */
+    static async bulkUpdate(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const ticketTypeIds = context.executeFunctions.getNodeParameter(
+            'ticketTypeIds',
+            context.itemIndex
+        ) as string;
+
+        const updateType = context.executeFunctions.getNodeParameter(
+            'updateType',
+            context.itemIndex
+        ) as 'percentage_change' | 'fixed_change' | 'absolute_value';
+
+        const updateFields = context.executeFunctions.getNodeParameter(
+            'updateFields',
+            context.itemIndex,
+            {}
+        ) as IDataObject;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex,
+            {}
+        ) as IDataObject;
+
+        // Parse ticket type IDs from comma-separated string
+        const ticketTypeIdArray = parseCommaSeparatedIds(ticketTypeIds);
+
+        if (ticketTypeIdArray.length === 0) {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'At least one ticket type ID must be provided'
+            );
+        }
+
+        // Build the request body
+        const requestBody: BulkUpdateTicketTypesRequest = {
+            ticket_type_ids: ticketTypeIdArray,
+            update_type: updateType,
+            update_fields: {}
+        };
+
+        // Process price change
+        if (updateFields.priceChange) {
+            const priceChange = updateFields.priceChange as IDataObject;
+            if (priceChange.settings) {
+                const settings = priceChange.settings as IDataObject;
+                requestBody.update_fields.price_change = {
+                    type: settings.type as 'percentage' | 'fixed',
+                    value: settings.value as number
+                };
+            }
+        }
+
+        // Process capacity change
+        if (updateFields.capacityChange) {
+            const capacityChange = updateFields.capacityChange as IDataObject;
+            if (capacityChange.settings) {
+                const settings = capacityChange.settings as IDataObject;
+                requestBody.update_fields.capacity_change = {
+                    type: settings.type as 'percentage' | 'fixed' | 'absolute',
+                    value: settings.value as number
+                };
+            }
+        }
+
+        // Process sale end date
+        if (updateFields.saleEndAt) {
+            requestBody.update_fields.sale_end_at =
+                updateFields.saleEndAt as string;
+        }
+
+        // Process hidden status
+        if (updateFields.isHidden !== undefined) {
+            requestBody.update_fields.is_hidden =
+                updateFields.isHidden as boolean;
+        }
+
+        // Process additional fields
+        if (Object.keys(additionalFields).length > 0) {
+            requestBody.additional_fields = {};
+
+            if (additionalFields.skipIfSoldOut !== undefined) {
+                requestBody.additional_fields.skip_if_sold_out =
+                    additionalFields.skipIfSoldOut as boolean;
+            }
+            if (additionalFields.validateBeforeUpdate !== undefined) {
+                requestBody.additional_fields.validate_before_update =
+                    additionalFields.validateBeforeUpdate as boolean;
+            }
+            if (additionalFields.rollbackOnError !== undefined) {
+                requestBody.additional_fields.rollback_on_error =
+                    additionalFields.rollbackOnError as boolean;
+            }
+        }
+
+        const response = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.TICKET_TYPES_BULK_UPDATE),
+            body: requestBody
+        });
+
+        return {
+            json: response,
+            pairedItem: {
+                item: context.itemIndex
+            }
+        };
+    }
+
+    /**
      * Delete a ticket type
      */
     static async delete(
@@ -302,6 +417,8 @@ export async function handleTicketOperation(
             return await TicketOperations.get(context);
         case 'list':
             return await TicketOperations.list(context);
+        case 'bulkUpdate':
+            return await TicketOperations.bulkUpdate(context);
         default:
             throw new NodeOperationError(
                 context.executeFunctions.getNode(),
