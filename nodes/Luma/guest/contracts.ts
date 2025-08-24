@@ -51,3 +51,20 @@ export interface GuestRegistrationResponse extends IDataObject {
     next_steps?: string[];
     requires_approval: boolean;
 }
+
+export interface GuestUpdateData extends IDataObject {
+    guest_id: string; // Required guest ID
+    name?: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    company?: string;
+    job_title?: string;
+    phone?: string;
+    approval_status?: 'approved' | 'pending' | 'rejected';
+    registration_status?: 'confirmed' | 'cancelled' | 'waitlisted';
+    notes?: string;
+    custom_fields?: Record<string, any>;
+    notify_guest?: boolean;
+    reason_for_change?: string;
+}

@@ -31,6 +31,12 @@ const guestOperations: INodeProperties = {
             value: 'register',
             description: 'Register a guest for an event',
             action: 'Register guest for event'
+        },
+        {
+            name: 'Update',
+            value: 'update',
+            description: 'Update guest information and status',
+            action: 'Update guest information'
         }
     ],
     default: 'list'
@@ -66,7 +72,7 @@ const guestIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['guest'],
-            operation: ['get']
+            operation: ['get', 'update']
         }
     },
     default: '',
@@ -344,6 +350,196 @@ const guestRegistrationAdditionalFields: INodeProperties = {
 };
 
 /**
+ * Update fields collection for guest update operation
+ */
+const guestUpdateFields: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['update']
+        }
+    },
+    options: [
+        {
+            displayName: 'Approval Status',
+            name: 'approvalStatus',
+            type: 'options',
+            options: [
+                {
+                    name: 'Approved',
+                    value: 'approved'
+                },
+                {
+                    name: 'Pending',
+                    value: 'pending'
+                },
+                {
+                    name: 'Rejected',
+                    value: 'rejected'
+                }
+            ],
+            default: 'pending',
+            description: 'Approval status of the guest'
+        },
+        {
+            displayName: 'Company',
+            name: 'company',
+            type: 'string',
+            default: '',
+            description: 'Company or organization name'
+        },
+        {
+            displayName: 'Custom Fields',
+            name: 'customFields',
+            type: 'fixedCollection',
+            typeOptions: {
+                multipleValues: true
+            },
+            default: {},
+            description: 'Custom fields for the guest',
+            options: [
+                {
+                    name: 'customField',
+                    displayName: 'Custom Field',
+                    values: [
+                        {
+                            displayName: 'Field Name',
+                            name: 'name',
+                            type: 'string',
+                            default: '',
+                            description: 'Name of the custom field'
+                        },
+                        {
+                            displayName: 'Field Value',
+                            name: 'value',
+                            type: 'string',
+                            default: '',
+                            description: 'Value of the custom field'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            displayName: 'Email',
+            name: 'email',
+            type: 'string',
+            default: '',
+            placeholder: 'name@email.com',
+            description: 'Email address of the guest'
+        },
+        {
+            displayName: 'First Name',
+            name: 'firstName',
+            type: 'string',
+            default: '',
+            description: 'First name of the guest'
+        },
+        {
+            displayName: 'Job Title',
+            name: 'jobTitle',
+            type: 'string',
+            default: '',
+            description: 'Job title or position'
+        },
+        {
+            displayName: 'Last Name',
+            name: 'lastName',
+            type: 'string',
+            default: '',
+            description: 'Last name of the guest'
+        },
+        {
+            displayName: 'Name',
+            name: 'name',
+            type: 'string',
+            default: '',
+            description: 'Full name of the guest'
+        },
+        {
+            displayName: 'Notes',
+            name: 'notes',
+            type: 'string',
+            typeOptions: {
+                rows: 3
+            },
+            default: '',
+            description: 'Additional notes about the guest'
+        },
+        {
+            displayName: 'Phone',
+            name: 'phone',
+            type: 'string',
+            default: '',
+            description: 'Phone number of the guest'
+        },
+        {
+            displayName: 'Registration Status',
+            name: 'registrationStatus',
+            type: 'options',
+            options: [
+                {
+                    name: 'Confirmed',
+                    value: 'confirmed'
+                },
+                {
+                    name: 'Cancelled',
+                    value: 'cancelled'
+                },
+                {
+                    name: 'Waitlisted',
+                    value: 'waitlisted'
+                }
+            ],
+            default: 'confirmed',
+            description: 'Registration status of the guest'
+        }
+    ]
+};
+
+/**
+ * Additional fields collection for guest update operation
+ */
+const guestUpdateAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['update']
+        }
+    },
+    options: [
+        {
+            displayName: 'Notify Guest',
+            name: 'notifyGuest',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to send a notification to the guest about the update'
+        },
+        {
+            displayName: 'Reason for Change',
+            name: 'reasonForChange',
+            type: 'string',
+            typeOptions: {
+                rows: 2
+            },
+            default: '',
+            description: 'Reason for the guest information update'
+        }
+    ]
+};
+
+/**
  * Export all guest properties
  */
 export const guestProps: INodeProperties[] = [
@@ -354,5 +550,7 @@ export const guestProps: INodeProperties[] = [
     guestEmailField,
     guestAdditionalFields,
     guestGetAdditionalFields,
-    guestRegistrationAdditionalFields
+    guestRegistrationAdditionalFields,
+    guestUpdateFields,
+    guestUpdateAdditionalFields
 ];
