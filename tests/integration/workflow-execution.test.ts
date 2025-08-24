@@ -238,6 +238,88 @@ describe('Workflow Execution Tests', () => {
       });
     });
 
+    describe('Cancel Operation Validation', () => {
+      it('should include cancel in guest operations', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const guestOperationProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'operation' && p.displayOptions?.show?.resource?.includes('guest')
+        );
+        
+        expect(guestOperationProperty).toBeDefined();
+        expect(guestOperationProperty?.options).toBeDefined();
+        
+        const cancelOption = guestOperationProperty?.options.find((option: any) => 
+          option.value === 'cancel'
+        );
+        
+        expect(cancelOption).toBeDefined();
+        expect(cancelOption?.name).toBe('Cancel');
+        expect(cancelOption?.description).toBe('Cancel guest registrations');
+        expect(cancelOption?.action).toBe('Cancel guest registration');
+      });
+
+      it('should have cancelledBy field for cancel operation', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const cancelledByProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'cancelledBy'
+        );
+        
+        expect(cancelledByProperty).toBeDefined();
+        expect(cancelledByProperty?.required).toBe(true);
+        expect(cancelledByProperty?.type).toBe('options');
+        expect(cancelledByProperty?.displayOptions?.show?.operation).toContain('cancel');
+        expect(cancelledByProperty?.options).toHaveLength(2);
+        
+        const guestOption = cancelledByProperty?.options.find((opt: any) => opt.value === 'guest');
+        const organizerOption = cancelledByProperty?.options.find((opt: any) => opt.value === 'organizer');
+        
+        expect(guestOption).toBeDefined();
+        expect(organizerOption).toBeDefined();
+      });
+
+      it('should support guest ID for cancel operation', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const guestIdProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'guestId'
+        );
+        
+        expect(guestIdProperty).toBeDefined();
+        expect(guestIdProperty?.required).toBe(true);
+        expect(guestIdProperty?.displayOptions?.show?.operation).toContain('cancel');
+        expect(guestIdProperty?.description).toContain('bulk');
+      });
+
+      it('should have additional fields for cancel operation', async () => {
+        const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+        const lumaNode = new Luma();
+        
+        const additionalFieldsProperty = lumaNode.description.properties.find((p: any) => 
+          p.name === 'additionalFields' && 
+          p.displayOptions?.show?.operation?.includes('cancel')
+        );
+        
+        expect(additionalFieldsProperty).toBeDefined();
+        expect(additionalFieldsProperty?.type).toBe('collection');
+        expect(additionalFieldsProperty?.options).toBeDefined();
+        
+        const options = additionalFieldsProperty?.options;
+        const cancellationReasonOption = options?.find((opt: any) => opt.name === 'cancellationReason');
+        const sendNotificationOption = options?.find((opt: any) => opt.name === 'sendNotification');
+        const refundAmountOption = options?.find((opt: any) => opt.name === 'refundAmount');
+        
+        expect(cancellationReasonOption).toBeDefined();
+        expect(sendNotificationOption).toBeDefined();
+        expect(refundAmountOption).toBeDefined();
+        expect(refundAmountOption?.type).toBe('number');
+      });
+    });
+
     describe('Guest Operation Handler Integration', () => {
       it('should support reject operation in handler', async () => {
         // Import the handleGuestOperation function
@@ -258,6 +340,31 @@ describe('Workflow Execution Tests', () => {
         // Should not throw error for reject operation (though it will fail due to missing parameters)
         try {
           await handleGuestOperation('reject', mockContext);
+        } catch (error: any) {
+          // Should fail due to missing parameters, not unknown operation
+          expect(error.message).not.toContain('not supported');
+        }
+      });
+
+      it('should support cancel operation in handler', async () => {
+        // Import the handleGuestOperation function
+        const { handleGuestOperation } = await import('../../dist/nodes/Luma/guest/operations.js');
+        expect(typeof handleGuestOperation).toBe('function');
+        
+        // Test that cancel operation exists by checking it doesn't throw for unknown operation
+        const mockContext = {
+          executeFunctions: {
+            getNodeParameter: vi.fn(),
+            getNode: vi.fn().mockReturnValue({ name: 'test-node' }),
+            continueOnFail: vi.fn().mockReturnValue(false),
+            getCredentials: vi.fn().mockResolvedValue({ apiKey: 'test-key' })
+          },
+          itemIndex: 0
+        };
+        
+        // Should not throw error for cancel operation (though it will fail due to missing parameters)
+        try {
+          await handleGuestOperation('cancel', mockContext);
         } catch (error: any) {
           // Should fail due to missing parameters, not unknown operation
           expect(error.message).not.toContain('not supported');

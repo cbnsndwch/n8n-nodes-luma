@@ -21,6 +21,12 @@ const guestOperations: INodeProperties = {
             action: 'Approve guest registration'
         },
         {
+            name: 'Cancel',
+            value: 'cancel',
+            description: 'Cancel guest registrations',
+            action: 'Cancel guest registration'
+        },
+        {
             name: 'Get',
             value: 'get',
             description: 'Get detailed information about a specific guest',
@@ -84,7 +90,7 @@ const guestIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['guest'],
-            operation: ['get', 'update', 'approve', 'reject']
+            operation: ['get', 'update', 'approve', 'reject', 'cancel']
         }
     },
     default: '',
@@ -674,6 +680,82 @@ const guestRejectAdditionalFields: INodeProperties = {
 };
 
 /**
+ * Cancelled By field for guest cancel operation
+ */
+const guestCancelledByField: INodeProperties = {
+    displayName: 'Cancelled By',
+    name: 'cancelledBy',
+    type: 'options',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['cancel']
+        }
+    },
+    options: [
+        {
+            name: 'Guest',
+            value: 'guest'
+        },
+        {
+            name: 'Organizer',
+            value: 'organizer'
+        }
+    ],
+    default: 'guest',
+    description: 'Who is cancelling the registration'
+};
+
+/**
+ * Additional fields collection for guest cancel operation
+ */
+const guestCancelAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['cancel']
+        }
+    },
+    options: [
+        {
+            displayName: 'Cancellation Reason',
+            name: 'cancellationReason',
+            type: 'string',
+            typeOptions: {
+                rows: 3
+            },
+            default: '',
+            description: 'Reason for cancelling the registration'
+        },
+        {
+            displayName: 'Send Notification',
+            name: 'sendNotification',
+            type: 'boolean',
+            default: true,
+            description:
+                'Whether to send cancellation notification to the guest'
+        },
+        {
+            displayName: 'Refund Amount',
+            name: 'refundAmount',
+            type: 'number',
+            typeOptions: {
+                numberPrecision: 2,
+                minValue: 0
+            },
+            default: 0,
+            description: 'Amount to refund (if applicable)'
+        }
+    ]
+};
+
+/**
  * Export all guest properties
  */
 export const guestProps: INodeProperties[] = [
@@ -683,11 +765,13 @@ export const guestProps: INodeProperties[] = [
     guestNameField,
     guestEmailField,
     guestRejectionReasonField,
+    guestCancelledByField,
     guestAdditionalFields,
     guestGetAdditionalFields,
     guestRegistrationAdditionalFields,
     guestUpdateFields,
     guestUpdateAdditionalFields,
     guestApproveAdditionalFields,
-    guestRejectAdditionalFields
+    guestRejectAdditionalFields,
+    guestCancelAdditionalFields
 ];

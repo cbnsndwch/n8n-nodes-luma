@@ -84,3 +84,11 @@ export interface GuestRejectionData extends IDataObject {
     custom_message?: string;
     allow_reapply?: boolean;
 }
+
+export interface GuestCancellationData extends IDataObject {
+    guest_id: string | string[]; // Required guest ID(s)
+    cancelled_by: 'guest' | 'organizer'; // Required cancellation source
+    cancellation_reason?: string;
+    send_notification?: boolean;
+    refund_amount?: number;
+}
