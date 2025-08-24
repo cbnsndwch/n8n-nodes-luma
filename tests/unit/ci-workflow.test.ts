@@ -90,47 +90,31 @@ describe('CI Workflow Tests', () => {
     });
 
     describe('Test Execution Integration', () => {
-        it('should include main test execution step', () => {
+        it('should include test execution with coverage', () => {
             const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
             const workflow = parse(content);
             const testStep = workflow.jobs.test.steps.find(
-                (step: any) => step.name === 'Run tests'
+                (step: any) => step.name === 'Run tests with coverage'
             );
             expect(testStep).toBeDefined();
-            expect(testStep.run).toBe('pnpm run test');
+            expect(testStep.run).toBe('pnpm run test:coverage');
         });
 
-        it('should include unit test execution step', () => {
+        it('should include coverage upload to Codecov', () => {
             const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
             const workflow = parse(content);
-            const unitTestStep = workflow.jobs.test.steps.find(
-                (step: any) => step.name === 'Run unit tests'
+            const codecovStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Upload coverage to Codecov'
             );
-            expect(unitTestStep).toBeDefined();
-            expect(unitTestStep.run).toBe('pnpm run test:unit');
+            expect(codecovStep).toBeDefined();
+            expect(codecovStep.uses).toBe('codecov/codecov-action@v3');
+            expect(codecovStep.with.token).toBe('${{ secrets.CODECOV_TOKEN }}');
+            expect(codecovStep.with.file).toBe('./coverage/lcov.info');
+            expect(codecovStep.with.flags).toBe('unittests');
+            expect(codecovStep.with.fail_ci_if_error).toBe(true);
         });
 
-        it('should include integration test execution step', () => {
-            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
-            const workflow = parse(content);
-            const integrationTestStep = workflow.jobs.test.steps.find(
-                (step: any) => step.name === 'Run integration tests'
-            );
-            expect(integrationTestStep).toBeDefined();
-            expect(integrationTestStep.run).toBe('pnpm run test:integration');
-        });
-
-        it('should include frontend test execution step', () => {
-            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
-            const workflow = parse(content);
-            const frontendTestStep = workflow.jobs.test.steps.find(
-                (step: any) => step.name === 'Run frontend tests'
-            );
-            expect(frontendTestStep).toBeDefined();
-            expect(frontendTestStep.run).toBe('pnpm run test:frontend');
-        });
-
-        it('should have test steps in correct order after dependency installation', () => {
+        it('should have coverage test execution and upload steps in correct order after dependency installation', () => {
             const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
             const workflow = parse(content);
             const steps = workflow.jobs.test.steps;
@@ -138,24 +122,16 @@ describe('CI Workflow Tests', () => {
             const installIndex = steps.findIndex(
                 (step: any) => step.name === 'Install dependencies'
             );
-            const runTestsIndex = steps.findIndex(
-                (step: any) => step.name === 'Run tests'
+            const coverageTestIndex = steps.findIndex(
+                (step: any) => step.name === 'Run tests with coverage'
             );
-            const unitTestsIndex = steps.findIndex(
-                (step: any) => step.name === 'Run unit tests'
-            );
-            const integrationTestsIndex = steps.findIndex(
-                (step: any) => step.name === 'Run integration tests'
-            );
-            const frontendTestsIndex = steps.findIndex(
-                (step: any) => step.name === 'Run frontend tests'
+            const codecovUploadIndex = steps.findIndex(
+                (step: any) => step.name === 'Upload coverage to Codecov'
             );
 
             expect(installIndex).toBeGreaterThan(-1);
-            expect(runTestsIndex).toBeGreaterThan(installIndex);
-            expect(unitTestsIndex).toBeGreaterThan(runTestsIndex);
-            expect(integrationTestsIndex).toBeGreaterThan(unitTestsIndex);
-            expect(frontendTestsIndex).toBeGreaterThan(integrationTestsIndex);
+            expect(coverageTestIndex).toBeGreaterThan(installIndex);
+            expect(codecovUploadIndex).toBeGreaterThan(coverageTestIndex);
         });
 
         it('should have all required test commands available in package.json', () => {
@@ -228,7 +204,7 @@ describe('CI Workflow Tests', () => {
                 (step: any) => step.name === 'Lint code (prepublish rules)'
             );
             const runTestsIndex = steps.findIndex(
-                (step: any) => step.name === 'Run tests'
+                (step: any) => step.name === 'Run tests with coverage'
             );
 
             // All steps should exist

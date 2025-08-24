@@ -97,14 +97,14 @@ jobs:
           pnpm exec eslint -c .eslintrc.prepublish.js nodes credentials package.json || { echo "❌ Prepublish linting failed"; exit 1; }
           echo "✅ Prepublish linting passed"
         
-      - name: Run tests
-        run: pnpm run test
+      - name: Run tests with coverage
+        run: pnpm run test:coverage
         
-      - name: Run unit tests
-        run: pnpm run test:unit
-        
-      - name: Run integration tests
-        run: pnpm run test:integration
-        
-      - name: Run frontend tests
-        run: pnpm run test:frontend
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
