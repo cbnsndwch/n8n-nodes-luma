@@ -8,7 +8,9 @@ describe('Utility Operations Unit Tests', () => {
             );
 
             expect(LUMA_ENDPOINTS.IMAGE_CREATE_UPLOAD_URL).toBeDefined();
-            expect(LUMA_ENDPOINTS.IMAGE_CREATE_UPLOAD_URL).toBe('/public/v1/images/create-upload-url');
+            expect(LUMA_ENDPOINTS.IMAGE_CREATE_UPLOAD_URL).toBe(
+                '/public/v1/images/create-upload-url'
+            );
         });
     });
 

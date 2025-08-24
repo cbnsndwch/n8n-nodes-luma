@@ -9,9 +9,11 @@ describe('Calendar Frontend User Experience', () => {
 
             expect(Array.isArray(calendarProps)).toBe(true);
             expect(calendarProps.length).toBeGreaterThan(0);
-            
+
             // Check for operation property
-            const operationProp = calendarProps.find(prop => prop.name === 'operation');
+            const operationProp = calendarProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationProp).toBeDefined();
             expect(operationProp?.displayName).toBeDefined();
         });
@@ -21,7 +23,9 @@ describe('Calendar Frontend User Experience', () => {
                 '../../../dist/nodes/Luma/calendar/props.js'
             );
 
-            const operationField = calendarProps.find(prop => prop.name === 'operation');
+            const operationField = calendarProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationField?.displayName).toBe('Operation');
             expect(operationField?.type).toBe('options');
             expect(operationField?.options).toBeDefined();
@@ -35,10 +39,10 @@ describe('Calendar Frontend User Experience', () => {
             );
 
             // Test display options for calendar-specific fields
-            const calendarSpecificProps = calendarProps.filter(
-                prop => prop.displayOptions?.show?.resource?.includes('calendar')
+            const calendarSpecificProps = calendarProps.filter(prop =>
+                prop.displayOptions?.show?.resource?.includes('calendar')
             );
-            
+
             expect(calendarSpecificProps.length).toBeGreaterThan(0);
         });
 
@@ -62,7 +66,9 @@ describe('Calendar Frontend User Experience', () => {
             );
 
             // Check for common calendar fields that should have good UX
-            const operationField = calendarProps.find(prop => prop.name === 'operation');
+            const operationField = calendarProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationField?.displayName).toBe('Operation');
 
             // Look for additional fields that might be calendar-specific

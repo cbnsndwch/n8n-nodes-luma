@@ -9,9 +9,11 @@ describe('Ticket Frontend User Experience', () => {
 
             expect(Array.isArray(ticketProps)).toBe(true);
             expect(ticketProps.length).toBeGreaterThan(0);
-            
+
             // Check for operation property
-            const operationProp = ticketProps.find(prop => prop.name === 'operation');
+            const operationProp = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationProp).toBeDefined();
             expect(operationProp?.displayName).toBeDefined();
         });
@@ -21,7 +23,9 @@ describe('Ticket Frontend User Experience', () => {
                 '../../../dist/nodes/Luma/ticket/props.js'
             );
 
-            const operationField = ticketProps.find(prop => prop.name === 'operation');
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationField?.displayName).toBe('Operation');
             expect(operationField?.type).toBe('options');
             expect(operationField?.options).toBeDefined();
@@ -35,10 +39,10 @@ describe('Ticket Frontend User Experience', () => {
             );
 
             // Test display options for ticket-specific fields
-            const ticketSpecificProps = ticketProps.filter(
-                prop => prop.displayOptions?.show?.resource?.includes('ticket')
+            const ticketSpecificProps = ticketProps.filter(prop =>
+                prop.displayOptions?.show?.resource?.includes('ticket')
             );
-            
+
             expect(ticketSpecificProps.length).toBeGreaterThan(0);
         });
 
@@ -62,7 +66,9 @@ describe('Ticket Frontend User Experience', () => {
             );
 
             // Check for common ticket fields that should have good UX
-            const operationField = ticketProps.find(prop => prop.name === 'operation');
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationField?.displayName).toBe('Operation');
 
             // Look for additional fields that might be ticket-specific

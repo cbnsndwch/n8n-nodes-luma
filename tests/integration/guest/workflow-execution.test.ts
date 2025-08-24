@@ -26,10 +26,18 @@ describe('Guest Workflow Execution Tests', () => {
             expect(inputData[0]).toHaveProperty('json');
 
             // Verify the mock parameters can be retrieved
-            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe('guest');
-            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe('cancel');
-            expect(mockExecuteFunctions.getNodeParameter('guestId')).toBe('guest-123');
-            expect(mockExecuteFunctions.getNodeParameter('cancelledBy')).toBe('organizer');
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'guest'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'cancel'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('guestId')).toBe(
+                'guest-123'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('cancelledBy')).toBe(
+                'organizer'
+            );
         });
     });
 
@@ -45,30 +53,41 @@ describe('Guest Workflow Execution Tests', () => {
             expect(Array.isArray(inputData)).toBe(true);
 
             // Verify the mock parameters can be retrieved
-            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe('guest');
-            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe('reject');
-            expect(mockExecuteFunctions.getNodeParameter('guestId')).toBe('guest-456');
-            expect(mockExecuteFunctions.getNodeParameter('rejectionReason')).toBe('Rejected due to policy violation');
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'guest'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'reject'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('guestId')).toBe(
+                'guest-456'
+            );
+            expect(
+                mockExecuteFunctions.getNodeParameter('rejectionReason')
+            ).toBe('Rejected due to policy violation');
         });
     });
 
     describe('Guest Operations Error Handling', () => {
         it('should handle execution context errors gracefully', async () => {
             mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-            
+
             const shouldContinue = mockExecuteFunctions.continueOnFail();
             expect(shouldContinue).toBe(true);
         });
 
         it('should handle credential retrieval', async () => {
-            const credentials = await mockExecuteFunctions.getCredentials('lumaApi');
+            const credentials =
+                await mockExecuteFunctions.getCredentials('lumaApi');
             expect(credentials).toEqual({ apiKey: 'test-key' });
         });
     });
 
     describe('Guest Workflow Integration', () => {
         it('should validate workflow execution structure', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const lumaNode = new Luma();
 
             expect(typeof lumaNode.execute).toBe('function');

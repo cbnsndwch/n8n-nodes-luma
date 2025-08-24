@@ -36,6 +36,12 @@ const calendarOperations: INodeProperties = {
             description: 'Create a new coupon for calendar events'
         },
         {
+            name: 'Create Person Tag',
+            value: 'createPersonTag',
+            action: 'Create a person tag in a calendar',
+            description: 'Create a new person tag for organizing people'
+        },
+        {
             name: 'Import People',
             value: 'importPeople',
             action: 'Import people to a calendar',
@@ -94,6 +100,7 @@ const calendarApiIdField: INodeProperties = {
                 'importPeople',
                 'listPeople',
                 'listPersonTags',
+                'createPersonTag',
                 'updateCoupon'
             ]
         }
@@ -661,6 +668,55 @@ const listPersonTagsAdditionalFields: INodeProperties = {
     options: [paginationCursorField, paginationLimitField]
 };
 
+// Create Person Tag specific fields
+
+const personTagNameField: INodeProperties = {
+    displayName: 'Tag Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createPersonTag']
+        }
+    },
+    description: 'Name of the person tag (required)'
+};
+
+const createPersonTagAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createPersonTag']
+        }
+    },
+    options: [
+        {
+            displayName: 'Color',
+            name: 'color',
+            type: 'color',
+            default: '',
+            placeholder: '#FF5733',
+            description: 'Color for the tag (hex color code)'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            placeholder: 'Tag description',
+            description: 'Optional description for the tag'
+        }
+    ]
+};
+
 // Update Coupon specific fields
 
 const couponApiIdField: INodeProperties = {
@@ -771,6 +827,7 @@ export const calendarProps = [
     addEventApiIdField,
     couponApiIdField,
     peopleDataField,
+    personTagNameField,
     couponNameField,
     couponCodeField,
     discountTypeField,
@@ -782,5 +839,6 @@ export const calendarProps = [
     createCouponAdditionalFields,
     listPeopleAdditionalFields,
     listPersonTagsAdditionalFields,
+    createPersonTagAdditionalFields,
     updateCouponFields
 ];

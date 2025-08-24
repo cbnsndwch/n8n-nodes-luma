@@ -3,8 +3,12 @@ import { describe, it, expect } from 'vitest';
 describe('Shared Node Properties Frontend Tests', () => {
     describe('Node Property Validation', () => {
         it('should validate that nodes have user-friendly properties', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
-            const { LumaTrigger } = await import('../../../dist/nodes/LumaTrigger/LumaTrigger.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
+            const { LumaTrigger } = await import(
+                '../../../dist/nodes/LumaTrigger/LumaTrigger.node.js'
+            );
 
             const lumaNode = new Luma();
             const triggerNode = new LumaTrigger();
@@ -17,8 +21,12 @@ describe('Shared Node Properties Frontend Tests', () => {
         });
 
         it('should have proper node grouping for n8n UI', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
-            const { LumaTrigger } = await import('../../../dist/nodes/LumaTrigger/LumaTrigger.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
+            const { LumaTrigger } = await import(
+                '../../../dist/nodes/LumaTrigger/LumaTrigger.node.js'
+            );
 
             const lumaNode = new Luma();
             const triggerNode = new LumaTrigger();
@@ -28,8 +36,12 @@ describe('Shared Node Properties Frontend Tests', () => {
         });
 
         it('should have consistent iconography', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
-            const { LumaTrigger } = await import('../../../dist/nodes/LumaTrigger/LumaTrigger.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
+            const { LumaTrigger } = await import(
+                '../../../dist/nodes/LumaTrigger/LumaTrigger.node.js'
+            );
 
             const lumaNode = new Luma();
             const triggerNode = new LumaTrigger();
@@ -41,7 +53,9 @@ describe('Shared Node Properties Frontend Tests', () => {
 
     describe('Parameter Structure', () => {
         it('should have logical parameter hierarchy', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const lumaNode = new Luma();
 
             const properties = lumaNode.description.properties;
@@ -53,7 +67,9 @@ describe('Shared Node Properties Frontend Tests', () => {
         });
 
         it('should have resource options available', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const lumaNode = new Luma();
 
             const resourceProperty = lumaNode.description.properties.find(
@@ -62,11 +78,15 @@ describe('Shared Node Properties Frontend Tests', () => {
             expect(resourceProperty).toBeDefined();
             expect(resourceProperty?.options).toBeDefined();
             expect(Array.isArray(resourceProperty?.options)).toBe(true);
-            expect((resourceProperty?.options as any[]).length).toBeGreaterThan(0);
+            expect((resourceProperty?.options as any[]).length).toBeGreaterThan(
+                0
+            );
         });
 
         it('should have conditional parameter display', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const lumaNode = new Luma();
 
             const properties = lumaNode.description.properties;
@@ -81,7 +101,9 @@ describe('Shared Node Properties Frontend Tests', () => {
 
     describe('Credential Integration UX', () => {
         it('should reference correct credential name', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const lumaNode = new Luma();
 
             expect(lumaNode.description.credentials).toBeDefined();
@@ -92,7 +114,9 @@ describe('Shared Node Properties Frontend Tests', () => {
         });
 
         it('should have user-friendly credential display', async () => {
-            const { LumaApi } = await import('../../../dist/credentials/LumaApi.credentials.js');
+            const { LumaApi } = await import(
+                '../../../dist/credentials/LumaApi.credentials.js'
+            );
             const credential = new LumaApi();
 
             expect(credential.displayName).toBe('Luma API');
