@@ -67,6 +67,11 @@ const eventOperations: INodeProperties = {
             name: 'Update',
             value: 'update',
             action: 'Update an event'
+        },
+        {
+            name: 'Update Coupon',
+            value: 'updateCoupon',
+            action: 'Update an event coupon'
         }
     ],
     default: 'get'
@@ -77,7 +82,14 @@ const eventOperations: INodeProperties = {
  */
 const eventIdField = idField('Event ID', 'eventId', 'The ID of the event', {
     resource: ['event'],
-    operation: ['get', 'update', 'delete', 'listCoupons', 'createCoupon']
+    operation: [
+        'get',
+        'update',
+        'delete',
+        'listCoupons',
+        'createCoupon',
+        'updateCoupon'
+    ]
 });
 
 const eventNameField: INodeProperties = {
@@ -181,6 +193,25 @@ const discountValueField: INodeProperties = {
     },
     default: 10,
     description: 'Discount amount (percentage 0-100 or cents for fixed amount)'
+};
+
+/**
+ * Coupon ID field for updateCoupon operation
+ */
+const couponIdField: INodeProperties = {
+    displayName: 'Coupon ID',
+    name: 'couponId',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['updateCoupon']
+        }
+    },
+    default: '',
+    placeholder: 'coupon_123abc...',
+    description: 'API ID of the coupon to update'
 };
 
 /**
@@ -294,7 +325,8 @@ const eventAdditionalFields: INodeProperties = {
                 'get',
                 'delete',
                 'listCoupons',
-                'createCoupon'
+                'createCoupon',
+                'updateCoupon'
             ]
         }
     },
@@ -539,6 +571,68 @@ const eventAdditionalFields: INodeProperties = {
     ]
 };
 
+/**
+ * Update fields collection for updateCoupon operation
+ */
+const updateCouponFields: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['updateCoupon']
+        }
+    },
+    options: [
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            description: 'Updated coupon description'
+        },
+        {
+            displayName: 'Expires At',
+            name: 'expiresAt',
+            type: 'dateTime',
+            default: '',
+            description: 'Updated expiration date (ISO 8601 format)'
+        },
+        {
+            displayName: 'Is Active',
+            name: 'isActive',
+            type: 'boolean',
+            default: true,
+            description: 'Whether the coupon is active'
+        },
+        {
+            displayName: 'Is Public',
+            name: 'isPublic',
+            type: 'boolean',
+            default: true,
+            description: 'Whether the coupon is public or private'
+        },
+        {
+            displayName: 'Max Uses',
+            name: 'maxUses',
+            type: 'number',
+            default: 0,
+            description: 'Updated maximum number of uses (0 = unlimited)'
+        },
+        {
+            displayName: 'Name',
+            name: 'name',
+            type: 'string',
+            default: '',
+            placeholder: 'New coupon name',
+            description: 'Updated display name for the coupon'
+        }
+    ]
+};
+
 export const eventProps = [
     eventOperations,
     eventIdField,
@@ -549,5 +643,7 @@ export const eventProps = [
     couponCodeField,
     discountTypeField,
     discountValueField,
-    eventAdditionalFields
+    couponIdField,
+    eventAdditionalFields,
+    updateCouponFields
 ];
