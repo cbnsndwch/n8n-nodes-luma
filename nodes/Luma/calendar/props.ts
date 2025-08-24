@@ -58,6 +58,12 @@ const calendarOperations: INodeProperties = {
             value: 'lookupEvent',
             action: 'Lookup a specific event in a calendar',
             description: 'Check if an event exists in a calendar'
+        },
+        {
+            name: 'Update Coupon',
+            value: 'updateCoupon',
+            action: 'Update a calendar coupon',
+            description: 'Update existing coupon settings for a calendar'
         }
     ],
     default: 'listEvents'
@@ -80,7 +86,8 @@ const calendarApiIdField: INodeProperties = {
                 'addEvent',
                 'importPeople',
                 'listPeople',
-                'listPersonTags'
+                'listPersonTags',
+                'updateCoupon'
             ]
         }
     },
@@ -532,16 +539,121 @@ const listPersonTagsAdditionalFields: INodeProperties = {
     options: [paginationCursorField, paginationLimitField]
 };
 
+// Update Coupon specific fields
+
+const couponApiIdField: INodeProperties = {
+    displayName: 'Coupon ID',
+    name: 'apiId',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: 'coupon_123abc...',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updateCoupon']
+        }
+    },
+    description: 'API ID of the coupon to update'
+};
+
+const updateCouponFields: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['updateCoupon']
+        }
+    },
+    options: [
+        {
+            displayName: 'Code',
+            name: 'code',
+            type: 'string',
+            default: '',
+            placeholder: 'NEW_CODE',
+            description: 'Updated coupon code'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            description: 'Updated coupon description'
+        },
+        {
+            displayName: 'Discount Type',
+            name: 'discountType',
+            type: 'options',
+            options: [
+                {
+                    name: 'Percentage',
+                    value: 'percentage'
+                },
+                {
+                    name: 'Fixed Amount',
+                    value: 'fixed_amount'
+                }
+            ],
+            default: 'percentage',
+            description: 'Updated discount type'
+        },
+        {
+            displayName: 'Discount Value',
+            name: 'discountValue',
+            type: 'number',
+            default: 0,
+            description:
+                'Updated discount value (percentage: 0-100, fixed amount: cents)'
+        },
+        {
+            displayName: 'Expires At',
+            name: 'expiresAt',
+            type: 'dateTime',
+            default: '',
+            description: 'Updated expiration date (ISO 8601 format)'
+        },
+        {
+            displayName: 'Is Active',
+            name: 'isActive',
+            type: 'boolean',
+            default: true,
+            description: 'Whether the coupon is active'
+        },
+        {
+            displayName: 'Max Uses',
+            name: 'maxUses',
+            type: 'number',
+            default: 0,
+            description: 'Updated maximum number of uses (0 = unlimited)'
+        },
+        {
+            displayName: 'Name',
+            name: 'name',
+            type: 'string',
+            default: '',
+            placeholder: 'New coupon name',
+            description: 'Updated display name for the coupon'
+        }
+    ]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
     addEventApiIdField,
+    couponApiIdField,
     peopleDataField,
     calendarAdditionalFields,
     lookupAdditionalFields,
     addEventAdditionalFields,
     importPeopleAdditionalFields,
     listPeopleAdditionalFields,
-    listPersonTagsAdditionalFields
+    listPersonTagsAdditionalFields,
+    updateCouponFields
 ];

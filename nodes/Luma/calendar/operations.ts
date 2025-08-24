@@ -16,7 +16,8 @@ import type {
     ImportPeopleRequest,
     PersonData,
     CalendarPeopleFilters,
-    PersonTagsFilters
+    PersonTagsFilters,
+    UpdateCalendarCouponRequest
 } from './contracts';
 
 /**
@@ -331,6 +332,63 @@ class CalendarOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+
+    /**
+     * Update a calendar coupon
+     */
+    static async updateCoupon(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const apiId = context.executeFunctions.getNodeParameter(
+            'apiId',
+            context.itemIndex
+        ) as string;
+
+        const updateFields = context.executeFunctions.getNodeParameter(
+            'updateFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: UpdateCalendarCouponRequest = {
+            api_id: apiId
+        };
+
+        // Apply optional update fields
+        if (updateFields.name) {
+            requestBody.name = updateFields.name as string;
+        }
+        if (updateFields.code) {
+            requestBody.code = updateFields.code as string;
+        }
+        if (updateFields.discountType) {
+            requestBody.discount_type = updateFields.discountType as
+                | 'percentage'
+                | 'fixed_amount';
+        }
+        if (updateFields.discountValue !== undefined) {
+            requestBody.discount_value = updateFields.discountValue as number;
+        }
+        if (updateFields.maxUses !== undefined) {
+            requestBody.max_uses = updateFields.maxUses as number;
+        }
+        if (updateFields.expiresAt) {
+            requestBody.expires_at = updateFields.expiresAt as string;
+        }
+        if (updateFields.description) {
+            requestBody.description = updateFields.description as string;
+        }
+        if (updateFields.isActive !== undefined) {
+            requestBody.is_active = updateFields.isActive as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_UPDATE_COUPON),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
 }
 
 export async function handleCalendarOperation(
@@ -357,6 +415,9 @@ export async function handleCalendarOperation(
             break;
         case 'lookupEvent':
             result = await CalendarOperations.lookupEvent(context);
+            break;
+        case 'updateCoupon':
+            result = await CalendarOperations.updateCoupon(context);
             break;
         default:
             throw new NodeOperationError(
