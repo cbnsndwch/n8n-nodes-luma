@@ -79,6 +79,24 @@ jobs:
           
           echo "✅ All build artifacts validated successfully"
         
+      - name: Lint code (development rules)
+        run: |
+          echo "🔍 Running ESLint with development rules..."
+          pnpm run lint || { echo "❌ Development linting failed"; exit 1; }
+          echo "✅ Development linting passed"
+        
+      - name: Format check
+        run: |
+          echo "🔍 Checking code formatting..."
+          pnpm exec prettier nodes credentials tests --check || { echo "❌ Code formatting check failed. Run 'pnpm run format' to fix."; exit 1; }
+          echo "✅ Code formatting check passed"
+        
+      - name: Lint code (prepublish rules)
+        run: |
+          echo "🔍 Running ESLint with prepublish rules..."
+          pnpm exec eslint -c .eslintrc.prepublish.js nodes credentials package.json || { echo "❌ Prepublish linting failed"; exit 1; }
+          echo "✅ Prepublish linting passed"
+        
       - name: Run tests
         run: pnpm run test
         
