@@ -16,9 +16,15 @@ import {
     calendarOperations,
     calendarApiIdField,
     calendarAdditionalFields,
-    lumaResource
+    lumaResource,
+    userOperations,
+    userAdditionalFields
 } from './descriptions';
-import { EventOperations, CalendarOperations } from './operations';
+import {
+    CalendarOperations,
+    EventOperations,
+    UserOperations
+} from './operations';
 
 export class Luma implements INodeType {
     description: INodeTypeDescription = {
@@ -43,16 +49,21 @@ export class Luma implements INodeType {
         ],
         properties: [
             lumaResource,
+            // Event-specific fields
             eventOperations,
-            calendarOperations,
             eventIdField,
-            calendarIdField,
-            calendarApiIdField,
             eventNameField,
             eventDescriptionField,
             eventStartDateField,
             eventAdditionalFields,
-            calendarAdditionalFields
+            // Calendar-specific fields
+            calendarOperations,
+            calendarIdField,
+            calendarApiIdField,
+            calendarAdditionalFields,
+            // User-specific fields
+            userOperations,
+            userAdditionalFields
         ]
     };
 
@@ -65,12 +76,12 @@ export class Luma implements INodeType {
 
         for (let i = 0; i < items.length; i++) {
             try {
-                if (resource === 'event') {
-                    const context = {
-                        executeFunctions: this,
-                        itemIndex: i
-                    };
+                const context = {
+                    executeFunctions: this,
+                    itemIndex: i
+                };
 
+                if (resource === 'event') {
                     let result: INodeExecutionData | INodeExecutionData[];
 
                     switch (operation) {
@@ -103,11 +114,6 @@ export class Luma implements INodeType {
                         returnData.push(result);
                     }
                 } else if (resource === 'calendar') {
-                    const context = {
-                        executeFunctions: this,
-                        itemIndex: i
-                    };
-
                     let result: INodeExecutionData | INodeExecutionData[];
 
                     switch (operation) {
@@ -128,6 +134,21 @@ export class Luma implements INodeType {
                     } else {
                         returnData.push(result);
                     }
+                } else if (resource === 'user') {
+                    let result: INodeExecutionData;
+
+                    switch (operation) {
+                        case 'getSelf':
+                            result = await UserOperations.getSelf(context);
+                            break;
+                        default:
+                            throw new NodeOperationError(
+                                this.getNode(),
+                                `The operation "${operation}" is not supported for user resource!`
+                            );
+                    }
+
+                    returnData.push(result);
                 } else {
                     throw new NodeOperationError(
                         this.getNode(),
