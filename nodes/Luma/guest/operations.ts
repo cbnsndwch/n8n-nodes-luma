@@ -503,7 +503,10 @@ class GuestOperations extends BaseOperations {
         }
 
         // Validate cancelledBy is provided
-        if (!cancelledBy || (cancelledBy !== 'guest' && cancelledBy !== 'organizer')) {
+        if (
+            !cancelledBy ||
+            (cancelledBy !== 'guest' && cancelledBy !== 'organizer')
+        ) {
             throw new NodeOperationError(
                 context.executeFunctions.getNode(),
                 'Cancelled By is required and must be either "guest" or "organizer".'
@@ -517,10 +520,12 @@ class GuestOperations extends BaseOperations {
 
         // Apply additional fields
         if (additionalFields.cancellationReason) {
-            body.cancellation_reason = additionalFields.cancellationReason as string;
+            body.cancellation_reason =
+                additionalFields.cancellationReason as string;
         }
         if (additionalFields.sendNotification !== undefined) {
-            body.send_notification = additionalFields.sendNotification as boolean;
+            body.send_notification =
+                additionalFields.sendNotification as boolean;
         }
         if (additionalFields.refundAmount !== undefined) {
             body.refund_amount = additionalFields.refundAmount as number;

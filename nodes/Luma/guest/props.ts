@@ -738,7 +738,8 @@ const guestCancelAdditionalFields: INodeProperties = {
             name: 'sendNotification',
             type: 'boolean',
             default: true,
-            description: 'Whether to send cancellation notification to the guest'
+            description:
+                'Whether to send cancellation notification to the guest'
         },
         {
             displayName: 'Refund Amount',
