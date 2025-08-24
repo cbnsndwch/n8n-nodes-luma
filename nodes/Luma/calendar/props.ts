@@ -28,6 +28,12 @@ const calendarOperations: INodeProperties = {
             value: 'listEvents',
             action: 'List events in a calendar',
             description: 'List events managed by a calendar'
+        },
+        {
+            name: 'Lookup Event',
+            value: 'lookupEvent',
+            action: 'Lookup a specific event in a calendar',
+            description: 'Check if an event exists in a calendar'
         }
     ],
     default: 'listEvents'
@@ -44,7 +50,7 @@ const calendarApiIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['calendar'],
-            operation: ['listEvents']
+            operation: ['listEvents', 'lookupEvent']
         }
     },
     description: 'The API ID of the calendar'
@@ -151,9 +157,79 @@ const calendarAdditionalFields: INodeProperties = {
     ]
 };
 
+// Lookup Event specific fields
+
+const platformField: INodeProperties = {
+    displayName: 'Platform',
+    name: 'platform',
+    type: 'options',
+    default: 'luma',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['lookupEvent']
+        }
+    },
+    options: [
+        {
+            name: 'Luma',
+            value: 'luma'
+        },
+        {
+            name: 'External',
+            value: 'external'
+        }
+    ],
+    description: 'Platform type to search within'
+};
+
+const eventUrlField: INodeProperties = {
+    displayName: 'Event URL',
+    name: 'url',
+    type: 'string',
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['lookupEvent']
+        }
+    },
+    description: 'Event URL to lookup'
+};
+
+const eventApiIdField: INodeProperties = {
+    displayName: 'Event API ID',
+    name: 'eventApiId',
+    type: 'string',
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['lookupEvent']
+        }
+    },
+    description: 'Event API ID to lookup'
+};
+
+const lookupAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['lookupEvent']
+        }
+    },
+    options: [platformField, eventUrlField, eventApiIdField]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
-    calendarAdditionalFields
+    calendarAdditionalFields,
+    lookupAdditionalFields
 ];

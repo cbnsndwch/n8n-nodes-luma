@@ -9,7 +9,7 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { CalendarEventFilters } from './contracts';
+import type { CalendarEventFilters, EventLookupFilters } from './contracts';
 
 /**
  * Calendar-specific operations
@@ -63,6 +63,54 @@ class CalendarOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+
+    /**
+     * Lookup an event in a calendar
+     */
+    static async lookupEvent(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const calendarApiId = context.executeFunctions.getNodeParameter(
+            'calendarApiId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: EventLookupFilters = {
+            calendar_api_id: calendarApiId
+        };
+
+        // Apply optional lookup parameters from additional fields
+        if (additionalFields.platform) {
+            qs.platform = additionalFields.platform as string;
+        }
+        if (additionalFields.url) {
+            qs.url = additionalFields.url as string;
+        }
+        if (additionalFields.eventApiId) {
+            qs.event_api_id = additionalFields.eventApiId as string;
+        }
+
+        // Validate that at least one lookup parameter is provided
+        if (!qs.url && !qs.event_api_id) {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'At least one lookup parameter (URL or Event API ID) must be provided'
+            );
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LOOKUP_EVENT),
+            qs
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
 }
 
 export async function handleCalendarOperation(
@@ -74,6 +122,9 @@ export async function handleCalendarOperation(
     switch (operation) {
         case 'listEvents':
             result = await CalendarOperations.listEvents(context);
+            break;
+        case 'lookupEvent':
+            result = await CalendarOperations.lookupEvent(context);
             break;
         default:
             throw new NodeOperationError(
