@@ -8,7 +8,9 @@ describe('User Operations Unit Tests', () => {
             );
 
             expect(LUMA_ENDPOINTS.USER_GET_SELF).toBeDefined();
-            expect(LUMA_ENDPOINTS.USER_GET_SELF).toBe('/public/v1/user/get-self');
+            expect(LUMA_ENDPOINTS.USER_GET_SELF).toBe(
+                '/public/v1/user/get-self'
+            );
         });
     });
 

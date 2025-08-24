@@ -10,8 +10,12 @@ describe('Ticket Operations Unit Tests', () => {
         });
 
         it('should have built ticket operation files', () => {
-            expect(fs.existsSync('dist/nodes/Luma/ticket/contracts.js')).toBe(true);
-            expect(fs.existsSync('dist/nodes/Luma/ticket/operations.js')).toBe(true);
+            expect(fs.existsSync('dist/nodes/Luma/ticket/contracts.js')).toBe(
+                true
+            );
+            expect(fs.existsSync('dist/nodes/Luma/ticket/operations.js')).toBe(
+                true
+            );
             expect(fs.existsSync('dist/nodes/Luma/ticket/props.js')).toBe(true);
         });
     });
@@ -68,7 +72,9 @@ describe('Ticket Operations Unit Tests', () => {
 
             // Check for common ticket endpoints
             expect(LUMA_ENDPOINTS.TICKET_TYPES_LIST).toBeDefined();
-            expect(LUMA_ENDPOINTS.TICKET_TYPES_LIST).toBe('/public/v1/event/ticket-types/list');
+            expect(LUMA_ENDPOINTS.TICKET_TYPES_LIST).toBe(
+                '/public/v1/event/ticket-types/list'
+            );
         });
     });
 });

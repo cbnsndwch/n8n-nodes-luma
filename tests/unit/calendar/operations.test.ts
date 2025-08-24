@@ -8,7 +8,9 @@ describe('Calendar Operations Unit Tests', () => {
             );
 
             expect(LUMA_ENDPOINTS.CALENDAR_LIST_EVENTS).toBeDefined();
-            expect(LUMA_ENDPOINTS.CALENDAR_LIST_EVENTS).toBe('/public/v1/calendar/list-events');
+            expect(LUMA_ENDPOINTS.CALENDAR_LIST_EVENTS).toBe(
+                '/public/v1/calendar/list-events'
+            );
         });
     });
 
@@ -60,10 +62,10 @@ describe('Calendar Operations Unit Tests', () => {
                 '../../../dist/nodes/Luma/calendar/props.js'
             );
 
-            const calendarSpecificProps = calendarProps.filter(
-                prop => prop.displayOptions?.show?.resource?.includes('calendar')
+            const calendarSpecificProps = calendarProps.filter(prop =>
+                prop.displayOptions?.show?.resource?.includes('calendar')
             );
-            
+
             expect(calendarSpecificProps.length).toBeGreaterThan(0);
         });
     });

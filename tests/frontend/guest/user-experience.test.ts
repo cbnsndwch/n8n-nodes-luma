@@ -9,8 +9,10 @@ describe('Guest Frontend User Experience', () => {
 
             expect(Array.isArray(guestProps)).toBe(true);
             expect(guestProps.length).toBeGreaterThan(0);
-            
-            const operationProp = guestProps.find(prop => prop.name === 'operation');
+
+            const operationProp = guestProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationProp).toBeDefined();
             expect(operationProp?.options).toBeDefined();
         });
@@ -20,7 +22,9 @@ describe('Guest Frontend User Experience', () => {
                 '../../../dist/nodes/Luma/guest/props.js'
             );
 
-            const operationField = guestProps.find(prop => prop.name === 'operation');
+            const operationField = guestProps.find(
+                prop => prop.name === 'operation'
+            );
             expect(operationField?.displayName).toBe('Operation');
             expect(operationField?.type).toBe('options');
         });
@@ -32,9 +36,13 @@ describe('Guest Frontend User Experience', () => {
                 '../../../dist/nodes/Luma/guest/props.js'
             );
 
-            const operationField = guestProps.find(prop => prop.name === 'operation');
-            const cancelOption = operationField?.options?.find((opt: any) => opt.value === 'cancel');
-            
+            const operationField = guestProps.find(
+                prop => prop.name === 'operation'
+            );
+            const cancelOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'cancel'
+            );
+
             expect(cancelOption?.name).toBe('Cancel');
             expect((cancelOption as any)?.description).toContain('Cancel');
             expect((cancelOption as any)?.action).toContain('Cancel');
@@ -45,7 +53,9 @@ describe('Guest Frontend User Experience', () => {
                 '../../../dist/nodes/Luma/guest/props.js'
             );
 
-            const cancelledByField = guestProps.find(prop => prop.name === 'cancelledBy');
+            const cancelledByField = guestProps.find(
+                prop => prop.name === 'cancelledBy'
+            );
             expect(cancelledByField?.displayName).toBe('Cancelled By');
             expect(cancelledByField?.required).toBe(true);
             expect(cancelledByField?.options).toBeDefined();
@@ -58,9 +68,13 @@ describe('Guest Frontend User Experience', () => {
                 '../../../dist/nodes/Luma/guest/props.js'
             );
 
-            const operationField = guestProps.find(prop => prop.name === 'operation');
-            const rejectOption = operationField?.options?.find((opt: any) => opt.value === 'reject');
-            
+            const operationField = guestProps.find(
+                prop => prop.name === 'operation'
+            );
+            const rejectOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'reject'
+            );
+
             expect(rejectOption?.name).toBe('Reject');
             expect((rejectOption as any)?.description).toBeDefined();
         });
@@ -70,7 +84,9 @@ describe('Guest Frontend User Experience', () => {
                 '../../../dist/nodes/Luma/guest/props.js'
             );
 
-            const rejectionReasonField = guestProps.find(prop => prop.name === 'rejectionReason');
+            const rejectionReasonField = guestProps.find(
+                prop => prop.name === 'rejectionReason'
+            );
             expect(rejectionReasonField?.displayName).toBe('Rejection Reason');
             expect(rejectionReasonField?.required).toBe(true);
             expect(rejectionReasonField?.type).toBe('string');
@@ -84,10 +100,10 @@ describe('Guest Frontend User Experience', () => {
             );
 
             // Test display options for guest-specific fields
-            const guestSpecificProps = guestProps.filter(
-                prop => prop.displayOptions?.show?.resource?.includes('guest')
+            const guestSpecificProps = guestProps.filter(prop =>
+                prop.displayOptions?.show?.resource?.includes('guest')
             );
-            
+
             expect(guestSpecificProps.length).toBeGreaterThan(0);
         });
 
@@ -97,14 +113,14 @@ describe('Guest Frontend User Experience', () => {
             );
 
             // Check that cancel-specific fields only show for cancel operation
-            const cancelSpecificProps = guestProps.filter(
-                prop => prop.displayOptions?.show?.operation?.includes('cancel')
+            const cancelSpecificProps = guestProps.filter(prop =>
+                prop.displayOptions?.show?.operation?.includes('cancel')
             );
             expect(cancelSpecificProps.length).toBeGreaterThan(0);
 
             // Check that reject-specific fields only show for reject operation
-            const rejectSpecificProps = guestProps.filter(
-                prop => prop.displayOptions?.show?.operation?.includes('reject')
+            const rejectSpecificProps = guestProps.filter(prop =>
+                prop.displayOptions?.show?.operation?.includes('reject')
             );
             expect(rejectSpecificProps.length).toBeGreaterThan(0);
         });

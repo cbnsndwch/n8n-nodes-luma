@@ -62,10 +62,10 @@ describe('Event Operations Unit Tests', () => {
                 '../../../dist/nodes/Luma/event/props.js'
             );
 
-            const eventSpecificProps = eventProps.filter(
-                prop => prop.displayOptions?.show?.resource?.includes('event')
+            const eventSpecificProps = eventProps.filter(prop =>
+                prop.displayOptions?.show?.resource?.includes('event')
             );
-            
+
             expect(eventSpecificProps.length).toBeGreaterThan(0);
         });
     });

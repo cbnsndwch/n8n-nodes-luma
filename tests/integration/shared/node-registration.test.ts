@@ -40,7 +40,9 @@ describe('Node Registration Tests', () => {
         it('should have built credential files', async () => {
             // Check if credential files exist after build
             try {
-                await import('../../../dist/credentials/LumaApi.credentials.js');
+                await import(
+                    '../../../dist/credentials/LumaApi.credentials.js'
+                );
                 expect(true).toBe(true); // File exists
             } catch (error) {
                 throw new Error('LumaApi credentials file not built correctly');
@@ -51,7 +53,9 @@ describe('Node Registration Tests', () => {
             // Check if node files exist after build
             try {
                 await import('../../../dist/nodes/Luma/Luma.node.js');
-                await import('../../../dist/nodes/LumaTrigger/LumaTrigger.node.js');
+                await import(
+                    '../../../dist/nodes/LumaTrigger/LumaTrigger.node.js'
+                );
                 expect(true).toBe(true); // Files exist
             } catch (error) {
                 throw new Error('Node files not built correctly');
@@ -83,7 +87,9 @@ describe('Node Registration Tests', () => {
         });
 
         it('should export valid Luma node class', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
 
             const node = new Luma();
             expect(node.description.name).toBe('luma');
@@ -106,7 +112,9 @@ describe('Node Registration Tests', () => {
 
     describe('Node Properties Validation', () => {
         it('should have resource options available', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const node = new Luma();
 
             const resourceProperty = node.description.properties.find(
@@ -115,15 +123,20 @@ describe('Node Registration Tests', () => {
             expect(resourceProperty).toBeDefined();
             expect(resourceProperty?.options).toBeDefined();
             expect(Array.isArray(resourceProperty?.options)).toBe(true);
-            expect((resourceProperty?.options as any[]).length).toBeGreaterThan(0);
+            expect((resourceProperty?.options as any[]).length).toBeGreaterThan(
+                0
+            );
         });
 
         it('should have operation parameters for each resource', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const node = new Luma();
 
             const operationProperties = node.description.properties.filter(
-                (p: any) => p.name === 'operation' && p.displayOptions?.show?.resource
+                (p: any) =>
+                    p.name === 'operation' && p.displayOptions?.show?.resource
             );
 
             expect(operationProperties.length).toBeGreaterThan(0);

@@ -77,7 +77,9 @@ describe('Guest Cancel Operation Unit Tests', () => {
             );
             expect(cancelledByField?.options).toHaveLength(2);
             expect(
-                cancelledByField?.options?.some((opt: any) => opt.value === 'guest')
+                cancelledByField?.options?.some(
+                    (opt: any) => opt.value === 'guest'
+                )
             ).toBe(true);
             expect(
                 cancelledByField?.options?.some(

@@ -5,8 +5,12 @@ describe('Build System Tests', () => {
     describe('Core Source Files', () => {
         it('should have main TypeScript source files', () => {
             expect(fs.existsSync('nodes/Luma/Luma.node.ts')).toBe(true);
-            expect(fs.existsSync('nodes/LumaTrigger/LumaTrigger.node.ts')).toBe(true);
-            expect(fs.existsSync('credentials/LumaApi.credentials.ts')).toBe(true);
+            expect(fs.existsSync('nodes/LumaTrigger/LumaTrigger.node.ts')).toBe(
+                true
+            );
+            expect(fs.existsSync('credentials/LumaApi.credentials.ts')).toBe(
+                true
+            );
         });
 
         it('should have feature source directories', () => {
@@ -27,14 +31,22 @@ describe('Build System Tests', () => {
 
         it('should have compiled JavaScript files', () => {
             expect(fs.existsSync('dist/nodes/Luma/Luma.node.js')).toBe(true);
-            expect(fs.existsSync('dist/nodes/LumaTrigger/LumaTrigger.node.js')).toBe(true);
-            expect(fs.existsSync('dist/credentials/LumaApi.credentials.js')).toBe(true);
+            expect(
+                fs.existsSync('dist/nodes/LumaTrigger/LumaTrigger.node.js')
+            ).toBe(true);
+            expect(
+                fs.existsSync('dist/credentials/LumaApi.credentials.js')
+            ).toBe(true);
         });
 
         it('should have TypeScript declaration files', () => {
             expect(fs.existsSync('dist/nodes/Luma/Luma.node.d.ts')).toBe(true);
-            expect(fs.existsSync('dist/nodes/LumaTrigger/LumaTrigger.node.d.ts')).toBe(true);
-            expect(fs.existsSync('dist/credentials/LumaApi.credentials.d.ts')).toBe(true);
+            expect(
+                fs.existsSync('dist/nodes/LumaTrigger/LumaTrigger.node.d.ts')
+            ).toBe(true);
+            expect(
+                fs.existsSync('dist/credentials/LumaApi.credentials.d.ts')
+            ).toBe(true);
         });
 
         it('should have built feature directories', () => {

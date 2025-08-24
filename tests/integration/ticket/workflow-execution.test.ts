@@ -26,10 +26,18 @@ describe('Ticket Workflow Execution Tests', () => {
             expect(inputData[0]).toHaveProperty('json');
 
             // Verify parameters
-            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe('ticket');
-            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe('createType');
-            expect(mockExecuteFunctions.getNodeParameter('eventId')).toBe('event-123');
-            expect(mockExecuteFunctions.getNodeParameter('name')).toBe('VIP Pass');
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'createType'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('eventId')).toBe(
+                'event-123'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('name')).toBe(
+                'VIP Pass'
+            );
         });
 
         it('should handle ticket type list operation', async () => {
@@ -42,29 +50,38 @@ describe('Ticket Workflow Execution Tests', () => {
             expect(Array.isArray(inputData)).toBe(true);
 
             // Verify parameters
-            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe('ticket');
-            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe('listTypes');
-            expect(mockExecuteFunctions.getNodeParameter('eventId')).toBe('event-456');
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'listTypes'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('eventId')).toBe(
+                'event-456'
+            );
         });
     });
 
     describe('Ticket Error Handling', () => {
         it('should handle execution context errors gracefully', async () => {
             mockExecuteFunctions.continueOnFail.mockReturnValue(true);
-            
+
             const shouldContinue = mockExecuteFunctions.continueOnFail();
             expect(shouldContinue).toBe(true);
         });
 
         it('should handle credential retrieval for ticket operations', async () => {
-            const credentials = await mockExecuteFunctions.getCredentials('lumaApi');
+            const credentials =
+                await mockExecuteFunctions.getCredentials('lumaApi');
             expect(credentials).toEqual({ apiKey: 'test-key' });
         });
     });
 
     describe('Ticket Workflow Integration', () => {
         it('should validate ticket workflow structure', async () => {
-            const { Luma } = await import('../../../dist/nodes/Luma/Luma.node.js');
+            const { Luma } = await import(
+                '../../../dist/nodes/Luma/Luma.node.js'
+            );
             const lumaNode = new Luma();
 
             // Check that ticket is a valid resource
@@ -72,7 +89,7 @@ describe('Ticket Workflow Execution Tests', () => {
                 (p: any) => p.name === 'resource'
             );
             expect(resourceProperty).toBeDefined();
-            
+
             const ticketOption = resourceProperty?.options?.find(
                 (opt: any) => opt.value === 'ticket'
             );
