@@ -9,7 +9,11 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { GuestFilters, GuestRegistrationData } from './contracts';
+import type {
+    GuestFilters,
+    GuestRegistrationData,
+    GuestUpdateData
+} from './contracts';
 
 // Guest-specific operations
 
@@ -184,6 +188,103 @@ class GuestOperations extends BaseOperations {
 
         return this.createReturnItem(responseData, context.itemIndex);
     }
+
+    /**
+     * Update guest information
+     */
+    static async update(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const guestId = context.executeFunctions.getNodeParameter(
+            'guestId',
+            context.itemIndex
+        ) as string;
+
+        const updateFields = context.executeFunctions.getNodeParameter(
+            'updateFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: GuestUpdateData = {
+            guest_id: guestId
+        };
+
+        // Apply update fields
+        if (updateFields.name) {
+            body.name = updateFields.name as string;
+        }
+        if (updateFields.email) {
+            body.email = updateFields.email as string;
+        }
+        if (updateFields.firstName) {
+            body.first_name = updateFields.firstName as string;
+        }
+        if (updateFields.lastName) {
+            body.last_name = updateFields.lastName as string;
+        }
+        if (updateFields.company) {
+            body.company = updateFields.company as string;
+        }
+        if (updateFields.jobTitle) {
+            body.job_title = updateFields.jobTitle as string;
+        }
+        if (updateFields.phone) {
+            body.phone = updateFields.phone as string;
+        }
+        if (updateFields.approvalStatus) {
+            body.approval_status = updateFields.approvalStatus as
+                | 'approved'
+                | 'pending'
+                | 'rejected';
+        }
+        if (updateFields.registrationStatus) {
+            body.registration_status = updateFields.registrationStatus as
+                | 'confirmed'
+                | 'cancelled'
+                | 'waitlisted';
+        }
+        if (updateFields.notes) {
+            body.notes = updateFields.notes as string;
+        }
+        if (updateFields.customFields) {
+            // Convert fixedCollection format to Record<string, any>
+            const customFieldsCollection =
+                updateFields.customFields as IDataObject;
+            if (
+                customFieldsCollection.customField &&
+                Array.isArray(customFieldsCollection.customField)
+            ) {
+                const customFields: Record<string, any> = {};
+                customFieldsCollection.customField.forEach((field: any) => {
+                    if (field.name && field.value !== undefined) {
+                        customFields[field.name] = field.value;
+                    }
+                });
+                body.custom_fields = customFields;
+            }
+        }
+
+        // Apply additional fields
+        if (additionalFields.notifyGuest !== undefined) {
+            body.notify_guest = additionalFields.notifyGuest as boolean;
+        }
+        if (additionalFields.reasonForChange) {
+            body.reason_for_change = additionalFields.reasonForChange as string;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.UPDATE_GUEST_STATUS),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
 }
 
 export async function handleGuestOperation(
@@ -201,6 +302,9 @@ export async function handleGuestOperation(
             break;
         case 'register':
             result = await GuestOperations.register(context);
+            break;
+        case 'update':
+            result = await GuestOperations.update(context);
             break;
         default:
             throw new NodeOperationError(
