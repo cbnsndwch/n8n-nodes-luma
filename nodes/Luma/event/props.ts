@@ -39,6 +39,11 @@ const eventOperations: INodeProperties = {
             action: 'Create an event'
         },
         {
+            name: 'Create Coupon',
+            value: 'createCoupon',
+            action: 'Create an event coupon'
+        },
+        {
             name: 'Delete',
             value: 'delete',
             action: 'Delete an event'
@@ -72,7 +77,7 @@ const eventOperations: INodeProperties = {
  */
 const eventIdField = idField('Event ID', 'eventId', 'The ID of the event', {
     resource: ['event'],
-    operation: ['get', 'update', 'delete', 'listCoupons']
+    operation: ['get', 'update', 'delete', 'listCoupons', 'createCoupon']
 });
 
 const eventNameField: INodeProperties = {
@@ -102,6 +107,80 @@ const eventDescriptionField: INodeProperties = {
     },
     default: '',
     description: 'The description of the event'
+};
+
+/**
+ * Coupon-specific required fields for createCoupon operation
+ */
+const couponNameField: INodeProperties = {
+    displayName: 'Coupon Name',
+    name: 'couponName',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['createCoupon']
+        }
+    },
+    default: '',
+    description: 'The display name for the coupon'
+};
+
+const couponCodeField: INodeProperties = {
+    displayName: 'Coupon Code',
+    name: 'couponCode',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['createCoupon']
+        }
+    },
+    default: '',
+    description:
+        'The unique coupon code that users will enter. Must be alphanumeric with optional hyphens/underscores.'
+};
+
+const discountTypeField: INodeProperties = {
+    displayName: 'Discount Type',
+    name: 'discountType',
+    type: 'options',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['createCoupon']
+        }
+    },
+    options: [
+        {
+            name: 'Percentage',
+            value: 'percentage'
+        },
+        {
+            name: 'Fixed Amount',
+            value: 'fixed_amount'
+        }
+    ],
+    default: 'percentage',
+    description: 'Type of discount to apply'
+};
+
+const discountValueField: INodeProperties = {
+    displayName: 'Discount Value',
+    name: 'discountValue',
+    type: 'number',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['event'],
+            operation: ['createCoupon']
+        }
+    },
+    default: 10,
+    description: 'Discount amount (percentage 0-100 or cents for fixed amount)'
 };
 
 /**
@@ -214,7 +293,8 @@ const eventAdditionalFields: INodeProperties = {
                 'getMany',
                 'get',
                 'delete',
-                'listCoupons'
+                'listCoupons',
+                'createCoupon'
             ]
         }
     },
@@ -226,6 +306,19 @@ const eventAdditionalFields: INodeProperties = {
         // Fields for getMany operation - before cursor
         eventBeforeCursorField,
         capacityField,
+        // Fields for createCoupon operation
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            displayOptions: {
+                show: {
+                    '/operation': ['createCoupon']
+                }
+            },
+            default: '',
+            description: 'Optional description for the coupon'
+        },
         endDateField,
         // Fields for update operations - event name
         {
@@ -241,6 +334,19 @@ const eventAdditionalFields: INodeProperties = {
             description: 'Update the name of the event'
         },
         eventStateField,
+        {
+            displayName: 'Expires At',
+            name: 'expiresAt',
+            type: 'dateTime',
+            displayOptions: {
+                show: {
+                    '/operation': ['createCoupon']
+                }
+            },
+            default: '',
+            description:
+                'When the coupon expires (leave empty for no expiration)'
+        },
         // Fields for delete operation
         {
             ...forceDeleteField,
@@ -275,11 +381,55 @@ const eventAdditionalFields: INodeProperties = {
             default: true,
             description: 'Whether to include usage statistics for each coupon'
         },
+        {
+            displayName: 'Is Public',
+            name: 'isPublic',
+            type: 'boolean',
+            displayOptions: {
+                show: {
+                    '/operation': ['createCoupon']
+                }
+            },
+            default: true,
+            description: 'Whether the coupon is public or private'
+        },
         limitField,
         locationAddressField,
         locationNameField,
         locationTypeField,
         locationUrlField,
+        {
+            displayName: 'Max Uses',
+            name: 'maxUses',
+            type: 'number',
+            displayOptions: {
+                show: {
+                    '/operation': ['createCoupon']
+                }
+            },
+            typeOptions: {
+                minValue: 1
+            },
+            default: '',
+            description:
+                'Maximum number of times the coupon can be used (leave empty for unlimited)'
+        },
+        {
+            displayName: 'Max Uses Per User',
+            name: 'maxUsesPerUser',
+            type: 'number',
+            displayOptions: {
+                show: {
+                    '/operation': ['createCoupon']
+                }
+            },
+            typeOptions: {
+                minValue: 1
+            },
+            default: '',
+            description:
+                'Maximum number of times one user can use the coupon (leave empty for unlimited)'
+        },
         seriesIdField,
         {
             displayName: 'Sort By',
@@ -346,6 +496,19 @@ const eventAdditionalFields: INodeProperties = {
             default: '',
             description: 'Update the start date and time of the event'
         },
+        {
+            displayName: 'Starts At',
+            name: 'startsAt',
+            type: 'dateTime',
+            displayOptions: {
+                show: {
+                    '/operation': ['createCoupon']
+                }
+            },
+            default: '',
+            description:
+                'When the coupon becomes valid (leave empty for immediate activation)'
+        },
         eventUpdateStateField,
         timezoneField,
         // Fields for get operation
@@ -382,5 +545,9 @@ export const eventProps = [
     eventNameField,
     eventDescriptionField,
     eventStartDateField,
+    couponNameField,
+    couponCodeField,
+    discountTypeField,
+    discountValueField,
     eventAdditionalFields
 ];

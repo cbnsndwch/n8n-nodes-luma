@@ -4,7 +4,7 @@ import {
     NodeOperationError
 } from 'n8n-workflow';
 
-import { buildLumaApiUrl } from '../shared/constants';
+import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
@@ -62,6 +62,55 @@ class TicketOperations extends BaseOperations {
             }
         };
     }
+
+    /**
+     * Get details for a specific ticket type
+     */
+    static async get(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const ticketTypeId = context.executeFunctions.getNodeParameter(
+            'ticketTypeId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex,
+            {}
+        ) as IDataObject;
+
+        // Build query parameters
+        const qs: IDataObject = {
+            ticket_type_id: ticketTypeId
+        };
+
+        // Apply additional fields for get operation
+        if (additionalFields.includeAnalytics !== undefined) {
+            qs.include_analytics = additionalFields.includeAnalytics as boolean;
+        }
+        if (additionalFields.includePricingHistory !== undefined) {
+            qs.include_pricing_history =
+                additionalFields.includePricingHistory as boolean;
+        }
+        if (additionalFields.includeDiscountRules !== undefined) {
+            qs.include_discount_rules =
+                additionalFields.includeDiscountRules as boolean;
+        }
+
+        const response = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.TICKET_TYPE_GET),
+            qs
+        });
+
+        return {
+            json: response,
+            pairedItem: {
+                item: context.itemIndex
+            }
+        };
+    }
 }
 
 /**
@@ -72,6 +121,8 @@ export async function handleTicketOperation(
     context: LumaOperationContext
 ): Promise<INodeExecutionData | INodeExecutionData[]> {
     switch (operation) {
+        case 'get':
+            return await TicketOperations.get(context);
         case 'list':
             return await TicketOperations.list(context);
         default:
