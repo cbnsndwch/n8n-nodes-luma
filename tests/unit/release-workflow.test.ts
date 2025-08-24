@@ -345,7 +345,9 @@ describe('Release Workflow Tests', () => {
             );
             expect(authStep).toBeDefined();
             expect(authStep.run).toContain('npm authentication failed');
-            expect(authStep.run).toContain('https://www.npmjs.com/settings/tokens');
+            expect(authStep.run).toContain(
+                'https://www.npmjs.com/settings/tokens'
+            );
             expect(authStep.run).toContain('repository settings');
         });
 
