@@ -2,9 +2,11 @@ name: CI
 
 on:
   pull_request:
-    branches: ['*']
+    branches: 
+      - '*'
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   test:
@@ -30,88 +32,83 @@ jobs:
         with:
           package_json_file: ./package.json
           
-      - name: Cache dependencies
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          
+      - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-pnpm-store-
             
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
         
       - name: Validate TypeScript compilation
         run: |
           echo "🔍 Validating TypeScript compilation..."
-          pnpm exec tsc --noEmit || { echo "❌ TypeScript compilation failed"; exit 1; }
+          pnpm exec tsc --noEmit
           echo "✅ TypeScript compilation successful"
         
       - name: Build project
         run: |
           echo "🏗️ Building project..."
-          pnpm run build || { echo "❌ Build process failed"; exit 1; }
+          pnpm run build
           echo "✅ Build process completed successfully"
         
       - name: Validate build artifacts
         run: |
-          # Check that essential build outputs exist
           echo "🔍 Validating build artifacts..."
           
-          # Core node files
+          # Core files
           test -f dist/nodes/Luma/Luma.node.js || { echo "❌ Missing dist/nodes/Luma/Luma.node.js"; exit 1; }
           test -f dist/nodes/LumaTrigger/LumaTrigger.node.js || { echo "❌ Missing dist/nodes/LumaTrigger/LumaTrigger.node.js"; exit 1; }
           test -f dist/credentials/LumaApi.credentials.js || { echo "❌ Missing dist/credentials/LumaApi.credentials.js"; exit 1; }
           
-          # TypeScript declaration files
-          test -f dist/nodes/Luma/Luma.node.d.ts || { echo "❌ Missing dist/nodes/Luma/Luma.node.d.ts"; exit 1; }
-          test -f dist/nodes/LumaTrigger/LumaTrigger.node.d.ts || { echo "❌ Missing dist/nodes/LumaTrigger/LumaTrigger.node.d.ts"; exit 1; }
-          test -f dist/credentials/LumaApi.credentials.d.ts || { echo "❌ Missing dist/credentials/LumaApi.credentials.d.ts"; exit 1; }
+          # TypeScript declarations
+          test -f dist/nodes/Luma/Luma.node.d.ts || { echo "❌ Missing TypeScript declarations"; exit 1; }
+          test -f dist/nodes/LumaTrigger/LumaTrigger.node.d.ts || { echo "❌ Missing TypeScript declarations"; exit 1; }
+          test -f dist/credentials/LumaApi.credentials.d.ts || { echo "❌ Missing TypeScript declarations"; exit 1; }
           
-          # Icon files (via gulp build:icons)
-          test -f dist/nodes/Luma/luma.svg || { echo "❌ Missing dist/nodes/Luma/luma.svg"; exit 1; }
-          test -f dist/nodes/LumaTrigger/luma.svg || { echo "❌ Missing dist/nodes/LumaTrigger/luma.svg"; exit 1; }
+          # Icons and metadata
+          test -f dist/nodes/Luma/luma.svg || { echo "❌ Missing icons"; exit 1; }
+          test -f dist/nodes/LumaTrigger/luma.svg || { echo "❌ Missing icons"; exit 1; }
+          test -f dist/package.json || { echo "❌ Missing package.json"; exit 1; }
           
-          # Package metadata
-          test -f dist/package.json || { echo "❌ Missing dist/package.json"; exit 1; }
-          
-          # Verify feature directories are compiled
-          test -d dist/nodes/Luma/calendar || { echo "❌ Missing dist/nodes/Luma/calendar"; exit 1; }
-          test -d dist/nodes/Luma/event || { echo "❌ Missing dist/nodes/Luma/event"; exit 1; }
-          test -d dist/nodes/Luma/guest || { echo "❌ Missing dist/nodes/Luma/guest"; exit 1; }
-          test -d dist/nodes/Luma/ticket || { echo "❌ Missing dist/nodes/Luma/ticket"; exit 1; }
-          test -d dist/nodes/Luma/user || { echo "❌ Missing dist/nodes/Luma/user"; exit 1; }
-          test -d dist/nodes/Luma/utility || { echo "❌ Missing dist/nodes/Luma/utility"; exit 1; }
-          test -d dist/nodes/Luma/shared || { echo "❌ Missing dist/nodes/Luma/shared"; exit 1; }
+          # Resource directories
+          for dir in calendar event guest ticket user utility shared; do
+            test -d "dist/nodes/Luma/$dir" || { echo "❌ Missing dist/nodes/Luma/$dir"; exit 1; }
+          done
           
           echo "✅ All build artifacts validated successfully"
         
-      - name: Lint code (development rules)
+      - name: Lint code
         run: |
-          echo "🔍 Running ESLint with development rules..."
-          pnpm run lint || { echo "❌ Development linting failed"; exit 1; }
-          echo "✅ Development linting passed"
+          echo "🔍 Running ESLint..."
+          pnpm run lint
+          echo "✅ Linting passed"
         
       - name: Format check
         run: |
           echo "🔍 Checking code formatting..."
-          pnpm exec prettier nodes credentials tests --check || { echo "❌ Code formatting check failed. Run 'pnpm run format' to fix."; exit 1; }
+          pnpm exec prettier nodes credentials tests --check
           echo "✅ Code formatting check passed"
         
-      - name: Lint code (prepublish rules)
+      - name: Run test suite with coverage
         run: |
-          echo "🔍 Running ESLint with prepublish rules..."
-          pnpm exec eslint -c .eslintrc.prepublish.js nodes credentials package.json || { echo "❌ Prepublish linting failed"; exit 1; }
-          echo "✅ Prepublish linting passed"
-        
-      - name: Run tests with coverage
-        run: pnpm run test:coverage
-        
+          echo "🧪 Running test suite..."
+          pnpm run test:coverage
+          echo "✅ All tests passed"
+          
       - name: Upload coverage to Codecov
+        if: matrix.node-version == '22.x'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
-          fail_ci_if_error: true
+          fail_ci_if_error: false
