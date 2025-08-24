@@ -39,7 +39,10 @@ class TicketOperations extends BaseOperations {
 
         // Remove undefined values
         Object.keys(filters).forEach(key => {
-            if (filters[key as keyof TicketTypeFilters] === undefined || filters[key as keyof TicketTypeFilters] === '') {
+            if (
+                filters[key as keyof TicketTypeFilters] === undefined ||
+                filters[key as keyof TicketTypeFilters] === ''
+            ) {
                 delete filters[key as keyof TicketTypeFilters];
             }
         });
