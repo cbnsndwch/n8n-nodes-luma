@@ -27,6 +27,12 @@ const guestOperations: INodeProperties = {
             action: 'Cancel guest registration'
         },
         {
+            name: 'Check In',
+            value: 'checkIn',
+            description: 'Check in guests at event time',
+            action: 'Check in guest at event'
+        },
+        {
             name: 'Get',
             value: 'get',
             description: 'Get detailed information about a specific guest',
@@ -80,7 +86,7 @@ const eventIdField: INodeProperties = {
 };
 
 /**
- * Guest ID field for get, update, and approve operations
+ * Guest ID field for get, update, approve, reject, cancel, and check-in operations
  */
 const guestIdField: INodeProperties = {
     displayName: 'Guest ID',
@@ -90,14 +96,26 @@ const guestIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['guest'],
-            operation: ['get', 'update', 'approve', 'reject', 'cancel']
+            operation: [
+                'get',
+                'update',
+                'approve',
+                'reject',
+                'cancel',
+                'checkIn'
+            ]
+        },
+        hide: {
+            resource: ['guest'],
+            operation: ['checkIn'],
+            checkInMethod: ['emailLookup']
         }
     },
     default: '',
     placeholder:
         'gst-abc123def456 or gst-abc123def456,gst-def789ghi012 for multiple',
     description:
-        'The unique identifier(s) of the guest(s). For approve and reject operations, can be a single ID or comma-separated IDs for bulk operations.'
+        'The unique identifier(s) of the guest(s). For approve, reject, cancel, and check-in operations, can be a single ID or comma-separated IDs for bulk operations.'
 };
 
 /**
@@ -756,12 +774,139 @@ const guestCancelAdditionalFields: INodeProperties = {
 };
 
 /**
+ * Check-in method selector for guest check-in operation
+ */
+const guestCheckInMethodField: INodeProperties = {
+    displayName: 'Check-In Method',
+    name: 'checkInMethod',
+    type: 'options',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['checkIn']
+        }
+    },
+    options: [
+        {
+            name: 'Guest ID',
+            value: 'guestId',
+            description: 'Check in using guest ID(s)'
+        },
+        {
+            name: 'Email Lookup',
+            value: 'emailLookup',
+            description: 'Check in using event ID and email address'
+        }
+    ],
+    default: 'guestId',
+    description: 'Method to identify the guest for check-in'
+};
+
+/**
+ * Event ID field for check-in email lookup
+ */
+const guestCheckInEventIdField: INodeProperties = {
+    displayName: 'Event ID',
+    name: 'eventId',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['checkIn'],
+            checkInMethod: ['emailLookup']
+        }
+    },
+    default: '',
+    placeholder: 'evt-abc123def456',
+    description: 'The unique identifier of the event'
+};
+
+/**
+ * Email field for check-in email lookup
+ */
+const guestCheckInEmailField: INodeProperties = {
+    displayName: 'Guest Email',
+    name: 'email',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['checkIn'],
+            checkInMethod: ['emailLookup']
+        }
+    },
+    default: '',
+    placeholder: 'guest@example.com',
+    description: 'Email address of the guest to check in'
+};
+
+/**
+ * Additional fields collection for guest check-in operation
+ */
+const guestCheckInAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['checkIn']
+        }
+    },
+    options: [
+        {
+            displayName: 'Check-In Time',
+            name: 'checkInTime',
+            type: 'string',
+            default: '',
+            placeholder: '2024-01-15T10:30:00Z',
+            description:
+                'Custom check-in timestamp (ISO 8601 format). Defaults to current time if not provided.'
+        },
+        {
+            displayName: 'Check-In Location',
+            name: 'checkInLocation',
+            type: 'string',
+            default: '',
+            placeholder: 'Main Entrance',
+            description: 'Location where the check-in occurred'
+        },
+        {
+            displayName: 'Notes',
+            name: 'notes',
+            type: 'string',
+            typeOptions: {
+                rows: 3
+            },
+            default: '',
+            description: 'Additional notes about the check-in'
+        },
+        {
+            displayName: 'Verified Identity',
+            name: 'verifiedIdentity',
+            type: 'boolean',
+            default: false,
+            description:
+                "Whether the guest's identity was verified during check-in"
+        }
+    ]
+};
+
+/**
  * Export all guest properties
  */
 export const guestProps: INodeProperties[] = [
     guestOperations,
     eventIdField,
     guestIdField,
+    guestCheckInMethodField,
+    guestCheckInEventIdField,
+    guestCheckInEmailField,
     guestNameField,
     guestEmailField,
     guestRejectionReasonField,
@@ -773,5 +918,6 @@ export const guestProps: INodeProperties[] = [
     guestUpdateAdditionalFields,
     guestApproveAdditionalFields,
     guestRejectAdditionalFields,
-    guestCancelAdditionalFields
+    guestCancelAdditionalFields,
+    guestCheckInAdditionalFields
 ];
