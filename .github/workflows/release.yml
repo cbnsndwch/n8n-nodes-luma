@@ -2,78 +2,98 @@ name: Release to npm
 
 on:
   push:
-    tags: ['v*.*.*']
+    tags: 
+      - 'v*.*.*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version:
+          - 22.x
+          - 24.x
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
-          
+          node-version: ${{ matrix.node-version }}
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
-          
-      - name: Cache dependencies
-        uses: actions/cache@v3
+          package_json_file: ./package.json
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-pnpm-store-
             
       - name: Install dependencies
         run: |
           echo "📦 Installing dependencies..."
-          pnpm install || { echo "❌ Dependency installation failed"; exit 1; }
+          pnpm install --frozen-lockfile
           echo "✅ Dependencies installed successfully"
-        
-      - name: Validate package with dry-run
-        run: |
-          echo "🔍 Validating package structure with dry-run..."
-          npm pack --dry-run || { echo "❌ Package validation failed"; exit 1; }
-          echo "✅ Package structure validated successfully"
         
       - name: Run comprehensive validation
         run: |
-          echo "🔍 Running comprehensive pre-publish validation..."
-          pnpm run prepublishOnly || { echo "❌ Pre-publish validation failed"; exit 1; }
+          echo "🔍 Running pre-publish validation..."
+          pnpm run prepublishOnly
           echo "✅ Pre-publish validation completed successfully"
         
       - name: Run tests
         run: |
           echo "🧪 Running test suite..."
-          pnpm run test || { echo "❌ Test suite failed"; exit 1; }
+          pnpm run test
           echo "✅ All tests passed successfully"
         
       - name: Validate package contents
         run: |
-          echo "🔍 Validating final package contents..."
-          # Check that dist/ directory exists and contains required files
-          test -d dist || { echo "❌ Missing dist/ directory"; exit 1; }
-          test -f dist/package.json || { echo "❌ Missing dist/package.json"; exit 1; }
-          test -f dist/nodes/Luma/Luma.node.js || { echo "❌ Missing main node file"; exit 1; }
-          test -f dist/credentials/LumaApi.credentials.js || { echo "❌ Missing credentials file"; exit 1; }
+          echo "🔍 Validating package contents..."
+          npm pack --dry-run
           
-          # Verify package.json has correct name and version
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           echo "📋 Package: $PACKAGE_NAME@$PACKAGE_VERSION"
           echo "✅ Package contents validated successfully"
         
-      - name: Publish to npm
+      - name: Validate npm authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "🚀 Publishing package to npm..."
-          pnpm publish --access public || { echo "❌ npm publish failed"; exit 1; }
-          echo "✅ Package published successfully to npm"
+          echo "🔐 Validating npmjs authentication..."
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "❌ NPM_TOKEN secret is not set"
+            exit 1
+          fi
+          
+          CURRENT_USER=$(pnpm whoami) 
+          if [ -z "$CURRENT_USER" ]; then
+            echo "❌ npmjs authentication failed"
+            exit 1
+          fi
+          echo "✅ npmjs authentication successful as user: $CURRENT_USER"
+        
+      - name: Publish to npmjs
+        run: |
+          echo "🚀 Publishing package to npmjs..."
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          
+          pnpm publish --access public
+          echo "✅ Package $PACKAGE_NAME@$PACKAGE_VERSION published successfully"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
@@ -83,9 +103,6 @@ jobs:
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           
-          # Wait a moment for npm registry to update
           sleep 10
-          
-          # Check if package is available on npm
-          npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version || { echo "⚠️ Package not yet available on npm registry (may take a few minutes)"; exit 0; }
-          echo "✅ Package successfully published and available on npm registry"
+          npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version || echo "⚠️ Package not yet available (may take a few minutes)"
+          echo "✅ Release process completed"

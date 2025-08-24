@@ -83,23 +83,26 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version:
+          - 22.x
+          - 24.x
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         
-    - name: Install pnpm
+    - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:
-        package_json_file: './package.json'
+        package_json_file: ./package.json\
         
     - name: Setup pnpm cache
       uses: actions/cache@v4
@@ -108,7 +111,7 @@ jobs:
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
         
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: pnpm i --frozen-lockfile
       
     - name: Build project
       run: pnpm run build
@@ -117,7 +120,7 @@ jobs:
       run: pnpm run lint
       
     - name: Check code formatting
-      run: pnpm exec prettier nodes credentials --check
+      run: pnpm run format:check
       
     - name: Run test suite
       run: pnpm run test:run

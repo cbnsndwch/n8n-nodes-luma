@@ -17,12 +17,12 @@ This document analyzes the GitHub Actions APIs, npm registry APIs, and related t
 ### GitHub Actions Marketplace
 | Action | Purpose | Epic | Implementation Status |
 |--------|---------|------|---------------------|
-| `actions/checkout@v4` | Repository checkout | 1, 2, 3 | 📋 To Implement |
-| `actions/setup-node@v4` | Node.js environment | 1, 2, 3 | 📋 To Implement |
-| `pnpm/action-setup@v2` | pnpm package manager | 1, 2, 3 | 📋 To Implement |
-| `actions/cache@v3` | Dependency caching | 1, 2, 3 | 📋 To Implement |
-| `codecov/codecov-action@v3` | Coverage reporting | 1 | 📋 To Implement |
-| `softprops/action-gh-release@v1` | Release management | 3 | 📋 To Implement |
+| `actions/checkout` | Repository checkout | 1, 2, 3 | 📋 To Implement |
+| `actions/setup-node` | Node.js environment | 1, 2, 3 | 📋 To Implement |
+| `pnpm/action-setup` | pnpm package manager | 1, 2, 3 | 📋 To Implement |
+| `actions/cache` | Dependency caching | 1, 2, 3 | 📋 To Implement |
+| `codecov/codecov-action` | Coverage reporting | 1 | 📋 To Implement |
+| `softprops/action-gh-release` | Release management | 3 | 📋 To Implement |
 
 ### GitHub Secrets Required
 | Secret | Purpose | Epic | Security Level |

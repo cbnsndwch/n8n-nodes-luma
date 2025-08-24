@@ -16,6 +16,7 @@
         "clean": "rimraf dist",
         "dev": "tsc --watch",
         "format": "prettier nodes credentials tests --write",
+        "format:check": "prettier nodes credentials tests --check",
         "lint": "eslint nodes credentials package.json",
         "lintfix": "eslint nodes credentials package.json --fix",
         "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
