@@ -263,10 +263,7 @@ class TicketOperations extends BaseOperations {
         ) as IDataObject;
 
         // Parse ticket type IDs from comma-separated string
-        const ticketTypeIdArray = ticketTypeIds
-            .split(',')
-            .map(id => id.trim())
-            .filter(id => id.length > 0);
+        const ticketTypeIdArray = parseCommaSeparatedIds(ticketTypeIds);
 
         if (ticketTypeIdArray.length === 0) {
             throw new NodeOperationError(
