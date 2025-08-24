@@ -15,7 +15,8 @@ import type {
     AddEventRequest,
     ImportPeopleRequest,
     PersonData,
-    CalendarPeopleFilters
+    CalendarPeopleFilters,
+    PersonTagsFilters
 } from './contracts';
 
 /**
@@ -300,6 +301,36 @@ class CalendarOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+
+    /**
+     * List person tags in a calendar
+     */
+    static async listPersonTags(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: PersonTagsFilters = {};
+
+        // Apply pagination parameters from additional fields
+        if (additionalFields.paginationCursor) {
+            qs.pagination_cursor = additionalFields.paginationCursor as string;
+        }
+        if (additionalFields.paginationLimit) {
+            qs.pagination_limit = additionalFields.paginationLimit as number;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_PERSON_TAGS),
+            qs
+        });
+
+        return this.handleMultipleItems(responseData, context.itemIndex);
+    }
 }
 
 export async function handleCalendarOperation(
@@ -320,6 +351,9 @@ export async function handleCalendarOperation(
             break;
         case 'listPeople':
             result = await CalendarOperations.listPeople(context);
+            break;
+        case 'listPersonTags':
+            result = await CalendarOperations.listPersonTags(context);
             break;
         case 'lookupEvent':
             result = await CalendarOperations.lookupEvent(context);

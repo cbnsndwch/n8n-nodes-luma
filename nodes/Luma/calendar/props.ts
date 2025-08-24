@@ -48,6 +48,12 @@ const calendarOperations: INodeProperties = {
             description: 'List people associated with a calendar'
         },
         {
+            name: 'List Person Tags',
+            value: 'listPersonTags',
+            action: 'List person tags in a calendar',
+            description: 'List person tags for calendar organization'
+        },
+        {
             name: 'Lookup Event',
             value: 'lookupEvent',
             action: 'Lookup a specific event in a calendar',
@@ -73,7 +79,8 @@ const calendarApiIdField: INodeProperties = {
                 'lookupEvent',
                 'addEvent',
                 'importPeople',
-                'listPeople'
+                'listPeople',
+                'listPersonTags'
             ]
         }
     },
@@ -509,6 +516,22 @@ const listPeopleAdditionalFields: INodeProperties = {
     ]
 };
 
+// Additional fields for listPersonTags operation
+const listPersonTagsAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['listPersonTags']
+        }
+    },
+    options: [paginationCursorField, paginationLimitField]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
@@ -519,5 +542,6 @@ export const calendarProps = [
     lookupAdditionalFields,
     addEventAdditionalFields,
     importPeopleAdditionalFields,
-    listPeopleAdditionalFields
+    listPeopleAdditionalFields,
+    listPersonTagsAdditionalFields
 ];
