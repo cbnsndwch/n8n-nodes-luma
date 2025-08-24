@@ -63,3 +63,20 @@ export interface PersonTagsFilters extends IDataObject {
     pagination_cursor?: string; // For pagination
     pagination_limit?: number; // Number of items to return
 }
+
+export interface CreatePersonTagRequest extends IDataObject {
+    calendar_api_id: string; // Required
+    name: string; // Required
+    color?: string; // Optional hex color code
+    description?: string; // Optional description
+}
+
+export interface CreatePersonTagResponse extends IDataObject {
+    api_id: string;
+    name: string;
+    color?: string;
+    description?: string;
+    person_count: number; // Initially 0
+    created_at: string; // ISO 8601
+    updated_at: string; // ISO 8601
+}

@@ -30,6 +30,12 @@ const calendarOperations: INodeProperties = {
             description: 'Add an existing event to a calendar'
         },
         {
+            name: 'Create Person Tag',
+            value: 'createPersonTag',
+            action: 'Create a person tag in a calendar',
+            description: 'Create a new person tag for organizing people'
+        },
+        {
             name: 'Import People',
             value: 'importPeople',
             action: 'Import people to a calendar',
@@ -80,7 +86,8 @@ const calendarApiIdField: INodeProperties = {
                 'addEvent',
                 'importPeople',
                 'listPeople',
-                'listPersonTags'
+                'listPersonTags',
+                'createPersonTag'
             ]
         }
     },
@@ -532,16 +539,67 @@ const listPersonTagsAdditionalFields: INodeProperties = {
     options: [paginationCursorField, paginationLimitField]
 };
 
+// Create Person Tag specific fields
+
+const personTagNameField: INodeProperties = {
+    displayName: 'Tag Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createPersonTag']
+        }
+    },
+    description: 'Name of the person tag (required)'
+};
+
+const createPersonTagAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['createPersonTag']
+        }
+    },
+    options: [
+        {
+            displayName: 'Color',
+            name: 'color',
+            type: 'color',
+            default: '',
+            placeholder: '#FF5733',
+            description: 'Color for the tag (hex color code)'
+        },
+        {
+            displayName: 'Description',
+            name: 'description',
+            type: 'string',
+            default: '',
+            placeholder: 'Tag description',
+            description: 'Optional description for the tag'
+        }
+    ]
+};
+
 export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
     addEventApiIdField,
     peopleDataField,
+    personTagNameField,
     calendarAdditionalFields,
     lookupAdditionalFields,
     addEventAdditionalFields,
     importPeopleAdditionalFields,
     listPeopleAdditionalFields,
-    listPersonTagsAdditionalFields
+    listPersonTagsAdditionalFields,
+    createPersonTagAdditionalFields
 ];

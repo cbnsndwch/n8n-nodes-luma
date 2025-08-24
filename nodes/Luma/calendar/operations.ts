@@ -16,7 +16,8 @@ import type {
     ImportPeopleRequest,
     PersonData,
     CalendarPeopleFilters,
-    PersonTagsFilters
+    PersonTagsFilters,
+    CreatePersonTagRequest
 } from './contracts';
 
 /**
@@ -331,6 +332,49 @@ class CalendarOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+
+    /**
+     * Create a person tag in a calendar
+     */
+    static async createPersonTag(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const calendarApiId = context.executeFunctions.getNodeParameter(
+            'calendarApiId',
+            context.itemIndex
+        ) as string;
+
+        const name = context.executeFunctions.getNodeParameter(
+            'name',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const requestBody: CreatePersonTagRequest = {
+            calendar_api_id: calendarApiId,
+            name
+        };
+
+        // Add optional fields from additional fields
+        if (additionalFields.color) {
+            requestBody.color = additionalFields.color as string;
+        }
+        if (additionalFields.description) {
+            requestBody.description = additionalFields.description as string;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_CREATE_PERSON_TAG),
+            body: requestBody
+        });
+
+        return [this.createReturnItem(responseData, context.itemIndex)];
+    }
 }
 
 export async function handleCalendarOperation(
@@ -342,6 +386,9 @@ export async function handleCalendarOperation(
     switch (operation) {
         case 'addEvent':
             result = await CalendarOperations.addEvent(context);
+            break;
+        case 'createPersonTag':
+            result = await CalendarOperations.createPersonTag(context);
             break;
         case 'importPeople':
             result = await CalendarOperations.importPeople(context);
