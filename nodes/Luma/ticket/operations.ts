@@ -9,7 +9,11 @@ import { buildLumaApiUrl, LUMA_ENDPOINTS } from '../shared/constants';
 import { BaseOperations } from '../shared/operations.base';
 import type { LumaOperationContext } from '../shared/contracts';
 
-import type { TicketTypeFilters, CreateTicketTypeRequest, BulkUpdateTicketTypesRequest } from './contracts';
+import type {
+    TicketTypeFilters,
+    CreateTicketTypeRequest,
+    BulkUpdateTicketTypesRequest
+} from './contracts';
 
 // Ticket-specific operations
 
@@ -304,12 +308,14 @@ class TicketOperations extends BaseOperations {
 
         // Process sale end date
         if (updateFields.saleEndAt) {
-            requestBody.update_fields.sale_end_at = updateFields.saleEndAt as string;
+            requestBody.update_fields.sale_end_at =
+                updateFields.saleEndAt as string;
         }
 
         // Process hidden status
         if (updateFields.isHidden !== undefined) {
-            requestBody.update_fields.is_hidden = updateFields.isHidden as boolean;
+            requestBody.update_fields.is_hidden =
+                updateFields.isHidden as boolean;
         }
 
         // Process additional fields
@@ -317,15 +323,15 @@ class TicketOperations extends BaseOperations {
             requestBody.additional_fields = {};
 
             if (additionalFields.skipIfSoldOut !== undefined) {
-                requestBody.additional_fields.skip_if_sold_out = 
+                requestBody.additional_fields.skip_if_sold_out =
                     additionalFields.skipIfSoldOut as boolean;
             }
             if (additionalFields.validateBeforeUpdate !== undefined) {
-                requestBody.additional_fields.validate_before_update = 
+                requestBody.additional_fields.validate_before_update =
                     additionalFields.validateBeforeUpdate as boolean;
             }
             if (additionalFields.rollbackOnError !== undefined) {
-                requestBody.additional_fields.rollback_on_error = 
+                requestBody.additional_fields.rollback_on_error =
                     additionalFields.rollbackOnError as boolean;
             }
         }

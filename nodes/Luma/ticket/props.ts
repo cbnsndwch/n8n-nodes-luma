@@ -459,7 +459,8 @@ const updateTypeField: INodeProperties = {
         {
             name: 'Percentage Change',
             value: 'percentage_change',
-            description: 'Apply percentage-based changes to pricing and capacity'
+            description:
+                'Apply percentage-based changes to pricing and capacity'
         },
         {
             name: 'Fixed Change',
@@ -494,7 +495,8 @@ const updateFieldsCollection: INodeProperties = {
             name: 'priceChange',
             type: 'fixedCollection',
             default: {},
-            description: 'Configure price changes for all selected ticket types',
+            description:
+                'Configure price changes for all selected ticket types',
             options: [
                 {
                     name: 'settings',
@@ -508,12 +510,14 @@ const updateFieldsCollection: INodeProperties = {
                                 {
                                     name: 'Percentage',
                                     value: 'percentage',
-                                    description: 'Change price by percentage (e.g., 10 for 10% increase)'
+                                    description:
+                                        'Change price by percentage (e.g., 10 for 10% increase)'
                                 },
                                 {
                                     name: 'Fixed',
                                     value: 'fixed',
-                                    description: 'Change price by fixed amount in cents'
+                                    description:
+                                        'Change price by fixed amount in cents'
                                 }
                             ],
                             default: 'percentage',
@@ -524,7 +528,8 @@ const updateFieldsCollection: INodeProperties = {
                             name: 'value',
                             type: 'number',
                             default: 0,
-                            description: 'Price change value (percentage or cents)'
+                            description:
+                                'Price change value (percentage or cents)'
                         }
                     ]
                 }
@@ -535,7 +540,8 @@ const updateFieldsCollection: INodeProperties = {
             name: 'capacityChange',
             type: 'fixedCollection',
             default: {},
-            description: 'Configure capacity changes for all selected ticket types',
+            description:
+                'Configure capacity changes for all selected ticket types',
             options: [
                 {
                     name: 'settings',
@@ -554,7 +560,8 @@ const updateFieldsCollection: INodeProperties = {
                                 {
                                     name: 'Fixed',
                                     value: 'fixed',
-                                    description: 'Change capacity by fixed amount'
+                                    description:
+                                        'Change capacity by fixed amount'
                                 },
                                 {
                                     name: 'Absolute',
@@ -588,7 +595,8 @@ const updateFieldsCollection: INodeProperties = {
             name: 'isHidden',
             type: 'boolean',
             default: false,
-            description: 'Whether to set visibility status for all selected ticket types'
+            description:
+                'Whether to set visibility status for all selected ticket types'
         }
     ]
 };
@@ -612,14 +620,16 @@ const bulkUpdateAdditionalFields: INodeProperties = {
             name: 'skipIfSoldOut',
             type: 'boolean',
             default: false,
-            description: 'Whether to skip updating ticket types that are sold out'
+            description:
+                'Whether to skip updating ticket types that are sold out'
         },
         {
             displayName: 'Validate Before Update',
             name: 'validateBeforeUpdate',
             type: 'boolean',
             default: true,
-            description: 'Whether to validate all changes before applying any updates'
+            description:
+                'Whether to validate all changes before applying any updates'
         },
         {
             displayName: 'Rollback On Error',

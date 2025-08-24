@@ -76,5 +76,73 @@ describe('Ticket Operations Unit Tests', () => {
                 '/public/v1/event/ticket-types/list'
             );
         });
+
+        it('should have bulk update endpoint defined', async () => {
+            const { LUMA_ENDPOINTS } = await import(
+                '../../../dist/nodes/Luma/shared/constants.js'
+            );
+
+            expect(LUMA_ENDPOINTS.TICKET_TYPES_BULK_UPDATE).toBeDefined();
+            expect(LUMA_ENDPOINTS.TICKET_TYPES_BULK_UPDATE).toBe(
+                '/v1/event/ticket-types/bulk-update'
+            );
+        });
+    });
+
+    describe('Bulk Update Operation', () => {
+        it('should have bulk update operation option', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+            expect(operationField?.options).toBeDefined();
+
+            const bulkUpdateOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'bulkUpdate'
+            );
+            expect(bulkUpdateOption).toBeDefined();
+            expect(bulkUpdateOption?.name).toBe('Bulk Update Ticket Types');
+        });
+
+        it('should have required bulk update parameters', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check for ticket type IDs field
+            const ticketTypeIdsField = ticketProps.find(
+                prop => prop.name === 'ticketTypeIds'
+            );
+            expect(ticketTypeIdsField).toBeDefined();
+            expect(ticketTypeIdsField?.required).toBe(true);
+            expect(
+                ticketTypeIdsField?.displayOptions?.show?.operation
+            ).toContain('bulkUpdate');
+
+            // Check for update type field
+            const updateTypeField = ticketProps.find(
+                prop => prop.name === 'updateType'
+            );
+            expect(updateTypeField).toBeDefined();
+            expect(updateTypeField?.required).toBe(true);
+            expect(updateTypeField?.type).toBe('options');
+        });
+
+        it('should have bulk update contracts defined', async () => {
+            try {
+                const contracts = await import(
+                    '../../../dist/nodes/Luma/ticket/contracts.js'
+                );
+
+                // These should be available as type exports, so we just verify the module loads
+                expect(contracts).toBeDefined();
+            } catch (error) {
+                throw new Error('Bulk update contracts should be compilable');
+            }
+        });
     });
 });
