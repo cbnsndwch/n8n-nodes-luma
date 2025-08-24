@@ -11,7 +11,7 @@ export interface CalendarEventFilters extends IDataObject {
 }
 
 export interface EventLookupFilters extends IDataObject {
-    calendar_api_id?: string;
+    calendar_api_id: string;
     platform?: string; // external or luma
     url?: string; // Event URL to lookup
     event_api_id?: string; // Event API ID to lookup
