@@ -15,6 +15,12 @@ const guestOperations: INodeProperties = {
     },
     options: [
         {
+            name: 'Approve',
+            value: 'approve',
+            description: 'Approve pending guest registrations',
+            action: 'Approve guest registration'
+        },
+        {
             name: 'Get',
             value: 'get',
             description: 'Get detailed information about a specific guest',
@@ -62,7 +68,7 @@ const eventIdField: INodeProperties = {
 };
 
 /**
- * Guest ID field for get operation
+ * Guest ID field for get, update, and approve operations
  */
 const guestIdField: INodeProperties = {
     displayName: 'Guest ID',
@@ -72,12 +78,14 @@ const guestIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['guest'],
-            operation: ['get', 'update']
+            operation: ['get', 'update', 'approve']
         }
     },
     default: '',
-    placeholder: 'gst-abc123def456',
-    description: 'The unique identifier of the guest to retrieve'
+    placeholder:
+        'gst-abc123def456 or gst-abc123def456,gst-def789ghi012 for multiple',
+    description:
+        'The unique identifier(s) of the guest(s). For approve operation, can be a single ID or comma-separated IDs for bulk approval.'
 };
 
 /**
@@ -540,6 +548,60 @@ const guestUpdateAdditionalFields: INodeProperties = {
 };
 
 /**
+ * Additional fields collection for guest approve operation
+ */
+const guestApproveAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['approve']
+        }
+    },
+    options: [
+        {
+            displayName: 'Send Notification',
+            name: 'sendNotification',
+            type: 'boolean',
+            default: true,
+            description: 'Whether to send approval notification to the guest'
+        },
+        {
+            displayName: 'Approval Notes',
+            name: 'approvalNotes',
+            type: 'string',
+            typeOptions: {
+                rows: 3
+            },
+            default: '',
+            description: 'Internal notes about the approval decision'
+        },
+        {
+            displayName: 'Ticket Type ID',
+            name: 'ticketTypeId',
+            type: 'string',
+            default: '',
+            description: 'Assign specific ticket type upon approval'
+        },
+        {
+            displayName: 'Custom Message',
+            name: 'customMessage',
+            type: 'string',
+            typeOptions: {
+                rows: 3
+            },
+            default: '',
+            description:
+                'Custom message to include in the approval notification'
+        }
+    ]
+};
+
+/**
  * Export all guest properties
  */
 export const guestProps: INodeProperties[] = [
@@ -552,5 +614,6 @@ export const guestProps: INodeProperties[] = [
     guestGetAdditionalFields,
     guestRegistrationAdditionalFields,
     guestUpdateFields,
-    guestUpdateAdditionalFields
+    guestUpdateAdditionalFields,
+    guestApproveAdditionalFields
 ];

@@ -68,3 +68,11 @@ export interface GuestUpdateData extends IDataObject {
     notify_guest?: boolean;
     reason_for_change?: string;
 }
+
+export interface GuestApprovalData extends IDataObject {
+    guest_id: string | string[]; // Required guest ID(s)
+    send_notification?: boolean;
+    approval_notes?: string;
+    ticket_type_id?: string;
+    custom_message?: string;
+}
