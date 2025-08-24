@@ -4,13 +4,16 @@ import {
     ICredentialType,
     INodeProperties
 } from 'n8n-workflow';
-import { LUMA_API_BASE_URL, LUMA_ENDPOINTS } from '../nodes/Luma/utils/constants';
+import {
+    LUMA_API_BASE_URL,
+    LUMA_ENDPOINTS
+} from '../nodes/Luma/utils/constants';
 
 export class LumaApi implements ICredentialType {
     name = 'lumaApi';
     displayName = 'Luma API';
     // Note: credentials don't support icon property in the same way as nodes
-    
+
     documentationUrl = 'https://docs.lu.ma/api/getting-started';
 
     properties: INodeProperties[] = [
