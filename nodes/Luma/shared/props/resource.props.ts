@@ -12,6 +12,10 @@ const options = [
         value: 'calendar'
     },
     {
+        name: 'Guest',
+        value: 'guest'
+    },
+    {
         name: 'User',
         value: 'user'
     },
