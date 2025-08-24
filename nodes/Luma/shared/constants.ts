@@ -1,5 +1,6 @@
 /**
  * Shared constants for Luma nodes
+ * Updated to resolve merge conflicts with main branch
  */
 
 export const LUMA_API_BASE_URL = 'https://public-api.lu.ma';
