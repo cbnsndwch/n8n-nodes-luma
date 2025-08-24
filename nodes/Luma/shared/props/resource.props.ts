@@ -16,6 +16,10 @@ const options = [
         value: 'guest'
     },
     {
+        name: 'Ticket',
+        value: 'ticket'
+    },
+    {
         name: 'User',
         value: 'user'
     },
