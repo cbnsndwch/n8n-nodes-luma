@@ -22,7 +22,8 @@ module.exports = {
         '.eslintrc.js',
         '**/*.js',
         '**/node_modules/**',
-        '**/dist/**'
+        '**/dist/**',
+        'tests'
     ],
 
     overrides: [
