@@ -273,4 +273,130 @@ describe('Frontend User Experience', () => {
       expect(guestIdField?.description).toContain('comma-separated');
     });
   });
+
+  describe('Guest Cancel Operation UX', () => {
+    it('should have clear cancel operation option', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const operationField = properties.find((p: any) => 
+        p.name === 'operation' && 
+        p.displayOptions?.show?.resource?.includes('guest')
+      );
+      
+      expect(operationField).toBeDefined();
+      
+      const cancelOperation = operationField?.options?.find((opt: any) => opt.value === 'cancel');
+      expect(cancelOperation).toBeDefined();
+      expect(cancelOperation?.name).toBe('Cancel');
+      expect(cancelOperation?.description).toBe('Cancel guest registrations');
+      expect(cancelOperation?.action).toBe('Cancel guest registration');
+    });
+
+    it('should have user-friendly cancelledBy field', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const cancelledByField = properties.find((p: any) => 
+        p.name === 'cancelledBy'
+      );
+      
+      expect(cancelledByField).toBeDefined();
+      expect(cancelledByField?.displayName).toBe('Cancelled By');
+      expect(cancelledByField?.type).toBe('options');
+      expect(cancelledByField?.required).toBe(true);
+      expect(cancelledByField?.default).toBe('guest');
+      
+      const options = cancelledByField?.options || [];
+      expect(options).toHaveLength(2);
+      
+      const guestOption = options.find((opt: any) => opt.value === 'guest');
+      const organizerOption = options.find((opt: any) => opt.value === 'organizer');
+      
+      expect(guestOption?.name).toBe('Guest');
+      expect(organizerOption?.name).toBe('Organizer');
+    });
+
+    it('should have proper field visibility for cancel operation', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      
+      // Find cancel-specific fields
+      const guestIdField = properties.find((p: any) => 
+        p.name === 'guestId' && 
+        p.displayOptions?.show?.operation?.includes('cancel')
+      );
+      const cancelledByField = properties.find((p: any) => 
+        p.name === 'cancelledBy'
+      );
+      const additionalFields = properties.find((p: any) => 
+        p.name === 'additionalFields' && 
+        p.displayOptions?.show?.operation?.includes('cancel')
+      );
+      
+      expect(guestIdField).toBeDefined();
+      expect(cancelledByField).toBeDefined();
+      expect(additionalFields).toBeDefined();
+      
+      // Guest ID and cancelledBy should be required
+      expect(guestIdField?.required).toBe(true);
+      expect(cancelledByField?.required).toBe(true);
+      expect(additionalFields?.required).toBeFalsy();
+    });
+
+    it('should have helpful additional fields for cancel operation', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const cancelAdditionalFields = properties.find((p: any) => 
+        p.name === 'additionalFields' && 
+        p.displayOptions?.show?.operation?.includes('cancel')
+      );
+      
+      expect(cancelAdditionalFields).toBeDefined();
+      expect(cancelAdditionalFields?.type).toBe('collection');
+      expect(cancelAdditionalFields?.displayName).toBe('Additional Fields');
+      
+      const options = cancelAdditionalFields?.options || [];
+      
+      // Check cancellation reason option
+      const cancellationReasonOption = options.find((opt: any) => opt.name === 'cancellationReason');
+      expect(cancellationReasonOption?.displayName).toBe('Cancellation Reason');
+      expect(cancellationReasonOption?.type).toBe('string');
+      expect(cancellationReasonOption?.typeOptions?.rows).toBe(3);
+      
+      // Check send notification option
+      const sendNotificationOption = options.find((opt: any) => opt.name === 'sendNotification');
+      expect(sendNotificationOption?.displayName).toBe('Send Notification');
+      expect(sendNotificationOption?.type).toBe('boolean');
+      expect(sendNotificationOption?.default).toBe(true);
+      
+      // Check refund amount option
+      const refundAmountOption = options.find((opt: any) => opt.name === 'refundAmount');
+      expect(refundAmountOption?.displayName).toBe('Refund Amount');
+      expect(refundAmountOption?.type).toBe('number');
+      expect(refundAmountOption?.typeOptions?.numberPrecision).toBe(2);
+      expect(refundAmountOption?.typeOptions?.minValue).toBe(0);
+    });
+
+    it('should have consistent bulk operation support', async () => {
+      const { Luma } = await import('../../dist/nodes/Luma/Luma.node.js');
+      const lumaNode = new Luma();
+      
+      const properties = lumaNode.description.properties;
+      const guestIdField = properties.find((p: any) => 
+        p.name === 'guestId' && 
+        p.displayOptions?.show?.operation?.includes('cancel')
+      );
+      
+      expect(guestIdField?.placeholder).toContain('multiple');
+      expect(guestIdField?.description).toContain('bulk');
+      expect(guestIdField?.description).toContain('comma-separated');
+    });
+  });
 });
