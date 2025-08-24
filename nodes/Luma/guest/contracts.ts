@@ -92,3 +92,18 @@ export interface GuestCancellationData extends IDataObject {
     send_notification?: boolean;
     refund_amount?: number;
 }
+
+export interface GuestCheckInData extends IDataObject {
+    // Option 1: Direct guest ID
+    guest_id?: string | string[];
+
+    // Option 2: Event + email lookup
+    event_id?: string;
+    email?: string;
+
+    // Additional options
+    check_in_time?: string; // ISO 8601, defaults to now
+    check_in_location?: string;
+    notes?: string;
+    verified_identity?: boolean;
+}

@@ -41,6 +41,7 @@ export const LUMA_ENDPOINTS = {
     GUEST_APPROVE: '/v1/guest/approve',
     GUEST_REJECT: '/v1/guest/reject',
     GUEST_CANCEL: '/v1/guest/cancel',
+    GUEST_CHECK_IN: '/v1/guest/check-in',
 
     // Ticket endpoints
     TICKET_TYPES_LIST: '/public/v1/event/ticket-types/list',

@@ -15,7 +15,8 @@ import type {
     GuestUpdateData,
     GuestApprovalData,
     GuestRejectionData,
-    GuestCancellationData
+    GuestCancellationData,
+    GuestCheckInData
 } from './contracts';
 
 // Guest-specific operations
@@ -539,6 +540,117 @@ class GuestOperations extends BaseOperations {
 
         return this.createReturnItem(responseData, context.itemIndex);
     }
+
+    /**
+     * Check in guest(s) at event time
+     */
+    static async checkIn(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const checkInMethod = context.executeFunctions.getNodeParameter(
+            'checkInMethod',
+            context.itemIndex
+        ) as 'guestId' | 'emailLookup';
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const body: GuestCheckInData = {};
+
+        if (checkInMethod === 'guestId') {
+            // Option 1: Direct guest ID lookup
+            const guestId = context.executeFunctions.getNodeParameter(
+                'guestId',
+                context.itemIndex
+            ) as string;
+
+            // Parse guest ID(s) - support both single and comma-separated values
+            let guestIds: string | string[];
+            // Validate guestId input for malformed comma-separated values
+            if (typeof guestId !== 'string' || guestId.trim() === '') {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'Guest ID is required and cannot be empty.'
+                );
+            }
+            if (guestId.includes(',')) {
+                // Check for leading/trailing commas or consecutive commas
+                if (/^,|,,|,$/.test(guestId)) {
+                    throw new NodeOperationError(
+                        context.executeFunctions.getNode(),
+                        'Malformed guest ID input: leading/trailing or consecutive commas are not allowed. Please provide a comma-separated list of valid guest IDs.'
+                    );
+                }
+                guestIds = guestId
+                    .split(',')
+                    .map(id => id.trim())
+                    .filter(id => id);
+                if (guestIds.length === 0) {
+                    throw new NodeOperationError(
+                        context.executeFunctions.getNode(),
+                        'No valid guest IDs found. Please provide at least one valid guest ID.'
+                    );
+                }
+            } else {
+                guestIds = guestId;
+            }
+
+            body.guest_id = guestIds;
+        } else {
+            // Option 2: Event + email lookup
+            const eventId = context.executeFunctions.getNodeParameter(
+                'eventId',
+                context.itemIndex
+            ) as string;
+
+            const email = context.executeFunctions.getNodeParameter(
+                'email',
+                context.itemIndex
+            ) as string;
+
+            // Validate required fields for email lookup
+            if (!eventId || eventId.trim() === '') {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'Event ID is required for email lookup check-in method.'
+                );
+            }
+            if (!email || email.trim() === '') {
+                throw new NodeOperationError(
+                    context.executeFunctions.getNode(),
+                    'Email address is required for email lookup check-in method.'
+                );
+            }
+
+            body.event_id = eventId.trim();
+            body.email = email.trim();
+        }
+
+        // Apply additional fields
+        if (additionalFields.checkInTime) {
+            body.check_in_time = additionalFields.checkInTime as string;
+        }
+        if (additionalFields.checkInLocation) {
+            body.check_in_location = additionalFields.checkInLocation as string;
+        }
+        if (additionalFields.notes) {
+            body.notes = additionalFields.notes as string;
+        }
+        if (additionalFields.verifiedIdentity !== undefined) {
+            body.verified_identity =
+                additionalFields.verifiedIdentity as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'POST',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.GUEST_CHECK_IN),
+            body
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
 }
 
 export async function handleGuestOperation(
@@ -553,6 +665,9 @@ export async function handleGuestOperation(
             break;
         case 'cancel':
             result = await GuestOperations.cancel(context);
+            break;
+        case 'checkIn':
+            result = await GuestOperations.checkIn(context);
             break;
         case 'get':
             result = await GuestOperations.get(context);

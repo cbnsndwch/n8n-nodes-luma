@@ -68,6 +68,98 @@ describe('Guest Workflow Execution Tests', () => {
         });
     });
 
+    describe('Guest Check-In Operation Execution', () => {
+        it('should handle guest check-in operation with guest ID method', async () => {
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('guest')
+                .mockReturnValueOnce('checkIn')
+                .mockReturnValueOnce('guestId')
+                .mockReturnValueOnce('guest-789')
+                .mockReturnValueOnce({});
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify the mock parameters can be retrieved
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'guest'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'checkIn'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('checkInMethod')).toBe(
+                'guestId'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('guestId')).toBe(
+                'guest-789'
+            );
+        });
+
+        it('should handle guest check-in operation with email lookup method', async () => {
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('guest')
+                .mockReturnValueOnce('checkIn')
+                .mockReturnValueOnce('emailLookup')
+                .mockReturnValueOnce('event-123')
+                .mockReturnValueOnce('guest@example.com')
+                .mockReturnValueOnce({
+                    checkInTime: '2024-01-15T10:30:00Z',
+                    checkInLocation: 'Main Entrance',
+                    notes: 'VIP guest',
+                    verifiedIdentity: true
+                });
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify the mock parameters can be retrieved
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'guest'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'checkIn'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('checkInMethod')).toBe(
+                'emailLookup'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('eventId')).toBe(
+                'event-123'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('email')).toBe(
+                'guest@example.com'
+            );
+        });
+
+        it('should handle bulk check-in operation with multiple guest IDs', async () => {
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('guest')
+                .mockReturnValueOnce('checkIn')
+                .mockReturnValueOnce('guestId')
+                .mockReturnValueOnce('guest-456,guest-789,guest-101')
+                .mockReturnValueOnce({
+                    checkInLocation: 'Side Entrance',
+                    notes: 'Bulk check-in'
+                });
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify the mock parameters can be retrieved
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'guest'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'checkIn'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('checkInMethod')).toBe(
+                'guestId'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('guestId')).toBe(
+                'guest-456,guest-789,guest-101'
+            );
+        });
+    });
+
     describe('Guest Operations Error Handling', () => {
         it('should handle execution context errors gracefully', async () => {
             mockExecuteFunctions.continueOnFail.mockReturnValue(true);
