@@ -12,9 +12,19 @@ const ticketOperations: INodeProperties = {
     },
     options: [
         {
+            name: 'Bulk Update Ticket Types',
+            value: 'bulkUpdate',
+            action: 'Bulk update ticket types'
+        },
+        {
             name: 'Create New Ticket Type',
             value: 'create',
             action: 'Create new ticket type'
+        },
+        {
+            name: 'Delete Ticket Type',
+            value: 'delete',
+            action: 'Delete ticket type'
         },
         {
             name: 'Get Ticket Type Details',
@@ -83,7 +93,7 @@ const ticketPriceField: INodeProperties = {
     description: 'The price of the ticket in cents (e.g., 2500 for $25.00)'
 };
 
-// Ticket Type ID field for get operation
+// Ticket Type ID field for get and delete operations
 const ticketTypeIdField: INodeProperties = {
     displayName: 'Ticket Type ID',
     name: 'ticketTypeId',
@@ -93,10 +103,27 @@ const ticketTypeIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['ticket'],
-            operation: ['get', 'update']
+            operation: ['get', 'delete', 'update']
         }
     },
-    description: 'The ID of the ticket type to get details for or update'
+    description:
+        'The ID of the ticket type to get details for or update or delete'
+};
+
+// Ticket Type IDs field for bulk update operation
+const ticketTypeIdsField: INodeProperties = {
+    displayName: 'Ticket Type IDs',
+    name: 'ticketTypeIds',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['bulkUpdate']
+        }
+    },
+    description: 'Comma-separated list of ticket type IDs to update'
 };
 
 // Additional fields for ticket operations
@@ -456,14 +483,6 @@ const ticketUpdateFields: INodeProperties = {
             description: 'Description of the ticket type'
         },
         {
-            displayName: 'Price (in Cents)',
-            name: 'price',
-            type: 'number',
-            default: undefined,
-            description:
-                'The price of the ticket in cents (e.g., 2500 for $25.00)'
-        },
-        {
             displayName: 'Capacity',
             name: 'capacity',
             type: 'number',
@@ -472,16 +491,26 @@ const ticketUpdateFields: INodeProperties = {
                 'Maximum number of tickets available (leave empty for unlimited)'
         },
         {
-            displayName: 'Minimum Quantity',
-            name: 'minQuantity',
-            type: 'number',
-            description: 'Minimum number of tickets a user can purchase'
-        },
-        {
             displayName: 'Maximum Quantity',
             name: 'maxQuantity',
             type: 'number',
-            description: 'Maximum number of tickets a user can purchase'
+            description: 'Maximum number of tickets a user can purchase',
+            default: undefined
+        },
+        {
+            displayName: 'Minimum Quantity',
+            name: 'minQuantity',
+            type: 'number',
+            description: 'Minimum number of tickets a user can purchase',
+            default: 1
+        },
+        {
+            displayName: 'Price (in Cents)',
+            name: 'price',
+            type: 'number',
+            default: undefined,
+            description:
+                'The price of the ticket in cents (e.g., 2500 for $25.00)'
         },
         {
             displayName: 'Sale Start Date',
@@ -672,15 +701,268 @@ const ticketUpdateAdditionalFields: INodeProperties = {
     ]
 };
 
+// Update Type field for bulk update operation
+const updateTypeField: INodeProperties = {
+    displayName: 'Update Type',
+    name: 'updateType',
+    type: 'options',
+    required: true,
+    default: 'percentage_change',
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['bulkUpdate']
+        }
+    },
+    options: [
+        {
+            name: 'Percentage Change',
+            value: 'percentage_change',
+            description:
+                'Apply percentage-based changes to pricing and capacity'
+        },
+        {
+            name: 'Fixed Change',
+            value: 'fixed_change',
+            description: 'Apply fixed amount changes to pricing and capacity'
+        },
+        {
+            name: 'Absolute Value',
+            value: 'absolute_value',
+            description: 'Set absolute values for pricing and capacity'
+        }
+    ],
+    description: 'Type of update to apply to selected ticket types'
+};
+
+// Update Fields for bulk update operation
+const updateFieldsCollection: INodeProperties = {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['bulkUpdate']
+        }
+    },
+    options: [
+        {
+            displayName: 'Price Change',
+            name: 'priceChange',
+            type: 'fixedCollection',
+            default: {},
+            description:
+                'Configure price changes for all selected ticket types',
+            options: [
+                {
+                    name: 'settings',
+                    displayName: 'Price Change Settings',
+                    values: [
+                        {
+                            displayName: 'Type',
+                            name: 'type',
+                            type: 'options',
+                            options: [
+                                {
+                                    name: 'Percentage',
+                                    value: 'percentage',
+                                    description:
+                                        'Change price by percentage (e.g., 10 for 10% increase)'
+                                },
+                                {
+                                    name: 'Fixed',
+                                    value: 'fixed',
+                                    description:
+                                        'Change price by fixed amount in cents'
+                                }
+                            ],
+                            default: 'percentage',
+                            description: 'How to apply the price change'
+                        },
+                        {
+                            displayName: 'Value',
+                            name: 'value',
+                            type: 'number',
+                            default: 0,
+                            description:
+                                'Price change value (percentage or cents)'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            displayName: 'Capacity Change',
+            name: 'capacityChange',
+            type: 'fixedCollection',
+            default: {},
+            description:
+                'Configure capacity changes for all selected ticket types',
+            options: [
+                {
+                    name: 'settings',
+                    displayName: 'Capacity Change Settings',
+                    values: [
+                        {
+                            displayName: 'Type',
+                            name: 'type',
+                            type: 'options',
+                            options: [
+                                {
+                                    name: 'Percentage',
+                                    value: 'percentage',
+                                    description: 'Change capacity by percentage'
+                                },
+                                {
+                                    name: 'Fixed',
+                                    value: 'fixed',
+                                    description:
+                                        'Change capacity by fixed amount'
+                                },
+                                {
+                                    name: 'Absolute',
+                                    value: 'absolute',
+                                    description: 'Set absolute capacity value'
+                                }
+                            ],
+                            default: 'percentage',
+                            description: 'How to apply the capacity change'
+                        },
+                        {
+                            displayName: 'Value',
+                            name: 'value',
+                            type: 'number',
+                            default: 0,
+                            description: 'Capacity change value'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            displayName: 'Sale End Date',
+            name: 'saleEndAt',
+            type: 'dateTime',
+            default: '',
+            description: 'Set new sale end date for all selected ticket types'
+        },
+        {
+            displayName: 'Is Hidden',
+            name: 'isHidden',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to set visibility status for all selected ticket types'
+        }
+    ]
+};
+
+// Additional Fields for bulk update operation
+const bulkUpdateAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['bulkUpdate']
+        }
+    },
+    options: [
+        {
+            displayName: 'Skip If Sold Out',
+            name: 'skipIfSoldOut',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to skip updating ticket types that are sold out'
+        },
+        {
+            displayName: 'Validate Before Update',
+            name: 'validateBeforeUpdate',
+            type: 'boolean',
+            default: true,
+            description:
+                'Whether to validate all changes before applying any updates'
+        },
+        {
+            displayName: 'Rollback On Error',
+            name: 'rollbackOnError',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to rollback all changes if any update fails'
+        }
+    ]
+};
+
+// Additional fields for ticket delete operation
+const ticketDeleteAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['delete']
+        }
+    },
+    options: [
+        {
+            displayName: 'Force Delete',
+            name: 'force',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to allow deletion even if there are existing sales for this ticket type'
+        },
+        {
+            displayName: 'Archive Instead',
+            name: 'archiveInstead',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to archive the ticket type instead of permanently deleting it (soft delete)'
+        },
+        {
+            displayName: 'Transfer Sales To Type ID',
+            name: 'transferSalesToTypeId',
+            type: 'string',
+            default: '',
+            description:
+                'Transfer existing sales to another ticket type (provide the target ticket type ID)'
+        },
+        {
+            displayName: 'Refund Existing Sales',
+            name: 'refundExistingSales',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to refund all existing sales for this ticket type before deletion'
+        }
+    ]
+};
+
 export const ticketProps: INodeProperties[] = [
     ticketOperations,
     eventIdField,
     ticketNameField,
     ticketPriceField,
     ticketTypeIdField,
+    ticketTypeIdsField,
+    updateTypeField,
+    updateFieldsCollection,
     ticketAdditionalFields,
     ticketGetAdditionalFields,
     ticketCreateAdditionalFields,
     ticketUpdateFields,
-    ticketUpdateAdditionalFields
+    ticketUpdateAdditionalFields,
+    bulkUpdateAdditionalFields,
+    ticketDeleteAdditionalFields
 ];

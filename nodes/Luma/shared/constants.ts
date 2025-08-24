@@ -32,6 +32,7 @@ export const LUMA_ENDPOINTS = {
     EVENT_GET_GUESTS: '/public/v1/event/get-guests',
     EVENT_LIST_COUPONS: '/public/v1/event/coupons',
     EVENT_CREATE_COUPON: '/public/v1/event/create-coupon',
+    EVENT_UPDATE_COUPON: '/public/v1/event/update-coupon',
 
     // Guest endpoints
     GUEST_GET: '/public/v1/guest/get',
@@ -40,12 +41,15 @@ export const LUMA_ENDPOINTS = {
     GUEST_APPROVE: '/v1/guest/approve',
     GUEST_REJECT: '/v1/guest/reject',
     GUEST_CANCEL: '/v1/guest/cancel',
+    GUEST_CHECK_IN: '/v1/guest/check-in',
 
     // Ticket endpoints
     TICKET_TYPES_LIST: '/public/v1/event/ticket-types/list',
     TICKET_TYPE_GET: '/public/v1/event/ticket-types/get',
     TICKET_TYPE_CREATE: '/public/v1/event/ticket-types/create',
     TICKET_TYPE_UPDATE: '/v1/event/ticket-types/update',
+    TICKET_TYPE_DELETE: '/public/v1/event/ticket-types/delete',
+    TICKET_TYPES_BULK_UPDATE: '/v1/event/ticket-types/bulk-update',
 
     // Calendar endpoints
     CALENDAR_LIST_EVENTS: '/public/v1/calendar/list-events',

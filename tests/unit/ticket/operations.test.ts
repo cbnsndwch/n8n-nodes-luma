@@ -75,6 +75,96 @@ describe('Ticket Operations Unit Tests', () => {
             expect(LUMA_ENDPOINTS.TICKET_TYPES_LIST).toBe(
                 '/public/v1/event/ticket-types/list'
             );
+            expect(LUMA_ENDPOINTS.TICKET_TYPE_DELETE).toBeDefined();
+            expect(LUMA_ENDPOINTS.TICKET_TYPE_DELETE).toBe(
+                '/public/v1/event/ticket-types/delete'
+            );
+        });
+
+        it('should have delete operation in ticket props', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+            expect(operationField?.options).toBeDefined();
+
+            const deleteOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'delete'
+            );
+            expect(deleteOption).toBeDefined();
+            expect(deleteOption?.name).toBe('Delete Ticket Type');
+        });
+
+        it('should have bulk update endpoint defined', async () => {
+            const { LUMA_ENDPOINTS } = await import(
+                '../../../dist/nodes/Luma/shared/constants.js'
+            );
+
+            expect(LUMA_ENDPOINTS.TICKET_TYPES_BULK_UPDATE).toBeDefined();
+            expect(LUMA_ENDPOINTS.TICKET_TYPES_BULK_UPDATE).toBe(
+                '/v1/event/ticket-types/bulk-update'
+            );
+        });
+    });
+
+    describe('Bulk Update Operation', () => {
+        it('should have bulk update operation option', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+            expect(operationField?.options).toBeDefined();
+
+            const bulkUpdateOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'bulkUpdate'
+            );
+            expect(bulkUpdateOption).toBeDefined();
+            expect(bulkUpdateOption?.name).toBe('Bulk Update Ticket Types');
+        });
+
+        it('should have required bulk update parameters', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check for ticket type IDs field
+            const ticketTypeIdsField = ticketProps.find(
+                prop => prop.name === 'ticketTypeIds'
+            );
+            expect(ticketTypeIdsField).toBeDefined();
+            expect(ticketTypeIdsField?.required).toBe(true);
+            expect(
+                ticketTypeIdsField?.displayOptions?.show?.operation
+            ).toContain('bulkUpdate');
+
+            // Check for update type field
+            const updateTypeField = ticketProps.find(
+                prop => prop.name === 'updateType'
+            );
+            expect(updateTypeField).toBeDefined();
+            expect(updateTypeField?.required).toBe(true);
+            expect(updateTypeField?.type).toBe('options');
+        });
+
+        it('should have bulk update contracts defined', async () => {
+            try {
+                const contracts = await import(
+                    '../../../dist/nodes/Luma/ticket/contracts.js'
+                );
+
+                // These should be available as type exports, so we just verify the module loads
+                expect(contracts).toBeDefined();
+            } catch (error) {
+                throw new Error('Bulk update contracts should be compilable');
+            }
         });
 
         it('should have update ticket endpoint defined', async () => {
@@ -122,9 +212,11 @@ describe('Ticket Operations Unit Tests', () => {
                 ticketTypeIdField?.displayOptions?.show?.operation
             ).toContain('update');
 
-            // Check for updateFields collection
+            // Check for updateFields collection for update operation
             const updateFieldsCollection = ticketProps.find(
-                prop => prop.name === 'updateFields'
+                prop =>
+                    prop.name === 'updateFields' &&
+                    prop.displayOptions?.show?.operation?.includes('update')
             );
             expect(updateFieldsCollection).toBeDefined();
             expect(updateFieldsCollection?.type).toBe('collection');
