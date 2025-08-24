@@ -208,7 +208,14 @@ const eventAdditionalFields: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['event'],
-            operation: ['create', 'update', 'getMany', 'get', 'delete', 'listCoupons']
+            operation: [
+                'create',
+                'update',
+                'getMany',
+                'get',
+                'delete',
+                'listCoupons'
+            ]
         }
     },
     options: [

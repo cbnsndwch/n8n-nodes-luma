@@ -72,6 +72,48 @@ class GuestOperations extends BaseOperations {
 
         return this.handleMultipleItems(responseData, context.itemIndex);
     }
+
+    /**
+     * Get details for a specific guest
+     */
+    static async get(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const guestId = context.executeFunctions.getNodeParameter(
+            'guestId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: IDataObject = {
+            guest_id: guestId
+        };
+
+        // Apply additional fields for get operation
+        if (additionalFields.includeHistory !== undefined) {
+            qs.include_history = additionalFields.includeHistory as boolean;
+        }
+        if (additionalFields.includePersonalInfo !== undefined) {
+            qs.include_personal_info =
+                additionalFields.includePersonalInfo as boolean;
+        }
+        if (additionalFields.includeEventDetails !== undefined) {
+            qs.include_event_details =
+                additionalFields.includeEventDetails as boolean;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.GUEST_GET),
+            qs
+        });
+
+        return this.createReturnItem(responseData, context.itemIndex);
+    }
 }
 
 export async function handleGuestOperation(
@@ -81,6 +123,9 @@ export async function handleGuestOperation(
     let result: INodeExecutionData | INodeExecutionData[];
 
     switch (operation) {
+        case 'get':
+            result = await GuestOperations.get(context);
+            break;
         case 'list':
             result = await GuestOperations.list(context);
             break;

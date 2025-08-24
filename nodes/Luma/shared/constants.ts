@@ -32,6 +32,9 @@ export const LUMA_ENDPOINTS = {
     EVENT_GET_GUESTS: '/public/v1/event/get-guests',
     EVENT_LIST_COUPONS: '/public/v1/event/coupons',
 
+    // Guest endpoints
+    GUEST_GET: '/public/v1/guest/get',
+
     // Calendar endpoints
     CALENDAR_LIST_EVENTS: '/public/v1/calendar/list-events',
     CALENDAR_LOOKUP_EVENT: '/public/v1/calendar/lookup-event',

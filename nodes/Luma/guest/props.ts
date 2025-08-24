@@ -15,6 +15,12 @@ const guestOperations: INodeProperties = {
     },
     options: [
         {
+            name: 'Get',
+            value: 'get',
+            description: 'Get detailed information about a specific guest',
+            action: 'Get guest details'
+        },
+        {
             name: 'List',
             value: 'list',
             description: 'Get all guests for a specific event',
@@ -41,6 +47,25 @@ const eventIdField: INodeProperties = {
     default: '',
     placeholder: 'evt-abc123def456',
     description: 'The unique identifier of the event to list guests for'
+};
+
+/**
+ * Guest ID field for get operation
+ */
+const guestIdField: INodeProperties = {
+    displayName: 'Guest ID',
+    name: 'guestId',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['get']
+        }
+    },
+    default: '',
+    placeholder: 'gst-abc123def456',
+    description: 'The unique identifier of the guest to retrieve'
 };
 
 /**
@@ -152,10 +177,54 @@ const guestAdditionalFields: INodeProperties = {
 };
 
 /**
+ * Additional fields collection for guest get operation
+ */
+const guestGetAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['get']
+        }
+    },
+    options: [
+        {
+            displayName: 'Include History',
+            name: 'includeHistory',
+            type: 'boolean',
+            default: false,
+            description:
+                'Whether to include registration history and timestamps'
+        },
+        {
+            displayName: 'Include Personal Info',
+            name: 'includePersonalInfo',
+            type: 'boolean',
+            default: true,
+            description:
+                'Whether to include personal information in the response'
+        },
+        {
+            displayName: 'Include Event Details',
+            name: 'includeEventDetails',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to include event-specific information'
+        }
+    ]
+};
+
+/**
  * Export all guest properties
  */
 export const guestProps: INodeProperties[] = [
     guestOperations,
     eventIdField,
-    guestAdditionalFields
+    guestIdField,
+    guestAdditionalFields,
+    guestGetAdditionalFields
 ];
