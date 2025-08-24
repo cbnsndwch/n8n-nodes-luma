@@ -1,6 +1,7 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 import { idField } from '../shared/props';
+import { forceDeleteField } from '../shared/props/common.props';
 
 const calendarIdField = idField(
     'Calendar ID',
@@ -40,6 +41,12 @@ const calendarOperations: INodeProperties = {
             value: 'createPersonTag',
             action: 'Create a person tag in a calendar',
             description: 'Create a new person tag for organizing people'
+        },
+        {
+            name: 'Delete Person Tag',
+            value: 'deletePersonTag',
+            action: 'Delete a person tag from a calendar',
+            description: 'Delete a person tag that is no longer needed'
         },
         {
             name: 'Import People',
@@ -100,12 +107,29 @@ const calendarApiIdField: INodeProperties = {
                 'importPeople',
                 'listPeople',
                 'listPersonTags',
+                'deletePersonTag',
                 'createPersonTag',
                 'updateCoupon'
             ]
         }
     },
     description: 'The API ID of the calendar'
+};
+
+const tagApiIdField: INodeProperties = {
+    displayName: 'Tag API ID',
+    name: 'tagApiId',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: 'tag_123abc...',
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['deletePersonTag']
+        }
+    },
+    description: 'The API ID of the person tag to delete'
 };
 
 // Time range filter fields for calendar events
@@ -668,6 +692,29 @@ const listPersonTagsAdditionalFields: INodeProperties = {
     options: [paginationCursorField, paginationLimitField]
 };
 
+// Additional fields for deletePersonTag operation
+const deletePersonTagAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['deletePersonTag']
+        }
+    },
+    options: [
+        {
+            ...forceDeleteField,
+            displayName: 'Force Delete',
+            name: 'forceDelete',
+            description: 'Force deletion even if tag is assigned to people'
+        }
+    ]
+};
+
 // Create Person Tag specific fields
 
 const personTagNameField: INodeProperties = {
@@ -824,6 +871,7 @@ export const calendarProps = [
     calendarOperations,
     calendarIdField,
     calendarApiIdField,
+    tagApiIdField,
     addEventApiIdField,
     couponApiIdField,
     peopleDataField,
@@ -839,6 +887,7 @@ export const calendarProps = [
     createCouponAdditionalFields,
     listPeopleAdditionalFields,
     listPersonTagsAdditionalFields,
+    deletePersonTagAdditionalFields,
     createPersonTagAdditionalFields,
     updateCouponFields
 ];

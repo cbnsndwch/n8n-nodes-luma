@@ -64,6 +64,21 @@ export interface PersonTagsFilters extends IDataObject {
     pagination_limit?: number; // Number of items to return
 }
 
+export interface DeletePersonTagRequest extends IDataObject {
+    api_id: string; // Required - ID of tag to delete
+    force_delete?: boolean; // Optional - force deletion even if tag is assigned to people
+}
+
+export interface DeletePersonTagResponse extends IDataObject {
+    success: boolean;
+    message?: string;
+    deleted_tag?: {
+        api_id: string;
+        name: string;
+        person_count: number; // Number of people who had this tag
+    };
+}
+
 export interface CreatePersonTagRequest extends IDataObject {
     calendar_api_id: string; // Required
     name: string; // Required
