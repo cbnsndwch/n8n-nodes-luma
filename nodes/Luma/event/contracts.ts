@@ -57,3 +57,13 @@ export interface CouponFilters extends IDataObject {
     sort_by?: 'name' | 'created_at' | 'expires_at' | 'usage';
     sort_order?: 'asc' | 'desc';
 }
+
+export interface UpdateEventCouponRequest extends IDataObject {
+    coupon_api_id: string; // Required - ID of coupon to update
+    name?: string; // Optional - new display name
+    description?: string; // Optional - new description
+    max_uses?: number; // Optional - new maximum uses (null = unlimited)
+    expires_at?: string; // Optional - new expiration date (ISO 8601)
+    is_active?: boolean; // Optional - activate/deactivate coupon
+    is_public?: boolean; // Optional - public/private visibility
+}

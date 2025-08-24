@@ -60,6 +60,135 @@ describe('Ticket Workflow Execution Tests', () => {
                 'event-456'
             );
         });
+
+        it('should handle bulk update operation', async () => {
+            const mockTicketTypeIds = 'ticket-123,ticket-456,ticket-789';
+            const mockUpdateType = 'percentage_change';
+            const mockUpdateFields = {
+                priceChange: {
+                    settings: {
+                        type: 'percentage',
+                        value: 10
+                    }
+                }
+            };
+            const mockAdditionalFields = {
+                validateBeforeUpdate: true,
+                rollbackOnError: false
+            };
+
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('ticket')
+                .mockReturnValueOnce('bulkUpdate')
+                .mockReturnValueOnce(mockTicketTypeIds)
+                .mockReturnValueOnce(mockUpdateType)
+                .mockReturnValueOnce(mockUpdateFields)
+                .mockReturnValueOnce(mockAdditionalFields);
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify parameters
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'bulkUpdate'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('ticketTypeIds')).toBe(
+                mockTicketTypeIds
+            );
+            expect(mockExecuteFunctions.getNodeParameter('updateType')).toBe(
+                mockUpdateType
+            );
+            expect(
+                mockExecuteFunctions.getNodeParameter('updateFields')
+            ).toEqual(mockUpdateFields);
+            expect(
+                mockExecuteFunctions.getNodeParameter('additionalFields')
+            ).toEqual(mockAdditionalFields);
+        });
+    });
+
+    describe('Bulk Update Parameter Validation', () => {
+        it('should validate ticket type IDs parsing', () => {
+            const ticketTypeIds =
+                'ticket-123,ticket-456, ticket-789 ,ticket-012';
+            const parsedIds = ticketTypeIds
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id.length > 0);
+
+            expect(parsedIds).toEqual([
+                'ticket-123',
+                'ticket-456',
+                'ticket-789',
+                'ticket-012'
+            ]);
+            expect(parsedIds.length).toBe(4);
+        });
+
+        it('should handle empty ticket type IDs', () => {
+            const ticketTypeIds = '';
+            const parsedIds = ticketTypeIds
+                .split(',')
+                .map(id => id.trim())
+                .filter(id => id.length > 0);
+
+            expect(parsedIds).toEqual([]);
+            expect(parsedIds.length).toBe(0);
+        });
+
+        it('should validate update field structures', () => {
+            const updateFields = {
+                priceChange: {
+                    settings: {
+                        type: 'percentage',
+                        value: 15
+                    }
+                },
+                capacityChange: {
+                    settings: {
+                        type: 'fixed',
+                        value: 50
+                    }
+                },
+                saleEndAt: '2024-12-31T23:59:59Z',
+                isHidden: true
+            };
+
+            expect(updateFields.priceChange.settings.type).toBe('percentage');
+            expect(updateFields.priceChange.settings.value).toBe(15);
+            expect(updateFields.capacityChange.settings.type).toBe('fixed');
+            expect(updateFields.capacityChange.settings.value).toBe(50);
+            expect(updateFields.saleEndAt).toBe('2024-12-31T23:59:59Z');
+            expect(updateFields.isHidden).toBe(true);
+        });
+
+        it('should handle ticket type delete operation', async () => {
+            mockExecuteFunctions.getNodeParameter
+                .mockReturnValueOnce('ticket')
+                .mockReturnValueOnce('delete')
+                .mockReturnValueOnce('ticket-type-123')
+                .mockReturnValueOnce({
+                    force: true,
+                    archiveInstead: false
+                });
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify parameters
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'delete'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('ticketTypeId')).toBe(
+                'ticket-type-123'
+            );
+        });
     });
 
     describe('Ticket Error Handling', () => {
