@@ -47,6 +47,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         
+      - name: Security Scan (Advisory Only)
+        run: |
+          echo "🔒 Running security scan (advisory only for CI)..."
+          echo "🔍 Checking for security vulnerabilities..."
+          
+          # Run security audit but don't fail CI - just report
+          pnpm audit --audit-level moderate || {
+            echo "⚠️ Security vulnerabilities detected (will block release)"
+            echo "🔍 Run 'pnpm run security:check' locally for details"
+          }
+          
+          echo "📋 Running license compliance check..."
+          pnpm run security:license || {
+            echo "⚠️ License compliance issues detected (will block release)"
+          }
+          
+          echo "ℹ️ Security scan completed (advisory mode)"
+        
       - name: Validate TypeScript compilation
         run: |
           echo "🔍 Validating TypeScript compilation..."

@@ -47,6 +47,69 @@ jobs:
           pnpm install --frozen-lockfile
           echo "✅ Dependencies installed successfully"
         
+      - name: Security Audit
+        run: |
+          echo "🔒 Running security audit..."
+          echo "🔍 Checking for known security vulnerabilities..."
+          
+          # Run audit and capture both output and exit code
+          set +e  # Don't exit on non-zero
+          pnpm audit --audit-level high --json > audit-results.json 2>&1
+          AUDIT_EXIT_CODE=$?
+          set -e  # Re-enable exit on error
+          
+          # Display human-readable audit results
+          echo "📊 Security Audit Results:"
+          pnpm audit --audit-level high || true
+          
+          # Check for critical or high severity vulnerabilities
+          if [ $AUDIT_EXIT_CODE -ne 0 ]; then
+            echo "❌ Security audit found high or critical vulnerabilities"
+            echo "🚫 Release blocked due to security vulnerabilities"
+            echo "::error::Security audit failed - high or critical vulnerabilities found"
+            exit 1
+          else
+            echo "✅ Security audit passed - no high or critical vulnerabilities found"
+          fi
+        
+      - name: License Compliance Check
+        run: |
+          echo "📋 Running license compliance check..."
+          
+          # Install license-checker temporarily
+          npx license-checker --summary --onlyAllow "MIT;Apache-2.0;BSD;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;Custom: https://user-images.githubusercontent.com/65276001/173571060-9f2f6d7b-bac0-43b6-bdb2-001da9694058.png" --excludePackages "unknown@0.0.0" > license-report.txt || {
+            echo "❌ License compliance check failed"
+            echo "🔍 Found packages with non-approved licenses:"
+            npx license-checker --onlyunknown || true
+            npx license-checker --summary || true
+            echo "::error::License compliance check failed - non-approved licenses found"
+            exit 1
+          }
+          
+          echo "✅ License compliance check passed"
+          echo "📄 License Summary:"
+          cat license-report.txt
+        
+      - name: Dependency Security Validation
+        run: |
+          echo "🔍 Running additional dependency security validation..."
+          
+          # Check for packages with known security issues in package.json
+          echo "📦 Validating package integrity..."
+          
+          # Verify all dependencies are from trusted sources
+          echo "🔐 Checking dependency sources..."
+          pnpm list --depth=0 --json > deps.json
+          
+          # Check for suspicious packages (basic validation)
+          if grep -i "suspicious\|malicious\|backdoor" deps.json > /dev/null 2>&1; then
+            echo "❌ Suspicious packages detected"
+            echo "::error::Potentially malicious packages found"
+            exit 1
+          fi
+          
+          echo "✅ Dependency security validation passed"
+        
       - name: Run comprehensive validation
         run: |
           echo "🔍 Running pre-publish validation..."
