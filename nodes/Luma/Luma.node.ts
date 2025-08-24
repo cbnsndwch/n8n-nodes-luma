@@ -11,6 +11,7 @@ import { lumaResource, type ResourceId } from './shared/props';
 
 import { calendarProps } from './calendar/props';
 import { eventProps } from './event/props';
+import { guestProps } from './guest/props';
 import { userProps } from './user/props';
 import { utilityProps } from './utility/props';
 
@@ -41,6 +42,7 @@ export class Luma implements INodeType {
             lumaResource,
             ...eventProps,
             ...calendarProps,
+            ...guestProps,
             ...userProps,
             ...utilityProps
         ]
