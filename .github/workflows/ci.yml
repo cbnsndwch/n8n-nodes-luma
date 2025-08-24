@@ -34,8 +34,65 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         
+      - name: Validate TypeScript compilation
+        run: |
+          echo "🔍 Validating TypeScript compilation..."
+          pnpm exec tsc --noEmit || { echo "❌ TypeScript compilation failed"; exit 1; }
+          echo "✅ TypeScript compilation successful"
+        
       - name: Build project
-        run: pnpm run build
+        run: |
+          echo "🏗️ Building project..."
+          pnpm run build || { echo "❌ Build process failed"; exit 1; }
+          echo "✅ Build process completed successfully"
+        
+      - name: Validate build artifacts
+        run: |
+          # Check that essential build outputs exist
+          echo "🔍 Validating build artifacts..."
+          
+          # Core node files
+          test -f dist/nodes/Luma/Luma.node.js || { echo "❌ Missing dist/nodes/Luma/Luma.node.js"; exit 1; }
+          test -f dist/nodes/LumaTrigger/LumaTrigger.node.js || { echo "❌ Missing dist/nodes/LumaTrigger/LumaTrigger.node.js"; exit 1; }
+          test -f dist/credentials/LumaApi.credentials.js || { echo "❌ Missing dist/credentials/LumaApi.credentials.js"; exit 1; }
+          
+          # TypeScript declaration files
+          test -f dist/nodes/Luma/Luma.node.d.ts || { echo "❌ Missing dist/nodes/Luma/Luma.node.d.ts"; exit 1; }
+          test -f dist/nodes/LumaTrigger/LumaTrigger.node.d.ts || { echo "❌ Missing dist/nodes/LumaTrigger/LumaTrigger.node.d.ts"; exit 1; }
+          test -f dist/credentials/LumaApi.credentials.d.ts || { echo "❌ Missing dist/credentials/LumaApi.credentials.d.ts"; exit 1; }
+          
+          # Icon files (via gulp build:icons)
+          test -f dist/nodes/Luma/luma.svg || { echo "❌ Missing dist/nodes/Luma/luma.svg"; exit 1; }
+          test -f dist/nodes/LumaTrigger/luma.svg || { echo "❌ Missing dist/nodes/LumaTrigger/luma.svg"; exit 1; }
+          
+          # Package metadata
+          test -f dist/package.json || { echo "❌ Missing dist/package.json"; exit 1; }
+          
+          # Verify feature directories are compiled
+          test -d dist/nodes/Luma/calendar || { echo "❌ Missing dist/nodes/Luma/calendar"; exit 1; }
+          test -d dist/nodes/Luma/event || { echo "❌ Missing dist/nodes/Luma/event"; exit 1; }
+          test -d dist/nodes/Luma/guest || { echo "❌ Missing dist/nodes/Luma/guest"; exit 1; }
+          test -d dist/nodes/Luma/ticket || { echo "❌ Missing dist/nodes/Luma/ticket"; exit 1; }
+          test -d dist/nodes/Luma/user || { echo "❌ Missing dist/nodes/Luma/user"; exit 1; }
+          test -d dist/nodes/Luma/utility || { echo "❌ Missing dist/nodes/Luma/utility"; exit 1; }
+          test -d dist/nodes/Luma/shared || { echo "❌ Missing dist/nodes/Luma/shared"; exit 1; }
+          
+          echo "✅ All build artifacts validated successfully"
+        
+      - name: Validate icon copying process
+        run: |
+          echo "🎨 Validating icon copying process..."
+          
+          # Clean dist and verify icons are copied correctly by gulp
+          pnpm run clean
+          pnpm exec tsc
+          pnpm exec gulp build:icons || { echo "❌ Icon copying failed"; exit 1; }
+          
+          # Verify icons were copied correctly
+          test -f dist/nodes/Luma/luma.svg || { echo "❌ Luma icon not copied"; exit 1; }
+          test -f dist/nodes/LumaTrigger/luma.svg || { echo "❌ LumaTrigger icon not copied"; exit 1; }
+          
+          echo "✅ Icon copying process validated successfully"
         
       - name: Run tests
         run: pnpm run test
