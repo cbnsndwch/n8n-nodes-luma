@@ -25,6 +25,12 @@ const guestOperations: INodeProperties = {
             value: 'list',
             description: 'Get all guests for a specific event',
             action: 'List guests for an event'
+        },
+        {
+            name: 'Register',
+            value: 'register',
+            description: 'Register a guest for an event',
+            action: 'Register guest for event'
         }
     ],
     default: 'list'
@@ -41,7 +47,7 @@ const eventIdField: INodeProperties = {
     displayOptions: {
         show: {
             resource: ['guest'],
-            operation: ['list']
+            operation: ['list', 'register']
         }
     },
     default: '',
@@ -219,12 +225,134 @@ const guestGetAdditionalFields: INodeProperties = {
 };
 
 /**
+ * Required guest information fields for registration
+ */
+const guestNameField: INodeProperties = {
+    displayName: 'Guest Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['register']
+        }
+    },
+    default: '',
+    description: 'Full name of the guest'
+};
+
+const guestEmailField: INodeProperties = {
+    displayName: 'Guest Email',
+    name: 'email',
+    type: 'string',
+    required: true,
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['register']
+        }
+    },
+    default: '',
+    placeholder: 'name@email.com',
+    description: 'Email address of the guest'
+};
+
+/**
+ * Additional fields collection for guest registration
+ */
+const guestRegistrationAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['guest'],
+            operation: ['register']
+        }
+    },
+    options: [
+        {
+            displayName: 'Auto Approve',
+            name: 'autoApprove',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to automatically approve the registration'
+        },
+        {
+            displayName: 'Company',
+            name: 'company',
+            type: 'string',
+            default: '',
+            description: 'Company or organization name'
+        },
+        {
+            displayName: 'Custom Message',
+            name: 'customMessage',
+            type: 'string',
+            typeOptions: {
+                rows: 3
+            },
+            default: '',
+            description: 'Custom message to include in the invitation'
+        },
+        {
+            displayName: 'First Name',
+            name: 'firstName',
+            type: 'string',
+            default: '',
+            description: 'First name of the guest'
+        },
+        {
+            displayName: 'Job Title',
+            name: 'jobTitle',
+            type: 'string',
+            default: '',
+            description: 'Job title or position'
+        },
+        {
+            displayName: 'Last Name',
+            name: 'lastName',
+            type: 'string',
+            default: '',
+            description: 'Last name of the guest'
+        },
+        {
+            displayName: 'Phone',
+            name: 'phone',
+            type: 'string',
+            default: '',
+            description: 'Phone number of the guest'
+        },
+        {
+            displayName: 'Send Invite',
+            name: 'sendInvite',
+            type: 'boolean',
+            default: true,
+            description: 'Whether to send an invitation email to the guest'
+        },
+        {
+            displayName: 'Ticket Type ID',
+            name: 'ticketTypeId',
+            type: 'string',
+            default: '',
+            description: 'ID of the ticket type to assign'
+        }
+    ]
+};
+
+/**
  * Export all guest properties
  */
 export const guestProps: INodeProperties[] = [
     guestOperations,
     eventIdField,
     guestIdField,
+    guestNameField,
+    guestEmailField,
     guestAdditionalFields,
-    guestGetAdditionalFields
+    guestGetAdditionalFields,
+    guestRegistrationAdditionalFields
 ];
