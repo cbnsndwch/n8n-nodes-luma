@@ -89,5 +89,37 @@ describe('Ticket Frontend User Experience', () => {
             );
             expect(fieldsWithDescriptions.length).toBeGreaterThan(0);
         });
+
+        it('should have delete operation with appropriate fields', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check for delete operation
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            const deleteOption = operationField?.options?.find(
+                (opt: any) => opt.value === 'delete'
+            );
+            expect(deleteOption).toBeDefined();
+            expect(deleteOption?.name).toBe('Delete Ticket Type');
+
+            // Check for delete-specific additional fields
+            const deleteAdditionalFields = ticketProps.find(
+                prop =>
+                    prop.name === 'additionalFields' &&
+                    prop.displayOptions?.show?.operation?.includes('delete')
+            );
+            expect(deleteAdditionalFields).toBeDefined();
+            expect(deleteAdditionalFields?.options).toBeDefined();
+
+            // Verify specific delete options exist
+            const forceDeleteOption = deleteAdditionalFields?.options?.find(
+                (opt: any) => opt.name === 'force'
+            );
+            expect(forceDeleteOption).toBeDefined();
+            expect(forceDeleteOption?.displayName).toBe('Force Delete');
+        });
     });
 });
