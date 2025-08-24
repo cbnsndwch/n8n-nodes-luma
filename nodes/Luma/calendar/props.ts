@@ -55,6 +55,12 @@ const calendarOperations: INodeProperties = {
             description: 'Import multiple people to a calendar in bulk'
         },
         {
+            name: 'List Coupons',
+            value: 'listCoupons',
+            action: 'List coupons in a calendar',
+            description: 'List discount coupons available for calendar events'
+        },
+        {
             name: 'List Events',
             value: 'listEvents',
             action: 'List events in a calendar',
@@ -113,6 +119,7 @@ const calendarApiIdField: INodeProperties = {
                 'importPeople',
                 'listPeople',
                 'listPersonTags',
+                'listCoupons',
                 'updatePersonTag',
                 'deletePersonTag',
                 'createPersonTag',
@@ -717,6 +724,22 @@ const listPersonTagsAdditionalFields: INodeProperties = {
     options: [paginationCursorField, paginationLimitField]
 };
 
+// Additional fields for listCoupons operation
+const listCouponsAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['calendar'],
+            operation: ['listCoupons']
+        }
+    },
+    options: [paginationCursorField, paginationLimitField]
+};
+
 // Update fields for updatePersonTag operation
 const updatePersonTagFields: INodeProperties = {
     displayName: 'Update Fields',
@@ -954,6 +977,7 @@ export const calendarProps = [
     createCouponAdditionalFields,
     listPeopleAdditionalFields,
     listPersonTagsAdditionalFields,
+    listCouponsAdditionalFields,
     updatePersonTagFields,
     deletePersonTagAdditionalFields,
     createPersonTagAdditionalFields,

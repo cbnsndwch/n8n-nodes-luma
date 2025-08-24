@@ -56,7 +56,7 @@ export const LUMA_ENDPOINTS = {
     CALENDAR_UPDATE_PERSON_TAG: '/public/v1/calendar/update-person-tag',
     CALENDAR_DELETE_PERSON_TAG: '/public/v1/calendar/delete-person-tag',
     CALENDAR_CREATE_PERSON_TAG: '/public/v1/calendar/create-person-tag',
-    CALENDAR_LIST_COUPONS: '/public/v1/calendar/list-coupons',
+    CALENDAR_LIST_COUPONS: '/public/v1/calendar/coupons',
     CALENDAR_CREATE_COUPON: '/public/v1/calendar/coupons/create',
     CALENDAR_UPDATE_COUPON: '/public/v1/calendar/coupons/update',
 

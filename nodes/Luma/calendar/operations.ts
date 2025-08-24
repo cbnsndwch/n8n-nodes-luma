@@ -17,6 +17,7 @@ import type {
     PersonData,
     CalendarPeopleFilters,
     PersonTagsFilters,
+    CalendarCouponsFilters,
     DeletePersonTagRequest,
     CreatePersonTagRequest,
     CreateCalendarCouponRequest,
@@ -399,6 +400,43 @@ class CalendarOperations extends BaseOperations {
     }
 
     /**
+     * List coupons in a calendar
+     */
+    static async listCoupons(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData[]> {
+        const calendarApiId = context.executeFunctions.getNodeParameter(
+            'calendarApiId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex
+        ) as IDataObject;
+
+        const qs: CalendarCouponsFilters = {
+            calendar_api_id: calendarApiId
+        };
+
+        // Apply pagination parameters from additional fields
+        if (additionalFields.paginationCursor) {
+            qs.pagination_cursor = additionalFields.paginationCursor as string;
+        }
+        if (additionalFields.paginationLimit) {
+            qs.pagination_limit = additionalFields.paginationLimit as number;
+        }
+
+        const responseData = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.CALENDAR_LIST_COUPONS),
+            qs
+        });
+
+        return this.handleMultipleItems(responseData, context.itemIndex);
+    }
+
+    /**
      * Update a person tag in a calendar
      */
     static async updatePersonTag(
@@ -615,6 +653,9 @@ export async function handleCalendarOperation(
             break;
         case 'listPersonTags':
             result = await CalendarOperations.listPersonTags(context);
+            break;
+        case 'listCoupons':
+            result = await CalendarOperations.listCoupons(context);
             break;
         case 'updatePersonTag':
             result = await CalendarOperations.updatePersonTag(context);

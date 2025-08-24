@@ -149,3 +149,9 @@ export interface UpdatePersonTagResponse extends IDataObject {
     created_at: string; // ISO 8601
     updated_at: string; // ISO 8601 (updated timestamp)
 }
+
+export interface CalendarCouponsFilters extends IDataObject {
+    calendar_api_id?: string; // Calendar API ID to list coupons for
+    pagination_cursor?: string; // For pagination
+    pagination_limit?: number; // Number of items to return
+}
