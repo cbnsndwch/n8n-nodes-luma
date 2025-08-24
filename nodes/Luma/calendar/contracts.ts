@@ -58,3 +58,8 @@ export interface CalendarPeopleFilters extends IDataObject {
     pagination_cursor?: string; // For pagination
     pagination_limit?: number; // Number of items to return
 }
+
+export interface PersonTagsFilters extends IDataObject {
+    pagination_cursor?: string; // For pagination
+    pagination_limit?: number; // Number of items to return
+}
