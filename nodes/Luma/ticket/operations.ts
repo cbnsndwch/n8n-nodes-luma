@@ -11,10 +11,11 @@ import { BaseOperations } from '../shared/operations.base';
 import { parseCommaSeparatedIds } from '../shared/utils';
 
 import type {
-    TicketTypeFilters,
+    BulkUpdateTicketTypesRequest,
     CreateTicketTypeRequest,
     DeleteTicketTypeRequest,
-    BulkUpdateTicketTypesRequest,
+    TicketTypeFilters,
+    TicketAnalyticsRequest,
     UpdateTicketTypeRequest
 } from './contracts';
 
@@ -227,6 +228,100 @@ class TicketOperations extends BaseOperations {
             method: 'POST',
             url: buildLumaApiUrl(LUMA_ENDPOINTS.TICKET_TYPE_CREATE),
             body: requestBody
+        });
+
+        return {
+            json: response,
+            pairedItem: {
+                item: context.itemIndex
+            }
+        };
+    }
+
+    /**
+     * Get analytics for event or ticket type
+     */
+    static async analytics(
+        context: LumaOperationContext
+    ): Promise<INodeExecutionData> {
+        const eventId = context.executeFunctions.getNodeParameter(
+            'eventId',
+            context.itemIndex
+        ) as string;
+
+        const ticketTypeId = context.executeFunctions.getNodeParameter(
+            'ticketTypeId',
+            context.itemIndex
+        ) as string;
+
+        const additionalFields = context.executeFunctions.getNodeParameter(
+            'additionalFields',
+            context.itemIndex,
+            {}
+        ) as IDataObject;
+
+        // Validate that either eventId or ticketTypeId is provided
+        if (!eventId && !ticketTypeId) {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Either Event ID or Ticket Type ID must be provided for analytics'
+            );
+        }
+
+        if (eventId && ticketTypeId) {
+            throw new NodeOperationError(
+                context.executeFunctions.getNode(),
+                'Please provide either Event ID or Ticket Type ID, not both'
+            );
+        }
+
+        // Build query parameters
+        const qs: TicketAnalyticsRequest = {};
+
+        if (eventId) {
+            qs.event_id = eventId;
+        }
+        if (ticketTypeId) {
+            qs.ticket_type_id = ticketTypeId;
+        }
+
+        // Apply additional fields
+        if (additionalFields.dateFrom) {
+            qs.date_from = additionalFields.dateFrom as string;
+        }
+        if (additionalFields.dateTo) {
+            qs.date_to = additionalFields.dateTo as string;
+        }
+        if (additionalFields.includeRefunds !== undefined) {
+            qs.include_refunds = additionalFields.includeRefunds as boolean;
+        }
+        if (additionalFields.includePending !== undefined) {
+            qs.include_pending = additionalFields.includePending as boolean;
+        }
+        if (additionalFields.groupBy) {
+            qs.group_by = additionalFields.groupBy as 'day' | 'week' | 'month';
+        }
+        if (
+            additionalFields.metrics &&
+            Array.isArray(additionalFields.metrics)
+        ) {
+            qs.metrics = additionalFields.metrics as string[];
+        }
+
+        // Remove undefined values
+        Object.keys(qs).forEach(key => {
+            if (
+                qs[key as keyof TicketAnalyticsRequest] === undefined ||
+                qs[key as keyof TicketAnalyticsRequest] === ''
+            ) {
+                delete qs[key as keyof TicketAnalyticsRequest];
+            }
+        });
+
+        const response = await this.executeRequest(context, {
+            method: 'GET',
+            url: buildLumaApiUrl(LUMA_ENDPOINTS.TICKET_ANALYTICS),
+            qs
         });
 
         return {
@@ -543,6 +638,8 @@ export async function handleTicketOperation(
     context: LumaOperationContext
 ): Promise<INodeExecutionData | INodeExecutionData[]> {
     switch (operation) {
+        case 'analytics':
+            return await TicketOperations.analytics(context);
         case 'create':
             return await TicketOperations.create(context);
         case 'delete':

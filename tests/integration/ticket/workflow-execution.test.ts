@@ -105,6 +105,83 @@ describe('Ticket Workflow Execution Tests', () => {
             );
         });
 
+        it('should handle ticket analytics operation with event ID', async () => {
+            mockExecuteFunctions.getNodeParameter.mockImplementation(
+                (paramName: string) => {
+                    switch (paramName) {
+                        case 'resource':
+                            return 'ticket';
+                        case 'operation':
+                            return 'analytics';
+                        case 'eventId':
+                            return 'event-789';
+                        case 'ticketTypeId':
+                            return '';
+                        case 'additionalFields':
+                            return {
+                                dateFrom: '2024-01-01',
+                                dateTo: '2024-12-31',
+                                includeRefunds: true
+                            };
+                        default:
+                            return '';
+                    }
+                }
+            );
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify parameters
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'analytics'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('eventId')).toBe(
+                'event-789'
+            );
+        });
+
+        it('should handle ticket analytics operation with ticket type ID', async () => {
+            mockExecuteFunctions.getNodeParameter.mockImplementation(
+                (paramName: string) => {
+                    switch (paramName) {
+                        case 'resource':
+                            return 'ticket';
+                        case 'operation':
+                            return 'analytics';
+                        case 'eventId':
+                            return '';
+                        case 'ticketTypeId':
+                            return 'ticket-type-123';
+                        case 'additionalFields':
+                            return {
+                                groupBy: 'month',
+                                metrics: ['total_sales', 'conversion_rate']
+                            };
+                        default:
+                            return '';
+                    }
+                }
+            );
+
+            const inputData = mockExecuteFunctions.getInputData();
+            expect(Array.isArray(inputData)).toBe(true);
+
+            // Verify parameters
+            expect(mockExecuteFunctions.getNodeParameter('resource')).toBe(
+                'ticket'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('operation')).toBe(
+                'analytics'
+            );
+            expect(mockExecuteFunctions.getNodeParameter('ticketTypeId')).toBe(
+                'ticket-type-123'
+            );
+        });
+
         it('should handle bulk update operation', async () => {
             const mockTicketTypeIds = 'ticket-123,ticket-456,ticket-789';
             const mockUpdateType = 'percentage_change';

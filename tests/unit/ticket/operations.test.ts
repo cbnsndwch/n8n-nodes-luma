@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
+import { describe, expect, it } from 'vitest';
 
 describe('Ticket Operations Unit Tests', () => {
     describe('Source Files', () => {
@@ -75,6 +75,57 @@ describe('Ticket Operations Unit Tests', () => {
             expect(LUMA_ENDPOINTS.TICKET_TYPES_LIST).toBe(
                 '/public/v1/event/ticket-types/list'
             );
+
+            // Check for analytics endpoint
+            expect(LUMA_ENDPOINTS.TICKET_ANALYTICS).toBeDefined();
+            expect(LUMA_ENDPOINTS.TICKET_ANALYTICS).toBe(
+                '/public/v1/event/ticket-types/analytics'
+            );
+        });
+    });
+
+    describe('Ticket Analytics Interface', () => {
+        it('should have analytics operation defined', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+            expect(operationField?.options).toBeDefined();
+
+            const analyticsOption = operationField?.options?.find(
+                (option: any) => option.value === 'analytics'
+            );
+            expect(analyticsOption).toBeDefined();
+            expect(analyticsOption?.name).toBe('Get Ticket Analytics');
+        });
+
+        it('should have analytics parameter fields', async () => {
+            const { LUMA_ENDPOINTS } = await import(
+                '../../../dist/nodes/Luma/shared/constants.js'
+            );
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check for analytics event ID field
+            const analyticsEventIdField = ticketProps.find(
+                prop =>
+                    prop.name === 'eventId' &&
+                    prop.displayOptions?.show?.operation?.includes('analytics')
+            );
+            expect(analyticsEventIdField).toBeDefined();
+
+            // Check for analytics ticket type ID field
+            const analyticsTicketTypeIdField = ticketProps.find(
+                prop =>
+                    prop.name === 'ticketTypeId' &&
+                    prop.displayOptions?.show?.operation?.includes('analytics')
+            );
+            expect(analyticsTicketTypeIdField).toBeDefined();
             expect(LUMA_ENDPOINTS.TICKET_TYPE_DELETE).toBeDefined();
             expect(LUMA_ENDPOINTS.TICKET_TYPE_DELETE).toBe(
                 '/public/v1/event/ticket-types/delete'
@@ -205,7 +256,9 @@ describe('Ticket Operations Unit Tests', () => {
 
             // Check for ticketTypeId field for update operation
             const ticketTypeIdField = ticketProps.find(
-                prop => prop.name === 'ticketTypeId'
+                prop =>
+                    prop.name === 'ticketTypeId' &&
+                    prop.displayOptions?.show?.operation?.includes('update')
             );
             expect(ticketTypeIdField).toBeDefined();
             expect(

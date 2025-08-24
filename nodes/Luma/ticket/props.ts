@@ -27,6 +27,11 @@ const ticketOperations: INodeProperties = {
             action: 'Delete ticket type'
         },
         {
+            name: 'Get Ticket Analytics',
+            value: 'analytics',
+            action: 'Get ticket analytics'
+        },
+        {
             name: 'Get Ticket Type Details',
             value: 'get',
             action: 'Get ticket type details'
@@ -42,7 +47,7 @@ const ticketOperations: INodeProperties = {
             action: 'Update ticket type configuration'
         }
     ],
-    default: 'create'
+    default: 'analytics'
 };
 
 // Event ID field for ticket operations
@@ -60,6 +65,41 @@ const eventIdField: INodeProperties = {
     },
     description:
         'The ID of the event to list ticket types for or create a ticket type in'
+};
+
+// Event ID field for analytics operation
+const analyticsEventIdField: INodeProperties = {
+    displayName: 'Event ID',
+    name: 'eventId',
+    type: 'string',
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['analytics']
+        },
+        hide: {
+            ticketTypeId: ['', undefined]
+        }
+    },
+    description:
+        'The ID of the event to get analytics for (leave empty if using Ticket Type ID)'
+};
+
+// Ticket Type ID field for analytics operation
+const analyticsTicketTypeIdField: INodeProperties = {
+    displayName: 'Ticket Type ID',
+    name: 'ticketTypeId',
+    type: 'string',
+    default: '',
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['analytics']
+        }
+    },
+    description:
+        'The ID of the specific ticket type to get analytics for (leave empty to get event-level analytics)'
 };
 
 // Required fields for create operation
@@ -449,6 +489,109 @@ const ticketCreateAdditionalFields: INodeProperties = {
                     ]
                 }
             ]
+        }
+    ]
+};
+
+// Additional fields for ticket analytics operation
+const ticketAnalyticsAdditionalFields: INodeProperties = {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+        show: {
+            resource: ['ticket'],
+            operation: ['analytics']
+        }
+    },
+    options: [
+        {
+            displayName: 'Date From',
+            name: 'dateFrom',
+            type: 'dateTime',
+            default: '',
+            description: 'Start date for analytics period (ISO 8601 format)'
+        },
+        {
+            displayName: 'Date To',
+            name: 'dateTo',
+            type: 'dateTime',
+            default: '',
+            description: 'End date for analytics period (ISO 8601 format)'
+        },
+        {
+            displayName: 'Group By',
+            name: 'groupBy',
+            type: 'options',
+            options: [
+                {
+                    name: 'Day',
+                    value: 'day'
+                },
+                {
+                    name: 'Week',
+                    value: 'week'
+                },
+                {
+                    name: 'Month',
+                    value: 'month'
+                }
+            ],
+            default: 'day',
+            description: 'How to group time-based analytics data'
+        },
+        {
+            displayName: 'Include Pending',
+            name: 'includePending',
+            type: 'boolean',
+            default: false,
+            description: 'Whether to include pending transactions in analytics'
+        },
+        {
+            displayName: 'Include Refunds',
+            name: 'includeRefunds',
+            type: 'boolean',
+            default: true,
+            description: 'Whether to include refunded transactions in analytics'
+        },
+        {
+            displayName: 'Metrics',
+            name: 'metrics',
+            type: 'multiOptions',
+            options: [
+                {
+                    name: 'Average Order Value',
+                    value: 'avg_order_value'
+                },
+                {
+                    name: 'Conversion Rate',
+                    value: 'conversion_rate'
+                },
+                {
+                    name: 'Daily Breakdown',
+                    value: 'daily_breakdown'
+                },
+                {
+                    name: 'Refunds',
+                    value: 'refunds'
+                },
+                {
+                    name: 'Ticket Type Breakdown',
+                    value: 'ticket_type_breakdown'
+                },
+                {
+                    name: 'Total Revenue',
+                    value: 'total_revenue'
+                },
+                {
+                    name: 'Total Sales',
+                    value: 'total_sales'
+                }
+            ],
+            default: ['total_sales', 'total_revenue'],
+            description: 'Specific metrics to include in the response'
         }
     ]
 };
@@ -952,6 +1095,8 @@ const ticketDeleteAdditionalFields: INodeProperties = {
 export const ticketProps: INodeProperties[] = [
     ticketOperations,
     eventIdField,
+    analyticsEventIdField,
+    analyticsTicketTypeIdField,
     ticketNameField,
     ticketPriceField,
     ticketTypeIdField,
@@ -961,6 +1106,7 @@ export const ticketProps: INodeProperties[] = [
     ticketAdditionalFields,
     ticketGetAdditionalFields,
     ticketCreateAdditionalFields,
+    ticketAnalyticsAdditionalFields,
     ticketUpdateFields,
     ticketUpdateAdditionalFields,
     bulkUpdateAdditionalFields,

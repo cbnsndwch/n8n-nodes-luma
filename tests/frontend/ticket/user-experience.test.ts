@@ -287,4 +287,56 @@ describe('Ticket Frontend User Experience', () => {
             });
         });
     });
+
+    describe('Ticket Analytics User Experience', () => {
+        it('should have analytics operation with clear labeling', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            const operationField = ticketProps.find(
+                prop => prop.name === 'operation'
+            );
+            expect(operationField).toBeDefined();
+
+            const analyticsOption = operationField?.options?.find(
+                (option: any) => option.value === 'analytics'
+            );
+            expect(analyticsOption).toBeDefined();
+            expect(analyticsOption?.name).toBe('Get Ticket Analytics');
+            expect(analyticsOption?.action).toBe('Get ticket analytics');
+        });
+
+        it('should have user-friendly analytics parameter fields', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check analytics additional fields
+            const analyticsAdditionalFields = ticketProps.find(
+                prop =>
+                    prop.name === 'additionalFields' &&
+                    prop.displayOptions?.show?.operation?.includes('analytics')
+            );
+            expect(analyticsAdditionalFields).toBeDefined();
+            expect(analyticsAdditionalFields?.displayName).toBe(
+                'Additional Fields'
+            );
+            expect(analyticsAdditionalFields?.type).toBe('collection');
+            expect(analyticsAdditionalFields?.options).toBeDefined();
+        });
+
+        it('should have proper conditional field visibility for analytics', async () => {
+            const { ticketProps } = await import(
+                '../../../dist/nodes/Luma/ticket/props.js'
+            );
+
+            // Check that analytics fields only show for analytics operation
+            const analyticsSpecificFields = ticketProps.filter(prop =>
+                prop.displayOptions?.show?.operation?.includes('analytics')
+            );
+
+            expect(analyticsSpecificFields.length).toBeGreaterThanOrEqual(3); // eventId, ticketTypeId, additionalFields
+        });
+    });
 });

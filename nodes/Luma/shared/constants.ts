@@ -50,6 +50,7 @@ export const LUMA_ENDPOINTS = {
     TICKET_TYPE_UPDATE: '/v1/event/ticket-types/update',
     TICKET_TYPE_DELETE: '/public/v1/event/ticket-types/delete',
     TICKET_TYPES_BULK_UPDATE: '/v1/event/ticket-types/bulk-update',
+    TICKET_ANALYTICS: '/public/v1/event/ticket-types/analytics',
 
     // Calendar endpoints
     CALENDAR_LIST_EVENTS: '/public/v1/calendar/list-events',
