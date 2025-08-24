@@ -1,11 +1,16 @@
 name: Test Suite
 
 on:
-  pull_request:
-    branches: [ main ]
-    types: [ opened, synchronize, reopened ]
   push:
-    branches: [ main ]
+    branches: 
+      - main
+  pull_request:
+    branches: 
+      - main
+    types: 
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   test:
@@ -13,21 +18,23 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version:
+          - 22.x
+          - 24.x
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install pnpm
+    - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:
-        package_json_file: './package.json'
+        package_json_file: ./package.json
 
     - name: Get pnpm store directory
       shell: bash
@@ -52,7 +59,7 @@ jobs:
       run: pnpm run lint
 
     - name: Check code formatting
-      run: pnpm exec prettier nodes credentials --check
+      run: pnpm run format:check
 
     - name: Run test suite with coverage
       run: pnpm run test:coverage

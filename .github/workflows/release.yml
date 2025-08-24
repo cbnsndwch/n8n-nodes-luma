@@ -2,28 +2,28 @@ name: Release to npm
 
 on:
   push:
-    tags: ['v*.*.*']
+    tags: 
+      - 'v*.*.*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: ${{ matrix.node-version }}
           
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
-          
+          package_json_file: ./package.json
+
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -70,8 +70,10 @@ jobs:
           echo "✅ Package contents validated successfully"
         
       - name: Validate npm authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "🔐 Validating npm authentication..."
+          echo "🔐 Validating npmjs authentication..."
           if [ -z "$NODE_AUTH_TOKEN" ]; then
             echo "❌ NPM_TOKEN secret is not set. Please configure the NPM_TOKEN secret in repository settings."
             echo "💡 Go to: Repository Settings > Secrets and Variables > Actions > New repository secret"
@@ -80,25 +82,23 @@ jobs:
             exit 1
           fi
           
-          # Test npm authentication by checking whoami
-          npm whoami || {
-            echo "❌ npm authentication failed. The NPM_TOKEN may be invalid or expired."
-            echo "💡 Please verify your npm token has the following permissions:"
+          # Test npmjs authentication by checking whoami
+          CURRENT_USER=$(pnpm whoami) 
+          if [ -z "$CURRENT_USER" ]; then
+            echo "❌ npmjs authentication failed. The NPM_TOKEN may be invalid or expired."
+            echo "💡 Please verify your npmjs token has the following permissions:"
             echo "   - Read and write access to packages"
             echo "   - Automation scope (if available)"
             echo "💡 Generate a new token at: https://www.npmjs.com/settings/tokens"
             echo "💡 Then update the NPM_TOKEN secret in repository settings"
             exit 1
-          }
-          
-          CURRENT_USER=$(npm whoami)
-          echo "✅ npm authentication successful as user: $CURRENT_USER"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          fi
+                
+          echo "✅ npmjs authentication successful as user: $CURRENT_USER"
         
-      - name: Publish to npm
+      - name: Publish to npmjs
         run: |
-          echo "🚀 Publishing package to npm..."
+          echo "🚀 Publishing package to npmjs..."
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           
