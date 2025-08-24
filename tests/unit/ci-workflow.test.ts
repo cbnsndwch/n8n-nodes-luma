@@ -175,4 +175,111 @@ describe('CI Workflow Tests', () => {
             );
         });
     });
+
+    describe('Code Quality Checks', () => {
+        it('should include development linting step', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const lintStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Lint code (development rules)'
+            );
+            expect(lintStep).toBeDefined();
+            expect(lintStep.run).toContain('pnpm run lint');
+        });
+
+        it('should include format check step', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const formatStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Format check'
+            );
+            expect(formatStep).toBeDefined();
+            expect(formatStep.run).toContain('prettier');
+            expect(formatStep.run).toContain('--check');
+        });
+
+        it('should include prepublish linting step', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const prepublishLintStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Lint code (prepublish rules)'
+            );
+            expect(prepublishLintStep).toBeDefined();
+            expect(prepublishLintStep.run).toContain(
+                'eslint -c .eslintrc.prepublish.js'
+            );
+        });
+
+        it('should have code quality steps after build validation and before tests', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+            const steps = workflow.jobs.test.steps;
+
+            const buildValidationIndex = steps.findIndex(
+                (step: any) => step.name === 'Validate build artifacts'
+            );
+            const devLintIndex = steps.findIndex(
+                (step: any) => step.name === 'Lint code (development rules)'
+            );
+            const formatCheckIndex = steps.findIndex(
+                (step: any) => step.name === 'Format check'
+            );
+            const prepublishLintIndex = steps.findIndex(
+                (step: any) => step.name === 'Lint code (prepublish rules)'
+            );
+            const runTestsIndex = steps.findIndex(
+                (step: any) => step.name === 'Run tests'
+            );
+
+            // All steps should exist
+            expect(buildValidationIndex).toBeGreaterThan(-1);
+            expect(devLintIndex).toBeGreaterThan(-1);
+            expect(formatCheckIndex).toBeGreaterThan(-1);
+            expect(prepublishLintIndex).toBeGreaterThan(-1);
+            expect(runTestsIndex).toBeGreaterThan(-1);
+
+            // Code quality steps should be after build validation
+            expect(devLintIndex).toBeGreaterThan(buildValidationIndex);
+            expect(formatCheckIndex).toBeGreaterThan(buildValidationIndex);
+            expect(prepublishLintIndex).toBeGreaterThan(buildValidationIndex);
+
+            // Code quality steps should be before tests
+            expect(runTestsIndex).toBeGreaterThan(devLintIndex);
+            expect(runTestsIndex).toBeGreaterThan(formatCheckIndex);
+            expect(runTestsIndex).toBeGreaterThan(prepublishLintIndex);
+        });
+
+        it('should have proper error handling in code quality steps', () => {
+            const content = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
+            const workflow = parse(content);
+
+            const devLintStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Lint code (development rules)'
+            );
+            const formatStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Format check'
+            );
+            const prepublishLintStep = workflow.jobs.test.steps.find(
+                (step: any) => step.name === 'Lint code (prepublish rules)'
+            );
+
+            // All steps should have error handling with exit 1
+            expect(devLintStep.run).toContain('exit 1');
+            expect(formatStep.run).toContain('exit 1');
+            expect(prepublishLintStep.run).toContain('exit 1');
+        });
+
+        it('should have required linting commands available in package.json', () => {
+            const packageContent = fs.readFileSync('package.json', 'utf8');
+            const packageJson = JSON.parse(packageContent);
+
+            expect(packageJson.scripts).toBeDefined();
+            expect(packageJson.scripts.lint).toBe(
+                'eslint nodes credentials package.json'
+            );
+            expect(packageJson.scripts.format).toBe(
+                'prettier nodes credentials tests --write'
+            );
+        });
+    });
 });
