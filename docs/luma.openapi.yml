@@ -12,294 +12,6 @@ servers:
   - url: https://public-api.lu.ma
     description: Production server
 paths:
-  /public/v1/event/get:
-    get:
-      tags:
-        - Events
-      summary: Get Event
-      parameters:
-        - name: api_id
-          in: query
-          required: true
-          schema:
-            type: string
-      description: Return admin information about an event that you have manage access for.
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPublicV1EventGetResponseSchema'
-  /public/v1/calendar/list-events:
-    get:
-      tags:
-        - Calendars
-      summary: List Events
-      parameters:
-        - name: before
-          in: query
-          required: false
-          schema:
-            description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
-            type: string
-            format: date-time
-            pattern: >-
-              ^((\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\d|3[01])|(0[469]|11)-(0[1-9]|[12]\d|30)|(02)-(0[1-9]|1\d|2[0-8])))T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d+)?(Z|([+-]\d{2}:?\d{2}))$
-          description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
-        - name: after
-          in: query
-          required: false
-          schema:
-            description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
-            type: string
-            format: date-time
-            pattern: >-
-              ^((\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\d|3[01])|(0[469]|11)-(0[1-9]|[12]\d|30)|(02)-(0[1-9]|1\d|2[0-8])))T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d+)?(Z|([+-]\d{2}:?\d{2}))$
-          description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
-        - name: sort_direction
-          in: query
-          required: false
-          schema:
-            enum:
-              - asc
-              - desc
-              - asc nulls last
-              - desc nulls last
-            type: string
-        - name: sort_column
-          in: query
-          required: false
-          schema:
-            enum:
-              - start_at
-            type: string
-        - name: pagination_cursor
-          in: query
-          required: false
-          schema:
-            description: Value of `next_cursor` from a previous request.
-            type: string
-          description: Value of `next_cursor` from a previous request.
-        - name: pagination_limit
-          in: query
-          required: false
-          schema:
-            description: >-
-              The number of items to return. The server will enforce a maximum
-              number.
-            type: number
-          description: >-
-            The number of items to return. The server will enforce a maximum
-            number.
-      description: >-
-        Every event and API key on Luma is managed by a [Luma
-        Calendar](https://help.lu.ma/p/helpart-hJI2JawEcFaH6he/luma-calendar-overview).
-        You can list all of the events managed by your Calendar by using this
-        API route.
-
-
-        Note that this API route will not list events that are listed on the
-        Calendar but not managed by the Calendar.
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/GetPublicV1CalendarListEventsResponseSchema
-  /public/v1/event/get-guest:
-    get:
-      tags:
-        - Events
-      summary: Get Guest
-      parameters:
-        - name: event_api_id
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: api_id
-          in: query
-          required: false
-          schema:
-            description: This is the API ID of the guest (not the user).
-            type: string
-          description: This is the API ID of the guest (not the user).
-        - name: email
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: proxy_key
-          in: query
-          required: false
-          schema:
-            description: In the check in QR code, this is the value of the `pk` parameter.
-            type: string
-          description: In the check in QR code, this is the value of the `pk` parameter.
-      description: Get a guest by their Guest API ID, email or Proxy Key.
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPublicV1EventGetGuestResponseSchema'
-  /public/v1/event/get-guests:
-    get:
-      tags:
-        - Events
-      summary: Get Guests
-      parameters:
-        - name: event_api_id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: approval_status
-          in: query
-          required: false
-          schema:
-            enum:
-              - approved
-              - session
-              - pending_approval
-              - invited
-              - declined
-              - waitlist
-            type: string
-        - name: sort_direction
-          in: query
-          required: false
-          schema:
-            enum:
-              - asc
-              - desc
-              - asc nulls last
-              - desc nulls last
-            type: string
-        - name: sort_column
-          in: query
-          required: false
-          schema:
-            enum:
-              - name
-              - email
-              - created_at
-              - registered_at
-              - checked_in_at
-            type: string
-        - name: pagination_cursor
-          in: query
-          required: false
-          schema:
-            description: Value of `next_cursor` from a previous request.
-            type: string
-          description: Value of `next_cursor` from a previous request.
-        - name: pagination_limit
-          in: query
-          required: false
-          schema:
-            description: >-
-              The number of items to return. The server will enforce a maximum
-              number.
-            type: number
-          description: >-
-            The number of items to return. The server will enforce a maximum
-            number.
-      description: Get list of guests who have registered or been invited to an event.
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPublicV1EventGetGuestsResponseSchema'
-  /public/v1/user/get-self:
-    get:
-      tags:
-        - Miscellaneous
-      summary: Get Self
-      parameters: []
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPublicV1UserGetSelfResponseSchema'
-  /public/v1/calendar/list-person-tags:
-    get:
-      tags:
-        - Calendars
-      summary: List Person Tags
-      parameters:
-        - name: sort_direction
-          in: query
-          required: false
-          schema:
-            enum:
-              - asc
-              - desc
-              - asc nulls last
-              - desc nulls last
-            type: string
-        - name: sort_column
-          in: query
-          required: false
-          schema:
-            enum:
-              - name
-              - color
-              - created_at
-            type: string
-        - name: pagination_cursor
-          in: query
-          required: false
-          schema:
-            description: Value of `next_cursor` from a previous request.
-            type: string
-          description: Value of `next_cursor` from a previous request.
-        - name: pagination_limit
-          in: query
-          required: false
-          schema:
-            description: >-
-              The number of items to return. The server will enforce a maximum
-              number.
-            type: number
-          description: >-
-            The number of items to return. The server will enforce a maximum
-            number.
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/GetPublicV1CalendarListPersonTagsResponseSchema
-  /public/v1/entity/lookup:
-    get:
-      tags:
-        - Miscellaneous
-      summary: Lookup Entity
-      parameters:
-        - name: slug
-          in: query
-          required: true
-          schema:
-            type: string
-      description: Lookup an entity on Luma by it's slug.
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPublicV1EntityLookupResponseSchema'
   /public/v1/calendar/lookup-event:
     get:
       tags:
@@ -409,43 +121,6 @@ paths:
               schema:
                 $ref: >-
                   #/components/schemas/GetPublicV1CalendarListPeopleResponseSchema
-  /public/v1/event/coupons:
-    get:
-      tags:
-        - Events
-      summary: List Event Coupons
-      parameters:
-        - name: event_api_id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: pagination_cursor
-          in: query
-          required: false
-          schema:
-            description: Value of `next_cursor` from a previous request.
-            type: string
-          description: Value of `next_cursor` from a previous request.
-        - name: pagination_limit
-          in: query
-          required: false
-          schema:
-            description: >-
-              The number of items to return. The server will enforce a maximum
-              number.
-            type: number
-          description: >-
-            The number of items to return. The server will enforce a maximum
-            number.
-      description: List all coupons that have been created for an event..
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPublicV1EventCouponsResponseSchema'
   /public/v1/calendar/coupons:
     get:
       tags:
@@ -478,6 +153,430 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetPublicV1CalendarCouponsResponseSchema'
+  /public/v1/calendar/list-events:
+    get:
+      tags:
+        - Calendars
+      summary: List Events
+      parameters:
+        - name: before
+          in: query
+          required: false
+          schema:
+            description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
+            type: string
+            format: date-time
+            pattern: >-
+              ^((\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\d|3[01])|(0[469]|11)-(0[1-9]|[12]\d|30)|(02)-(0[1-9]|1\d|2[0-8])))T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d+)?(Z|([+-]\d{2}:?\d{2}))$
+          description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
+        - name: after
+          in: query
+          required: false
+          schema:
+            description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
+            type: string
+            format: date-time
+            pattern: >-
+              ^((\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\d|3[01])|(0[469]|11)-(0[1-9]|[12]\d|30)|(02)-(0[1-9]|1\d|2[0-8])))T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d+)?(Z|([+-]\d{2}:?\d{2}))$
+          description: ISO 8601 Datetime. For example, 2022-10-19T03:27:13.673Z
+        - name: sort_direction
+          in: query
+          required: false
+          schema:
+            enum:
+              - asc
+              - desc
+              - asc nulls last
+              - desc nulls last
+            type: string
+        - name: sort_column
+          in: query
+          required: false
+          schema:
+            enum:
+              - start_at
+            type: string
+        - name: pagination_cursor
+          in: query
+          required: false
+          schema:
+            description: Value of `next_cursor` from a previous request.
+            type: string
+          description: Value of `next_cursor` from a previous request.
+        - name: pagination_limit
+          in: query
+          required: false
+          schema:
+            description: >-
+              The number of items to return. The server will enforce a maximum
+              number.
+            type: number
+          description: >-
+            The number of items to return. The server will enforce a maximum
+            number.
+      description: >-
+        Every event and API key on Luma is managed by a [Luma
+        Calendar](https://help.lu.ma/p/helpart-hJI2JawEcFaH6he/luma-calendar-overview).
+        You can list all of the events managed by your Calendar by using this
+        API route.
+
+
+        Note that this API route will not list events that are listed on the
+        Calendar but not managed by the Calendar.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/GetPublicV1CalendarListEventsResponseSchema
+  /public/v1/calendar/coupons/create:
+    post:
+      tags:
+        - Calendars
+      summary: Create Coupon
+      description: >-
+        Create a coupon that can be applied to any event that is managed by the
+        calendar. Be careful not to have the same code on an event and on the
+        calendar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/PostPublicV1CalendarCouponsCreateRequestSchema
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/PostPublicV1CalendarCouponsCreateResponseSchema
+  /public/v1/calendar/coupons/update:
+    post:
+      tags:
+        - Calendars
+      summary: Update Coupon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/PostPublicV1CalendarCouponsUpdateRequestSchema
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/PostPublicV1CalendarCouponsUpdateResponseSchema
+  /public/v1/calendar/import-people:
+    post:
+      tags:
+        - Calendars
+      summary: Import People
+      description: >-
+        Import people to your calendar to easily invite them to events and send
+        them newsletters.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/PostPublicV1CalendarImportPeopleRequestSchema
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/PostPublicV1CalendarImportPeopleResponseSchema
+  /public/v1/calendar/create-person-tag:
+    post:
+      tags:
+        - Calendars
+      summary: Create Person Tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/PostPublicV1CalendarCreatePersonTagRequestSchema
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/PostPublicV1CalendarCreatePersonTagResponseSchema
+  /public/v1/calendar/update-person-tag:
+    post:
+      tags:
+        - Calendars
+      summary: Update Person Tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/PostPublicV1CalendarUpdatePersonTagRequestSchema
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/PostPublicV1CalendarUpdatePersonTagResponseSchema
+  /public/v1/calendar/delete-person-tag:
+    post:
+      tags:
+        - Calendars
+      summary: Delete Person Tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/PostPublicV1CalendarDeletePersonTagRequestSchema
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/PostPublicV1CalendarDeletePersonTagResponseSchema
+  /public/v1/calendar/add-event:
+    post:
+      tags:
+        - Calendars
+      summary: Add Event
+      description: >-
+        Add an existing event (on Luma or on an external platform) to the Luma
+        calendar. This will _not_ make the event managed by the calendar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostPublicV1CalendarAddEventRequestSchema'
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/PostPublicV1CalendarAddEventResponseSchema
+  /public/v1/calendar/list-person-tags:
+    get:
+      tags:
+        - Calendars
+      summary: List Person Tags
+      parameters:
+        - name: sort_direction
+          in: query
+          required: false
+          schema:
+            enum:
+              - asc
+              - desc
+              - asc nulls last
+              - desc nulls last
+            type: string
+        - name: sort_column
+          in: query
+          required: false
+          schema:
+            enum:
+              - name
+              - color
+              - created_at
+            type: string
+        - name: pagination_cursor
+          in: query
+          required: false
+          schema:
+            description: Value of `next_cursor` from a previous request.
+            type: string
+          description: Value of `next_cursor` from a previous request.
+        - name: pagination_limit
+          in: query
+          required: false
+          schema:
+            description: >-
+              The number of items to return. The server will enforce a maximum
+              number.
+            type: number
+          description: >-
+            The number of items to return. The server will enforce a maximum
+            number.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/GetPublicV1CalendarListPersonTagsResponseSchema
+  /public/v1/entity/lookup:
+    get:
+      tags:
+        - Miscellaneous
+      summary: Lookup Entity
+      parameters:
+        - name: slug
+          in: query
+          required: true
+          schema:
+            type: string
+      description: Lookup an entity on Luma by it's slug.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPublicV1EntityLookupResponseSchema'
+  /public/v1/event/get:
+    get:
+      tags:
+        - Events
+      summary: Get Event
+      parameters:
+        - name: api_id
+          in: query
+          required: true
+          schema:
+            type: string
+      description: Return admin information about an event that you have manage access for.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPublicV1EventGetResponseSchema'
+  /public/v1/event/get-guest:
+    get:
+      tags:
+        - Events
+      summary: Get Guest
+      parameters:
+        - name: event_api_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: api_id
+          in: query
+          required: false
+          schema:
+            description: This is the API ID of the guest (not the user).
+            type: string
+          description: This is the API ID of the guest (not the user).
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: proxy_key
+          in: query
+          required: false
+          schema:
+            description: In the check in QR code, this is the value of the `pk` parameter.
+            type: string
+          description: In the check in QR code, this is the value of the `pk` parameter.
+      description: Get a guest by their Guest API ID, email or Proxy Key.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPublicV1EventGetGuestResponseSchema'
+  /public/v1/event/get-guests:
+    get:
+      tags:
+        - Events
+      summary: Get Guests
+      parameters:
+        - name: event_api_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: approval_status
+          in: query
+          required: false
+          schema:
+            enum:
+              - approved
+              - session
+              - pending_approval
+              - invited
+              - declined
+              - waitlist
+            type: string
+        - name: sort_direction
+          in: query
+          required: false
+          schema:
+            enum:
+              - asc
+              - desc
+              - asc nulls last
+              - desc nulls last
+            type: string
+        - name: sort_column
+          in: query
+          required: false
+          schema:
+            enum:
+              - name
+              - email
+              - created_at
+              - registered_at
+              - checked_in_at
+            type: string
+        - name: pagination_cursor
+          in: query
+          required: false
+          schema:
+            description: Value of `next_cursor` from a previous request.
+            type: string
+          description: Value of `next_cursor` from a previous request.
+        - name: pagination_limit
+          in: query
+          required: false
+          schema:
+            description: >-
+              The number of items to return. The server will enforce a maximum
+              number.
+            type: number
+          description: >-
+            The number of items to return. The server will enforce a maximum
+            number.
+      description: Get list of guests who have registered or been invited to an event.
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPublicV1EventGetGuestsResponseSchema'
   /public/v1/event/create:
     post:
       tags:
@@ -639,155 +738,43 @@ paths:
               schema:
                 $ref: >-
                   #/components/schemas/PostPublicV1EventUpdateCouponResponseSchema
-  /public/v1/calendar/coupons/create:
-    post:
+  /public/v1/event/coupons:
+    get:
       tags:
-        - Calendars
-      summary: Create Coupon
-      description: >-
-        Create a coupon that can be applied to any event that is managed by the
-        calendar. Be careful not to have the same code on an event and on the
-        calendar.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: >-
-                #/components/schemas/PostPublicV1CalendarCouponsCreateRequestSchema
+        - Events
+      summary: List Event Coupons
+      parameters:
+        - name: event_api_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pagination_cursor
+          in: query
+          required: false
+          schema:
+            description: Value of `next_cursor` from a previous request.
+            type: string
+          description: Value of `next_cursor` from a previous request.
+        - name: pagination_limit
+          in: query
+          required: false
+          schema:
+            description: >-
+              The number of items to return. The server will enforce a maximum
+              number.
+            type: number
+          description: >-
+            The number of items to return. The server will enforce a maximum
+            number.
+      description: List all coupons that have been created for an event..
       responses:
         '200':
           description: Successful response.
           content:
             application/json:
               schema:
-                $ref: >-
-                  #/components/schemas/PostPublicV1CalendarCouponsCreateResponseSchema
-  /public/v1/calendar/coupons/update:
-    post:
-      tags:
-        - Calendars
-      summary: Update Coupon
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: >-
-                #/components/schemas/PostPublicV1CalendarCouponsUpdateRequestSchema
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/PostPublicV1CalendarCouponsUpdateResponseSchema
-  /public/v1/calendar/import-people:
-    post:
-      tags:
-        - Calendars
-      summary: Import People
-      description: >-
-        Import people to your calendar to easily invite them to events and send
-        them newsletters.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: >-
-                #/components/schemas/PostPublicV1CalendarImportPeopleRequestSchema
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/PostPublicV1CalendarImportPeopleResponseSchema
-  /public/v1/calendar/create-person-tag:
-    post:
-      tags:
-        - Calendars
-      summary: Create Person Tag
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: >-
-                #/components/schemas/PostPublicV1CalendarCreatePersonTagRequestSchema
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/PostPublicV1CalendarCreatePersonTagResponseSchema
-  /public/v1/calendar/update-person-tag:
-    post:
-      tags:
-        - Calendars
-      summary: Update Person Tag
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: >-
-                #/components/schemas/PostPublicV1CalendarUpdatePersonTagRequestSchema
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/PostPublicV1CalendarUpdatePersonTagResponseSchema
-  /public/v1/calendar/delete-person-tag:
-    post:
-      tags:
-        - Calendars
-      summary: Delete Person Tag
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: >-
-                #/components/schemas/PostPublicV1CalendarDeletePersonTagRequestSchema
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/PostPublicV1CalendarDeletePersonTagResponseSchema
-  /public/v1/calendar/add-event:
-    post:
-      tags:
-        - Calendars
-      summary: Add Event
-      description: >-
-        Add an existing event (on Luma or on an external platform) to the Luma
-        calendar. This will _not_ make the event managed by the calendar.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PostPublicV1CalendarAddEventRequestSchema'
-      responses:
-        '200':
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: >-
-                  #/components/schemas/PostPublicV1CalendarAddEventResponseSchema
+                $ref: '#/components/schemas/GetPublicV1EventCouponsResponseSchema'
   /public/v1/images/create-upload-url:
     post:
       tags:
@@ -808,6 +795,19 @@ paths:
               schema:
                 $ref: >-
                   #/components/schemas/PostPublicV1ImagesCreateUploadUrlResponseSchema
+  /public/v1/user/get-self:
+    get:
+      tags:
+        - Miscellaneous
+      summary: Get Self
+      parameters: []
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPublicV1UserGetSelfResponseSchema'
 security:
   - apiKeyAuth: []
 components:
