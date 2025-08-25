@@ -23,9 +23,7 @@ To use this node, you'll need to configure your Luma API credentials:
 2. In n8n, create new credentials of type "Luma API"
 3. Enter your API key
 
-## Development
-
-To set up development environment:
+### Development Commands
 
 ```bash
 # Install dependencies
@@ -42,33 +40,63 @@ pnpm run lint
 
 # Format the code
 pnpm run format
+
+# Run tests
+pnpm run test
+
+# Validate commit message (for last commit)
+pnpm run commitlint
 ```
+
+For detailed contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Release Process (Maintainers)
 
-This package uses automated GitHub workflows for releasing. To set up npm authentication:
+This package uses automated semantic versioning and GitHub workflows for releasing.
 
-### npm Token Setup
+### Automated Semantic Versioning
 
-1. **Generate npm token**:
-   ```bash
-   npm login  # If not already logged in
-   npm token create --read-only=false --cidr-whitelist=0.0.0.0/0
-   ```
+Releases are automated using semantic-release based on conventional commit messages:
 
-2. **Configure GitHub Secret**:
-   - Go to **Repository Settings > Secrets and Variables > Actions**
-   - Add new secret named `NPM_TOKEN`
-   - Use the token value from step 1
+- **feat**: New feature (minor version bump)
+- **fix**: Bug fix (patch version bump)  
+- **BREAKING CHANGE**: Breaking change (major version bump)
+- **docs**, **style**, **refactor**, **test**, **chore**: No version bump
 
-### Release Process
+### Commit Message Format
 
-1. **Create a GitHub release** with semantic version tag (e.g., `v1.0.0`)
-2. **Automated workflow** handles:
-   - Build validation
-   - npm authentication verification  
-   - Package publishing
-   - Publication verification
+Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+**Examples:**
+```bash
+feat(event): add support for recurring events
+fix(credentials): correct API key validation
+docs(readme): update installation instructions
+feat(luma): add new operation
+
+BREAKING CHANGE: API authentication method changed
+```
+
+### Release Workflow
+
+1. **Push commits** to `main` branch with conventional commit messages
+2. **Automated process** handles:
+   - Version determination based on commit messages
+   - Package.json version update
+   - Changelog generation
+   - Git tag creation
+   - GitHub release creation
+   - npm package publishing
+
+No manual version bumping or tagging required!
 
 ### Token Management
 
