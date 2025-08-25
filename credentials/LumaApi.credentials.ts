@@ -1,9 +1,11 @@
-import {
+import type {
     IAuthenticateGeneric,
+    Icon,
     ICredentialTestRequest,
     ICredentialType,
     INodeProperties
 } from 'n8n-workflow';
+
 import {
     LUMA_API_BASE_URL,
     LUMA_ENDPOINTS
@@ -11,8 +13,10 @@ import {
 
 export class LumaApi implements ICredentialType {
     name = 'lumaApi';
+
     displayName = 'Luma API';
-    // Note: credentials don't support icon property in the same way as nodes
+
+    icon: Icon = 'file:icons/lumaApi.svg';
 
     documentationUrl = 'https://docs.lu.ma/api/getting-started';
 
