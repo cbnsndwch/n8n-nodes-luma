@@ -106,12 +106,7 @@ For false positives or accepted risks, vulnerabilities can be ignored by:
 
 1. **Adding to security policy**:
    ```json
-   "ignoredVulnerabilities": ["CVE-2023-12345"]
-   ```
-
-2. **Using pnpm audit ignore**:
-   ```bash
-   pnpm audit --ignore CVE-2023-12345
+   "ignoredVulnerabilities": ["CVE-XXXX-EXAMPLE"] // Example CVE, replace with real CVE as needed
    ```
 
 ## Security Workflow Results
