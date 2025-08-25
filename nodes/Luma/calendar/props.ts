@@ -1,17 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-import { idField } from '../shared/props';
 import { forceDeleteField } from '../shared/props/common.props';
-
-const calendarIdField = idField(
-    'Calendar ID',
-    'calendarId',
-    'The ID of the calendar',
-    {
-        resource: ['event'],
-        operation: ['getMany', 'create']
-    }
-);
 
 const calendarOperations: INodeProperties = {
     displayName: 'Operation',
@@ -958,7 +947,6 @@ const updateCouponFields: INodeProperties = {
 
 export const calendarProps = [
     calendarOperations,
-    calendarIdField,
     calendarApiIdField,
     deleteTagApiIdField,
     addEventApiIdField,

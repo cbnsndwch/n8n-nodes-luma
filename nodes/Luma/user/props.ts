@@ -1,21 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-// User resource parameter descriptions
-
-const userResource: INodeProperties = {
-    displayName: 'Resource',
-    name: 'resource',
-    type: 'options',
-    noDataExpression: true,
-    options: [
-        {
-            name: 'User',
-            value: 'user'
-        }
-    ],
-    default: 'user'
-};
-
 const userOperations: INodeProperties = {
     displayName: 'Operation',
     name: 'operation',
@@ -55,4 +39,4 @@ const userAdditionalFields: INodeProperties = {
     ]
 };
 
-export const userProps = [userResource, userOperations, userAdditionalFields];
+export const userProps = [userOperations, userAdditionalFields];

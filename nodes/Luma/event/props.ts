@@ -61,7 +61,7 @@ const eventOperations: INodeProperties = {
         {
             name: 'List Events',
             value: 'getMany',
-            action: 'Get many events'
+            action: 'List events'
         },
         {
             name: 'Update',
@@ -91,6 +91,16 @@ const eventIdField = idField('Event ID', 'eventId', 'The ID of the event', {
         'updateCoupon'
     ]
 });
+
+const eventCalendarIdField = idField(
+    'Calendar ID',
+    'calendarId',
+    'The ID of the calendar',
+    {
+        resource: ['event'],
+        operation: ['getMany', 'create']
+    }
+);
 
 const eventNameField: INodeProperties = {
     displayName: 'Event Name',
@@ -635,6 +645,7 @@ const updateCouponFields: INodeProperties = {
 
 export const eventProps = [
     eventOperations,
+    eventCalendarIdField,
     eventIdField,
     eventNameField,
     eventDescriptionField,
@@ -644,6 +655,6 @@ export const eventProps = [
     discountTypeField,
     discountValueField,
     couponIdField,
-    eventAdditionalFields,
-    updateCouponFields
+    updateCouponFields,
+    eventAdditionalFields
 ];
