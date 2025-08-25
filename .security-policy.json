@@ -1,0 +1,25 @@
+{
+  "auditLevel": "high",
+  "allowedLicenses": [
+    "MIT",
+    "Apache-2.0",
+    "BSD",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "CC0-1.0",
+    "Unlicense",
+    "Custom: https://user-images.githubusercontent.com/65276001/173571060-9f2f6d7b-bac0-43b6-bdb2-001da9694058.png"
+  ],
+  "ignoredVulnerabilities": [],
+  "ignoreDevDependencies": false,
+  "failOnVulnerabilities": true,
+  "failOnLicenseViolations": true,
+  "excludePackages": [
+    "unknown@0.0.0"
+  ],
+  "allowedPackages": [
+    "n8n-workflow"
+  ],
+  "description": "Security policy configuration for n8n-nodes-luma package. This file defines the security scanning rules used during CI/CD pipeline. n8n-workflow is explicitly allowed due to its Sustainable Use License which is required for n8n community nodes."
+}

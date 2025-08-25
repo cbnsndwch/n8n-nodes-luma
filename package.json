@@ -43,7 +43,12 @@
         "n8n": "pnpm run build && pnpm run n8n:link && pnpm run n8n:start",
         "n8n:dev": "concurrently \"pnpm run dev\" \"tsx .n8n/scripts/watch.ts\"",
         "n8n:help": "tsx .n8n/scripts/help.ts",
-        "n8n:watch": "tsx .n8n/scripts/watch.ts"
+        "n8n:watch": "tsx .n8n/scripts/watch.ts",
+        "security:audit": "pnpm audit --audit-level high",
+        "security:audit:fix": "pnpm audit --fix",
+        "security:license": "npx license-checker --summary --onlyAllow \"MIT;Apache-2.0;BSD;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;Custom: https://user-images.githubusercontent.com/65276001/173571060-9f2f6d7b-bac0-43b6-bdb2-001da9694058.png\" --excludePackages \"unknown@0.0.0\"",
+        "security:check": "pnpm run security:audit && pnpm run security:license",
+        "prepublish": "pnpm run security:check && pnpm run prepublishOnly"
     },
     "files": [
         "dist"
